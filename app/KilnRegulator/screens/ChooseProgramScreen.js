@@ -1,6 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Button} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
+import ProgramList from "../components/ProgramList";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -11,7 +12,20 @@ class ChooseProgramScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>ChooseProgramScreen</Text>
+                <View style={{flex: 1}}>
+                    <Text>ChooseProgramScreen</Text>
+                </View>
+                <View style={{flex: 6, backgroundColor: 'skyblue'}}>
+                    <ProgramList/>
+                </View>
+                <View style={{flex: 2} && styles.buttons}>
+                    <View style={styles.button}>
+                        <Button title={"Créer une nouvelle cuisson"} onPress={() => {}}/>
+                    </View>
+                    <View style={styles.button}>
+                        <Button title={"Lancer la cuisson"} onPress={() => {}}/>
+                    </View>
+                </View>
             </View>
         );
     }
@@ -22,8 +36,16 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f2f2f2',
         justifyContent: 'center',
-        alignItems: "center"
+        alignItems: "stretch",
+
+        flexDirection: 'column',
     },
+    buttons: {
+        alignItems: "center",
+    },
+    button: {
+        padding: 10,
+    }
 });
 
 export default ChooseProgramScreen;
