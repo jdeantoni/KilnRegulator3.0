@@ -23,7 +23,7 @@ class ChooseProgramScreen extends React.Component {
                         <Button title={"Créer une nouvelle cuisson"} onPress={() => {}}/>
                     </View>
                     <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => {}}/>
+                        <Button title={"Lancer la cuisson"} onPress={() => {this.props.navigation.navigate("TrackingCooking")}}/>
                     </View>
                 </View>
             </View>
