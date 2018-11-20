@@ -48,7 +48,7 @@
      * @type {String}
      * @default https://petstore.swagger.io
      */
-    this.basePath = 'http://10.212.100.10:8080'.replace(/\/+$/, '');
+    this.basePath = 'http://10.212.100.10:3000'.replace(/\/+$/, '');
 
     /**
      * The authentication methods to be included for all API calls.
