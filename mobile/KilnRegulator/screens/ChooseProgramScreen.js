@@ -1,13 +1,19 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
+import {View, Text, StyleSheet, Button, Alert} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
+import {ActionAPI} from "../network/APIClient";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'ChooseProgramScreen',
         headerLeft: displayHamburger(navigation),
     });
+
+    constructor(props) {
+        super(props);
+        this.actionAPI = new ActionAPI();
+    }
 
     render() {
         return (
@@ -23,11 +29,29 @@ class ChooseProgramScreen extends React.Component {
                         <Button title={"Créer une nouvelle cuisson"} onPress={() => {}}/>
                     </View>
                     <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => {this.props.navigation.navigate("TrackingCooking")}}/>
+                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()}/>
                     </View>
                 </View>
             </View>
         );
+    }
+
+    launchCooking() {
+        this.actionAPI.startCooking()
+            .then((response) => {
+                if (response.status === 200) {
+                    Alert.alert("Démarrage de la cuisson", "Êtes-vous sûr de vouloir lancer le processus de cuisson ?",
+                        [
+                            {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                            {text: 'Oui', onPress: () => this.props.navigation.navigate("TrackingCooking")},
+                        ]);
+                }
+                else throw new Error("HTTP response status not code 200 as expected.");
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Connexion réseau échouée")
+            });
     }
 }
 
