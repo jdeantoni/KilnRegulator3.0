@@ -11,15 +11,32 @@ export default class ProgramItem extends React.Component {
                 </View>
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
-                        <Text style={styles.title_text}>Miaou</Text>
+                        <Text style={styles.title_text}>{program.name}</Text>
                     </View>
                     <View style={styles.description_container}>
-                        <Text style={styles.description_text}>Nyan</Text>
-                        <Text style={styles.description_text}>Myu</Text>
+                        <Text style={styles.description_text}>{program.segments.length} segments</Text>
+                        <Text style={styles.description_text}>{this.computeTime(program.segments)}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
         )
+    }
+
+    computeTime(segments) {
+        let timeInSeconds = 0;
+        segments.forEach((segment) => {
+            if (segment.hasOwnProperty("duration")) {
+                timeInSeconds += segment["duration"];
+            } else if (segment.hasOwnProperty("target") && segment.hasOwnProperty("slope")) {
+                timeInSeconds += segment["target"] / segment["slope"];
+            }
+        });
+
+        const hours = Math.floor(timeInSeconds / 3600);
+        let minutes = Math.floor((timeInSeconds - (hours * 3600)) / 60);
+        if (minutes < 10) { minutes = "0" + minutes };
+
+        return hours + "h" + minutes + "min";
     }
 }
 

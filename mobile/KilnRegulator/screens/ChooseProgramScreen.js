@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, Alert} from 'react-native';
+import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
 import {ActionAPI} from "../network/APIClient";
 
-class ChooseProgramScreen extends React.Component {
+export default class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'ChooseProgramScreen',
-        headerLeft: displayHamburger(navigation),
+        //headerLeft: displayHamburger(navigation),
     });
 
     constructor(props) {
@@ -17,8 +17,8 @@ class ChooseProgramScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={{flex: 1}}>
+            <View style={styles.main_container}>
+                <View style={styles.title}>
                     <Text>ChooseProgramScreen</Text>
                 </View>
                 <View style={{flex: 6, backgroundColor: 'skyblue'}}>
@@ -36,27 +36,46 @@ class ChooseProgramScreen extends React.Component {
         );
     }
 
-    launchCooking() {
-        this.actionAPI.startCooking()
-            .then((response) => {
-                if (response.status === 200) {
-                    Alert.alert("Démarrage de la cuisson", "Êtes-vous sûr de vouloir lancer le processus de cuisson ?",
-                        [
-                            {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                            {text: 'Oui', onPress: () => this.props.navigation.navigate("TrackingCooking")},
-                        ]);
-                }
-                else throw new Error("HTTP response status not code 200 as expected.");
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Connexion réseau échouée")
-            });
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+    }
+
+    launchCooking() {
+        Alert.alert("Démarrage de la cuisson", "Êtes-vous sûr de vouloir lancer le processus de cuisson ?",
+            [
+                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                {text: 'Oui', onPress: () =>
+                        this.actionAPI.startCooking()
+                            .then((response) => {
+                                if (response.ok) {
+                                    this.props.navigation.navigate("TrackingCooking");
+                                }
+                                else throw new Error("HTTP response status not code 200 as expected.");
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                alert("Connexion réseau échouée")
+                            })
+                },
+            ]);
+    }
+
+    handleBackPress = () => {
+        Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
+            [
+                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                {text: 'Oui', onPress: () => this.props.navigation.goBack()},
+            ]);
+        return true;
+    };
 }
 
 const styles = StyleSheet.create({
-    container: {
+    main_container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
         justifyContent: 'center',
@@ -65,11 +84,14 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     buttons: {
-        alignItems: "center",
+        alignItems: "stretch",
     },
     button: {
         padding: 10,
+    },
+    title: {
+        alignItems: 'center',
+        padding: 10,
+        fontSize: 16
     }
 });
-
-export default ChooseProgramScreen;

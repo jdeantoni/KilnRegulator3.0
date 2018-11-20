@@ -4,22 +4,12 @@ import ChooseProgramScreen from "../screens/ChooseProgramScreen";
 import FindKilnScreen from "../screens/FindKilnScreen";
 import TrackingCookingScreen from "../screens/TrackingCookingScreen";
 
-const HomeStack = createStackNavigator({
-    Home: ChooseProgramScreen
-});
-const FindKilnStack = createStackNavigator({
-    FindKiln: FindKilnScreen
-});
-const TrackingCookingStack = createStackNavigator({
-   TrackingCooking: TrackingCookingScreen
+const MainStack = createStackNavigator({
+    FindKiln: FindKilnScreen,
+    ChooseProgram: ChooseProgramScreen,
+    TrackingCooking: TrackingCookingScreen
 });
 
-const DrawerNavigator = createDrawerNavigator({
-    HomeStack,
-    FindKilnStack,
-    TrackingCookingStack,
-});
-
-const AppContainer = createAppContainer(DrawerNavigator);
+const AppContainer = createAppContainer(MainStack);
 
 export default AppContainer;

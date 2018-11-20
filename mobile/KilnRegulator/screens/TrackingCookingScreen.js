@@ -1,12 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, Alert} from 'react-native';
+import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import {ActionAPI, StatusAPI} from "../network/APIClient";
 
-class TrackingCookingScreen extends React.Component {
+export default class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'TrackingCookingScreen',
-        headerLeft: displayHamburger(navigation),
+        //headerLeft: displayHamburger(navigation),
     });
 
     constructor(props) {
@@ -16,6 +16,7 @@ class TrackingCookingScreen extends React.Component {
         };
         this.statusApi = new StatusAPI();
         this.actionApi = new ActionAPI();
+        this.getTemperature();
     }
 
     render() {
@@ -34,15 +35,25 @@ class TrackingCookingScreen extends React.Component {
         );
     }
 
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        this.interval = setInterval(() => this.getTemperature(), 5000);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+        clearInterval(this.interval);
+    }
+
     getTemperature() {
         this.statusApi.getStatus()
             .then((response) => {
-                if (response.status === 200) {
+                if (response.ok) {
                     return response.json();
                 }
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
-            .then((response) => this.setState({temperature: response.sample.temperature}))
+            .then((response) => {console.log(response); this.setState({temperature: response.sample.temperature})})
             .catch((error) => {
                 console.log(error);
                 alert("Connexion réseau échouée")
@@ -50,22 +61,33 @@ class TrackingCookingScreen extends React.Component {
     }
 
     stopCooking() {
-        this.actionApi.stopCooking()
-            .then((response) => {
-                if (response.status === 200) {
-                    Alert.alert("Arrêt de la cuisson", "Êtes-vous sûr de vouloir arrêter le processus de cuisson ?",
-                        [
-                            {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                            {text: 'Oui', onPress: () => this.props.navigation.navigate("HomeStack")},
-                        ]);
-                }
-                else throw new Error("HTTP response status not code 200 as expected.");
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Connexion réseau échouée")
-            });
+        Alert.alert("Arrêt de la cuisson", "Êtes-vous sûr de vouloir arrêter le processus de cuisson ?",
+            [
+                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                {text: 'Oui', onPress: () =>
+                        this.actionApi.stopCooking()
+                            .then((response) => {
+                                if (response.status === 200) {
+                                    this.props.navigation.navigate("ChooseProgram")
+                                }
+                                else throw new Error("HTTP response status not code 200 as expected.");
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                alert("Connexion réseau échouée")
+                            })
+                },
+            ]);
     }
+
+    handleBackPress = () => {
+        Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
+            [
+                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                {text: 'Oui', onPress: () => this.props.navigation.navigate("FindKiln")},
+            ]);
+        return true;
+    };
 }
 
 const styles = StyleSheet.create({
@@ -79,5 +101,3 @@ const styles = StyleSheet.create({
         padding: 10,
     }
 });
-
-export default TrackingCookingScreen;
