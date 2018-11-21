@@ -1,6 +1,11 @@
 import { ActionApi, DebugApi, StatusApi, ApiClient } from './jsclient';
 
 class APIClient extends ApiClient {
+    constructor(address) {
+        super();
+        this.setAddress(address);
+    }
+
     callApi(path, httpMethod, pathParams, queryParams, collectionQueryParams, headerParams, formParams,
             bodyParam, authNames, contentTypes, accepts, returnType, callback) {
         return fetch(`${this.basePath}${path}`,
@@ -11,20 +16,20 @@ class APIClient extends ApiClient {
 }
 
 class ActionAPI extends ActionApi {
-    constructor() {
-        super(new APIClient());
+    constructor(address) {
+        super(new APIClient(address));
     }
 }
 
 class DebugAPI extends DebugApi {
-    constructor() {
-        super(new APIClient());
+    constructor(address) {
+        super(new APIClient(address));
     }
 }
 
 class StatusAPI extends StatusApi {
-    constructor() {
-        super(new APIClient());
+    constructor(address) {
+        super(new APIClient(address));
     }
 }
 

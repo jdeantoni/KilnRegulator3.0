@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
 import {ActionAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 export default class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -12,7 +13,7 @@ export default class ChooseProgramScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.actionAPI = new ActionAPI();
+        this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
     }
 
     render() {
