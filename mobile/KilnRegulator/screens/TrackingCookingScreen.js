@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import {ActionAPI, StatusAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 export default class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -14,8 +15,8 @@ export default class TrackingCookingScreen extends React.Component {
         this.state = {
             temperature: 0.0
         };
-        this.statusApi = new StatusAPI();
-        this.actionApi = new ActionAPI();
+        this.statusApi = new StatusAPI(NetworkRoute.getInstance().getAddress());
+        this.actionApi = new ActionAPI(NetworkRoute.getInstance().getAddress());
         this.getTemperature();
     }
 
@@ -53,7 +54,7 @@ export default class TrackingCookingScreen extends React.Component {
                 }
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
-            .then((response) => {console.log(response); this.setState({temperature: response.sample.temperature})})
+            .then((response) => this.setState({temperature: response.sample.temperature}))
             .catch((error) => {
                 console.log(error);
                 alert("Connexion réseau échouée")

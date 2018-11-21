@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, BackHandler, Alert} from 'react-native';
+import {View, Text, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import {StatusAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 export default class FindKilnScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -11,13 +12,18 @@ export default class FindKilnScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.statusApi = new StatusAPI();
+        this.state = {
+            ip: "10.212.100.10:3000"
+        };
     }
 
     render() {
         return (
             <View style={styles.main_container}>
                 <Text>FindKilnScreen</Text>
+                <TextInput placeholder={"Adresse IP"}
+                           onChangeText={(text) => this.setState({ip: text})}
+                           value={this.state.ip}/>
                 <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>
             </View>
         );
@@ -41,6 +47,10 @@ export default class FindKilnScreen extends React.Component {
     };
 
     kilnSelected() {
+        if (this.statusApi == null) {
+            this.statusApi = new StatusAPI(this.state.ip);
+        }
+
         this.statusApi.getStatus()
             .then((response) => {
                 if (response.ok) {
@@ -49,6 +59,7 @@ export default class FindKilnScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
+                NetworkRoute.getInstance().setAddress(this.state.ip);
                 if (response.state === "ready") {
                     this.props.navigation.navigate("ChooseProgram");
                 }
