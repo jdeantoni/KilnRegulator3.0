@@ -22,6 +22,18 @@ class ArduinoKilnRegulator {
   updateState(data) {
     this.temperature = data.temperature;
   }
+
+  stop() {
+    this.arduino.write(["stop"]);
+  }
+
+  start() {
+    this.arduino.write(["start"]);
+  }
+
+  setSetpoint(setpoint) {
+    this.arduino.write(["setpoint", setpoint]);
+  }
 }
 
 module.exports = ArduinoKilnRegulator;

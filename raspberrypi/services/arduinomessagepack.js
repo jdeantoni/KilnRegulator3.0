@@ -22,7 +22,8 @@ class ArduinoMessagePack extends Arduino {
   }
 
   write(m, c) {
-    serialPort.write(msgpack.encode(m), c);
+    console.log('Sending to Arduino: ' + m);
+    this.serialPort.write(msgpack.encode(m), c);
   }
 }
 
