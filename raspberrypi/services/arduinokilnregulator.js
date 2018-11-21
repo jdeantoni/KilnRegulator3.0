@@ -1,10 +1,15 @@
 const ArduinoMessagePack = require('./arduinomessagepack');
+const StateElement = require('../model/stateElement')
+const KilnState = require('../model/kilnState')
 
 class ArduinoKilnRegulator {
   constructor(dev, baudRate) {
     this.arduino = new ArduinoMessagePack(dev, baudRate);
 
     this.temperature = 0.0;
+    this.state = "";
+    this.elementState = "";
+    this.currentSegment = -1;
   }
 
   open() {
@@ -20,6 +25,9 @@ class ArduinoKilnRegulator {
   }
 
   updateState(data) {
+    this.state = this.findStateName(data.state);
+    this.elementState = this.findElementStateName(data.elementState);
+    this.currentSegment = data.currentSegment;
     this.temperature = data.temperature;
   }
 
@@ -33,6 +41,14 @@ class ArduinoKilnRegulator {
 
   setSetpoint(setpoint) {
     this.arduino.write(["setpoint", setpoint]);
+  }
+
+  findStateName(state) {
+    return StateElement[state];
+  }
+
+  findElementStateName(state) {
+    return KilnState[state];
   }
 }
 

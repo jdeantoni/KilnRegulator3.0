@@ -14,7 +14,7 @@ exports.handler = function getStatus(req, res, next) {
   }
 
   res.send({
-    state: 'ready',
+    state: arduinoRepository[0].state,
     elementState: arduinoRepository[0].elementState,
     sample: {
       timestamp: 0,
