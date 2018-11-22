@@ -4,6 +4,7 @@ import displayHamburger from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
 import {ActionAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import { NavigationEvents } from 'react-navigation';
 
 export default class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -19,6 +20,10 @@ export default class ChooseProgramScreen extends React.Component {
     render() {
         return (
             <View style={styles.main_container}>
+                <NavigationEvents
+                    onWillFocus={() => this.addBackListener()}
+                    onWillBlur={() => this.removeBackListener()}
+                />
                 <View style={styles.title}>
                     <Text>ChooseProgramScreen</Text>
                 </View>
@@ -27,7 +32,7 @@ export default class ChooseProgramScreen extends React.Component {
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
-                        <Button title={"Créer une nouvelle cuisson"} onPress={() => {}}/>
+                        <Button title={"Créer un nouveau programme"} onPress={() => this.props.navigation.navigate("CreateProgram")}/>
                     </View>
                     <View style={styles.button}>
                         <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()}/>
@@ -37,11 +42,11 @@ export default class ChooseProgramScreen extends React.Component {
         );
     }
 
-    componentDidMount() {
+    addBackListener() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
-    componentWillUnmount() {
+    removeBackListener() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     }
 
@@ -69,7 +74,7 @@ export default class ChooseProgramScreen extends React.Component {
         Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () => this.props.navigation.goBack()},
+                {text: 'Oui', onPress: () => this.props.navigation.navigate("FindKiln")},
             ]);
         return true;
     };

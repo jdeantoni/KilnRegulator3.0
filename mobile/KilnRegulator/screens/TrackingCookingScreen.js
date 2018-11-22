@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import {ActionAPI, StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import {NavigationEvents} from "react-navigation";
 
 export default class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -23,6 +24,10 @@ export default class TrackingCookingScreen extends React.Component {
     render() {
         return (
             <View style={styles.main_container}>
+                <NavigationEvents
+                    onWillFocus={() => this.addBackListener()}
+                    onWillBlur={() => this.removeBackListener()}
+                />
                 <View style={styles.container}>
                     <Text>{this.state.temperature}°C</Text>
                 </View>
@@ -36,12 +41,12 @@ export default class TrackingCookingScreen extends React.Component {
         );
     }
 
-    componentDidMount() {
+    addBackListener() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
         this.interval = setInterval(() => this.getTemperature(), 5000);
     }
 
-    componentWillUnmount() {
+    removeBackListener() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
         clearInterval(this.interval);
     }
