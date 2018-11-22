@@ -9,8 +9,11 @@ class Arduino {
     });
     this.serialPort.on('error', function(err) {
       console.log(err);
+      if (arduino.serialPort.isOpen)
+        arduino.serialPort.close();
       setTimeout(function() {
-        arduino.open();
+        if (!arduino.serialPort.isOpen)
+          arduino.open();
       }, 5000);
     });
     this.serialPort.on('close', function(err) {
