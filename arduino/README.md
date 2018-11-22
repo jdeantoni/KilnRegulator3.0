@@ -14,5 +14,5 @@ make
 # Deploy
 
 ```
-make update
+make upload
 ```

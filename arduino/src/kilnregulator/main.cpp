@@ -1,6 +1,8 @@
 #include <msgpack.hpp>
+#include <util/crc16.h>
 
 #include "KilnRegulator.h"
+#include "StreamCRC.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -8,27 +10,42 @@ MAX6675 thermocouple(/*thermoCLK*/6, /*thermoCS*/5, /*thermoDO*/4);
 
 KilnRegulator kilnRegulator(thermocouple);
 
+StreamCRC streamCRC(Serial);
+
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
-void sendAck(Stream &stream, char action[], int code) {
-	size_t mapSize = 2;
+void sendAck(StreamCRC &stream, unsigned long msgId, char action[], int code) {
+	size_t mapSize = 4;
 	msgpack::writeMapSize(stream, mapSize);
 
 	msgpack::writeString(stream, "ack");
 	msgpack::writeString(stream, key);
 
+	msgpack::writeString(stream, "id");
+	msgpack::writeIntU32(stream, msgId);
+
 	msgpack::writeString(stream, "code");
 	msgpack::writeInt16(stream, code);
+
+	msgpack::writeString(stream, "crc");
+	msgpack::writeIntU8(stream, stream.getCRC());
 }
 
 /*
  * Message format:
  * [ "command", param]
  */
-bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
+bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	size_t arraySize;
 	size_t keyLength;
 	int errCode = 0;
+	unsigned long msgId = -1;
+
+
+	/*
+	 * CRC computation
+	 */
+	stream.resetCRC();
 
 	/*
 	 * DEBUG
@@ -37,7 +54,7 @@ bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::DataType dataType;
 	msgpack::getNextDataType(stream, dataType, true);
-	sendAck(stream, key, dataType);
+	sendAck(stream, msgId, key, dataType);
 	/*
 	 * END DEBUG
 	 */
@@ -46,18 +63,26 @@ bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	errCode = msgpack::readArraySize(stream, arraySize);
 	if (!errCode) { // not error code but success
-		sendAck(stream, key, ErrorCode::BAD_REQUEST +10);
+		errCode = ErrorCode::BAD_REQUEST +10;
 		goto readerror;
 	}
 
-	if (arraySize < 0 || arraySize > 2) {
-		sendAck(stream, key, ErrorCode::BAD_REQUEST +20);
+	if (arraySize < 2 || arraySize > 3) {
+		errCode = ErrorCode::BAD_REQUEST +20;
 		goto readerror;
 	}
 
+	/*
+	 * Read message Id
+	 */
+	errCode = msgpack::readInt(stream, msgId);
+
+	/*
+	 * Read command
+	 */
 	errCode = msgpack::readString(stream, key, sizeof(key), keyLength);
 	if (!errCode) { // not error code but success
-		sendAck(stream, key, ErrorCode::BAD_REQUEST +30);
+		errCode = ErrorCode::BAD_REQUEST +30;
 		goto readerror;
 	}
 
@@ -65,30 +90,29 @@ bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
 		errCode = kilnRegulator.start();
 		//start cooking
 		//read program
-		sendAck(stream, key, errCode);
 	} else if (!strncmp(key, "stop", keyLength+1)) {
 		errCode = kilnRegulator.stop();
 		//stop cooking
-		sendAck(stream, key, errCode);
 	} else if (!strncmp(key, "time", keyLength+1)) {
 		//time synchronisation
 	} else if (!strncmp(key, "setpoint", keyLength+1)) {
 		if (arraySize < 2) {
-			sendAck(stream, key, ErrorCode::BAD_REQUEST);
+			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
 		}
 
 		long setpoint = -1;
-		msgpack::readInt(stream, setpoint);
+		errCode = msgpack::readInt(stream, setpoint);
 		errCode = kilnRegulator.setSetpoint(setpoint);
 		//set setpoint
-		sendAck(stream, key, errCode);
 	} else if (!strncmp(key, "getprogram", keyLength+1)) {
 		//send current program
 	}
+	sendAck(stream, msgId, key, errCode);
 	return true;
 readerror:
 	while (Serial.available()) Serial.read(); //clear input buffer
+	sendAck(stream, msgId, key, errCode);
 	return false;
 }
 
@@ -136,9 +160,9 @@ void setup() {
 
 void loop() {
 	if (Serial.available()) {
-		receiveMessage(Serial, kilnRegulator);
+		receiveMessage(streamCRC, kilnRegulator);
 	}
 	kilnRegulator.updateState();
-	sendState(Serial, kilnRegulator);
+	sendState(streamCRC, kilnRegulator);
 	delay(500);
 }
