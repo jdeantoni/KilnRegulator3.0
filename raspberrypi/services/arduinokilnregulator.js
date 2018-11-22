@@ -1,5 +1,5 @@
 const ArduinoMessagePack = require('./arduinomessagepack');
-const StateElement = require('../model/stateElement')
+const ElementState = require('../model/elementState')
 const KilnState = require('../model/kilnState')
 
 class ArduinoKilnRegulator {
@@ -29,6 +29,14 @@ class ArduinoKilnRegulator {
     this.elementState = this.findElementStateName(data.elementState);
     this.currentSegment = data.currentSegment;
     this.temperature = data.temperature;
+  }
+
+  findStateName(state) {
+    return KilnState[state];
+  }
+
+  findElementStateName(state) {
+    return ElementState[state];
   }
 
   stop() {
