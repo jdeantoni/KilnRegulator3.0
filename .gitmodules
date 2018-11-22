@@ -1,0 +1,9 @@
+[submodule "arduino/src/Arduino-PID-Library"]
+	path = arduino/src/Arduino-PID-Library
+	url = https://github.com/br3ttb/Arduino-PID-Library.git
+[submodule "arduino/src/MAX6675-library"]
+	path = arduino/src/MAX6675-library
+	url = https://github.com/adafruit/MAX6675-library.git
+[submodule "arduino/src/msgpack-arduino"]
+	path = arduino/src/msgpack-arduino
+	url = https://github.com/piernov/msgpack-arduino

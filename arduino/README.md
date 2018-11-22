@@ -4,14 +4,15 @@ Host:
 arduino-mk
 ```
 
-Arduino libraries:
-```
-MAX6675
-msgpack-arduino
-```
-
-# Build & deploy
+# Build
 
 ```
-make upload
+git submodule update --init
+make
+```
+
+# Deploy
+
+```
+make update
 ```

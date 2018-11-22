@@ -29,18 +29,26 @@ bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
 	size_t arraySize;
 	size_t keyLength;
 	int errCode = 0;
+
+	/*
+	 * DEBUG
+	 */
 	strcpy(key, "datatype");
 
 	msgpack::DataType dataType;
 	msgpack::getNextDataType(stream, dataType, true);
 	sendAck(stream, key, dataType);
+	/*
+	 * END DEBUG
+	 */
+
 	strcpy(key, "request");
 
 	errCode = msgpack::readArraySize(stream, arraySize);
 	if (!errCode) { // not error code but success
 		sendAck(stream, key, ErrorCode::BAD_REQUEST +10);
 		goto readerror;
-	}	
+	}
 
 	if (arraySize < 0 || arraySize > 2) {
 		sendAck(stream, key, ErrorCode::BAD_REQUEST +20);
@@ -51,7 +59,7 @@ bool receiveMessage(Stream &stream, KilnRegulator &kilnRegulator) {
 	if (!errCode) { // not error code but success
 		sendAck(stream, key, ErrorCode::BAD_REQUEST +30);
 		goto readerror;
-	}	
+	}
 
 	if (!strncmp(key, "start", keyLength+1)) { //keyLength+1 because we want to compare null character as well
 		errCode = kilnRegulator.start();
@@ -85,13 +93,13 @@ readerror:
 }
 
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
-	size_t mapSize = 5;
+	size_t mapSize = 6;
 
 	int state =  kilnRegulator.getState();
 	int elementState =  kilnRegulator.getElementState();
 	int segment = kilnRegulator.getCurrentSegment();
 	double temperature = kilnRegulator.getTemperature();
-  
+
 	msgpack::writeMapSize(stream, mapSize);
 
 	msgpack::writeString(stream, "command");
@@ -108,6 +116,9 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::writeString(stream, "temperature");
 	msgpack::writeFloat32(stream, temperature);
+
+	msgpack::writeString(stream, "output");
+	msgpack::writeFloat32(stream, kilnRegulator.output);
 }
 
 
@@ -119,6 +130,8 @@ void setup() {
 	// Shut off embedded LED
 	pinMode(13, OUTPUT);
 	digitalWrite(13, LOW);
+
+	kilnRegulator.init();
 }
 
 void loop() {
