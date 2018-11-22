@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Button, BackHandler, Alert, TextInput} from 'rea
 import displayHamburger from "../helpers/NavigationHelper";
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import {NavigationEvents} from "react-navigation";
 
 export default class FindKilnScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -13,13 +14,17 @@ export default class FindKilnScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ip: "10.212.100.10:3000"
+            ip: ""
         };
     }
 
     render() {
         return (
             <View style={styles.main_container}>
+                <NavigationEvents
+                    onWillFocus={() => this.addBackListener()}
+                    onWillBlur={() => this.removeBackListener()}
+                />
                 <Text>FindKilnScreen</Text>
                 <TextInput placeholder={"Adresse IP"}
                            onChangeText={(text) => this.setState({ip: text})}
@@ -29,11 +34,11 @@ export default class FindKilnScreen extends React.Component {
         );
     }
 
-    componentDidMount() {
+    addBackListener() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
-    componentWillUnmount() {
+    removeBackListener() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     }
 
@@ -47,9 +52,7 @@ export default class FindKilnScreen extends React.Component {
     };
 
     kilnSelected() {
-        if (this.statusApi == null) {
-            this.statusApi = new StatusAPI(this.state.ip);
-        }
+        this.statusApi = new StatusAPI(this.state.ip);
 
         this.statusApi.getStatus()
             .then((response) => {
