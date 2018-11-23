@@ -15,14 +15,14 @@ exports.handler = function setSetpoint(req, res, next) {
     return;
   }
 
-  const arduinoRepository = require('../../services/arduinorepository');
-  if (arduinoRepository.length < 1) {
+  const arduino = require('../../services/arduinorepository').first();
+  if (!arduino) {
     res.status(503);
-    res.send("Arduino not found.");
+    res.send({errored: true});
     return;
   }
 
-  arduinoRepository[0].setSetpoint(req.body.setpoint);
+  arduino.setSetpoint(req.body.setpoint);
 
   res.send('')
   next()

@@ -6,6 +6,7 @@ const eh = require('./errorhandler');
 
 class ArduinoKilnRegulator {
   constructor(dev, baudRate) {
+    const akr = this;
     this.arduino = new ArduinoMessagePack(dev, baudRate);
 
     this.temperature = 0.0;
@@ -13,6 +14,22 @@ class ArduinoKilnRegulator {
     this.elementState = "";
     this.currentSegment = -1;
 
+    this.errored = false;
+
+    eh.on('error', function(msg, timestamp) {
+      akr.errored = true;
+    });
+
+    eh.on('FATAL', function(msg, timestamp) {
+      akr.stop();
+      akr.errored = true;
+    });
+
+    // Should be more agressive than FATAL and really shutdown everything in hardware
+    eh.on('PANIC', function(msg, timestamp) {
+      akr.stop();
+      akr.errored = true;
+    });
   }
 
   handleError(akr, err, msg) {
@@ -26,10 +43,10 @@ class ArduinoKilnRegulator {
   open() {
     const akr = this;
     this.arduino.on('data', function(msg, error, originalmsg) {
-      console.log(msg);
       if (error) {
         akr.handleError(akr, error, originalmsg);
       } else {
+        console.log(msg);
         if (msg.command == 'status')
           akr.updateState(msg);
       }

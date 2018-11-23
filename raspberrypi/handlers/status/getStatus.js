@@ -6,19 +6,20 @@
  *
  */
 exports.handler = function getStatus(req, res, next) {
-  const arduinoRepository = require('../../services/arduinorepository');
-  if (arduinoRepository.length < 1) {
+  const arduino = require('../../services/arduinorepository').first();
+  if (!arduino) {
     res.status(503);
-    res.send("Arduino not found.");
+    res.send({errored: true});
     return;
   }
 
   res.send({
-    state: arduinoRepository[0].state,
-    elementState: arduinoRepository[0].elementState,
+    errored: arduino.errored,
+    state: arduino.state,
+    elementState: arduino.elementState,
     sample: {
       timestamp: 0,
-      temperature: arduinoRepository[0].temperature
+      temperature: arduino.temperature
     }
   });
   next()
