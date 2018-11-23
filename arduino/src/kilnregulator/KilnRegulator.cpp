@@ -19,8 +19,8 @@ void KilnRegulator::regulate() {
 
 	// do something with output
 	unsigned long now = millis();
-	if (windowSize == 0) {
-		windowSize = millis();
+	if (windowStartTime == 0) {
+		windowStartTime = millis();
 	}
 	if (now - windowStartTime > windowSize) { //time to shift the Relay Window
 		windowStartTime += windowSize;
