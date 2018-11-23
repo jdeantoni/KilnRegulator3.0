@@ -10,7 +10,7 @@ const model = require('./model/model');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
 
-const swaggerDocument = YAML.load('../doc/swagger.yaml');
+const swaggerDocument = YAML.load('./swagger.yaml');
 
 const arduinoRepository = require('./services/arduinorepository');
 
@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
 });
 
 swaggerRoutes(app, {
-  api: '../doc/swagger.yaml',
+  api: './swagger.yaml',
   handlers:  {
     path: './handlers',
     group: true
