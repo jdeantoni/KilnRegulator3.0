@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
+import {View, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
 import displayHamburger from "../helpers/NavigationHelper";
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
@@ -8,7 +8,7 @@ import {NavigationEvents} from "react-navigation";
 export default class FindKilnScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'FindKilnScreen',
-        //headerLeft: displayHamburger(navigation),
+        headerLeft: <View/>,
     });
 
     constructor(props) {
@@ -25,9 +25,6 @@ export default class FindKilnScreen extends React.Component {
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
                 />
-                <View style={styles.container}>
-                    <Text>FindKilnScreen</Text>
-                </View>
                 <View style={styles.container}>
                     <TextInput placeholder={"Adresse IP"}
                                onChangeText={(text) => this.setState({ip: text})}

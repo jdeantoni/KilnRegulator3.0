@@ -7,7 +7,7 @@ export default class Table extends React.Component {
         super(props);
 
         this.state = {
-            data: [{target: 573, slope: 0.027777}, {target: 1200, duration: 7200}, {target: 50, slope: -0.027777}, {}]
+            data: this.props.segments
         };
 
         this.dataHeaders = ["Segment", "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];
@@ -95,6 +95,7 @@ export default class Table extends React.Component {
         let array = [...this.state.data];
         array[rowId][headerKey] = value;
         this.setState({data: array});
+        this.props.onChangeValue(this.state.data);
     }
 
     giveValue(val) {
