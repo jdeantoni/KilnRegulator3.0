@@ -10,16 +10,30 @@ class ArduinoKilnRegulator {
     this.state = "";
     this.elementState = "";
     this.currentSegment = -1;
+
+  }
+
+  handleError(akr, err, msg) {
+    console.error(err);
+    if (msg && msg[0] == 'stop') { // we tried to send a stop command and it failed, try again…
+      console.log('Trying to send stop again…');
+      akr.stop();
+    }
   }
 
   open() {
     const akr = this;
-    this.arduino.on('data', function(msg, error) {
+    this.arduino.on('data', function(msg, error, originalmsg) {
+      console.log(msg);
       if (error) {
-        console.err(error);
+        akr.handleError(akr, error, originalmsg);
       } else {
-        akr.updateState(msg);
+        if (msg.command == 'status')
+          akr.updateState(msg);
       }
+    });
+    this.arduino.on('error', function(err, originalmsg) {
+      akr.handleError(akr, err, originalmsg);
     });
     this.arduino.open();
   }

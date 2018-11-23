@@ -15,6 +15,7 @@
     "swagger-ui-express": "~4.0.1",
     "msgpack5": "~4.2.1",
     "serialport": "~7.0.2",
-    "yamljs": "~0.3.0"
+    "yamljs": "~0.3.0",
+    "crc": "3.8.0"
   }
 }
