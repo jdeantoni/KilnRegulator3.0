@@ -47,18 +47,6 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	 */
 	stream.resetCRC();
 
-	/*
-	 * DEBUG
-	 */
-	strcpy(key, "datatype");
-
-	msgpack::DataType dataType;
-	msgpack::getNextDataType(stream, dataType, true);
-	sendAck(stream, msgId, key, dataType);
-	/*
-	 * END DEBUG
-	 */
-
 	strcpy(key, "request");
 
 	errCode = msgpack::readArraySize(stream, arraySize);
