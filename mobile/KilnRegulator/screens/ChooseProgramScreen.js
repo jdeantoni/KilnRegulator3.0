@@ -5,8 +5,9 @@ import ProgramList from "../components/ProgramList";
 import {ActionAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
+import { connect } from "react-redux";
 
-export default class ChooseProgramScreen extends React.Component {
+class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'ChooseProgramScreen',
         //headerLeft: displayHamburger(navigation),
@@ -28,14 +29,14 @@ export default class ChooseProgramScreen extends React.Component {
                     <Text>ChooseProgramScreen</Text>
                 </View>
                 <View style={{flex: 6, backgroundColor: 'skyblue'}}>
-                    <ProgramList/>
+                    <ProgramList programs={this.props.programs}/>
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
                         <Button title={"Créer un nouveau programme"} onPress={() => this.props.navigation.navigate("CreateProgram")}/>
                     </View>
                     <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()}/>
+                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === -1}/>
                     </View>
                 </View>
             </View>
@@ -83,10 +84,8 @@ export default class ChooseProgramScreen extends React.Component {
 const styles = StyleSheet.create({
     main_container: {
         flex: 1,
-        backgroundColor: '#f2f2f2',
         justifyContent: 'center',
         alignItems: "stretch",
-
         flexDirection: 'column',
     },
     buttons: {
@@ -101,3 +100,11 @@ const styles = StyleSheet.create({
         fontSize: 16
     }
 });
+
+const mapStateToProps = (state) => {
+    return {
+        selectedProgram: state.selectedProgram,
+        programs: state.programs
+    };
+};
+export default connect(mapStateToProps)(ChooseProgramScreen);
