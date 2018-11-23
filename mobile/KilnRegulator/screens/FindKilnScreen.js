@@ -25,11 +25,17 @@ export default class FindKilnScreen extends React.Component {
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
                 />
-                <Text>FindKilnScreen</Text>
-                <TextInput placeholder={"Adresse IP"}
-                           onChangeText={(text) => this.setState({ip: text})}
-                           value={this.state.ip}/>
-                <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>
+                <View style={styles.container}>
+                    <Text>FindKilnScreen</Text>
+                </View>
+                <View style={styles.container}>
+                    <TextInput placeholder={"Adresse IP"}
+                               onChangeText={(text) => this.setState({ip: text})}
+                               value={this.state.ip}/>
+                </View>
+                <View style={styles.container}>
+                    <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>
+                </View>
             </View>
         );
     }
@@ -84,4 +90,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "center"
     },
+    container: {
+        padding: 10
+    }
 });

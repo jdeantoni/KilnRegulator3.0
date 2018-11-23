@@ -1,5 +1,6 @@
 import React from "react";
 import {Button, StyleSheet, Text, TextInput, View} from "react-native";
+import Table from "../components/Table";
 
 export default class CreateProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -20,8 +21,8 @@ export default class CreateProgramScreen extends React.Component {
                 <View style={styles.graph}>
                     <Text>Graph</Text>
                 </View>
-                <View style={styles.table && {backgroundColor: 'skyblue'}}>
-                    <Text>Table</Text>
+                <View style={styles.table}>
+                    <Table/>
                 </View>
                 <View style={styles.bottom}>
                     <TextInput placeholder={"Nom du programme"}
@@ -48,11 +49,11 @@ const styles = StyleSheet.create({
     },
     graph: {
         flex: 4,
+        backgroundColor: "skyblue"
     },
     table: {
-        flex: 4
+        flex: 4,
     },
     bottom: {
-        flex: 2
     }
 });
