@@ -49,7 +49,7 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Cooking"
-  
+
   /action/start:
     post:
       tags:
@@ -76,7 +76,21 @@ paths:
           description: "invalid operation, ex. not running"
         500:
           description: "could not stop cooking"
-    
+
+  /action/emergencystop:
+    post:
+      tags:
+      - "action"
+      summary: "PANIC"
+      operationId: "emergencyStop"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "invalid operation, ex. not running"
+        500:
+          description: "could not stop cooking"
+
   /errors:
     get:
       tags:
@@ -140,13 +154,15 @@ paths:
         200:
           description: "successful operation"
 
-    
-    
-    
+
+
+
 definitions:
   Status:
     type: "object"
     properties:
+      errored:
+        type: "boolean"
       state:
         type: "string"
         enum:
