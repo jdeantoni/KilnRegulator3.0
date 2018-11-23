@@ -7,7 +7,8 @@ RUN apt update && apt install -y wget xz-utils make git python python-serial
 RUN wget -q -O- https://downloads.arduino.cc/arduino-1.8.7-linuxarm.tar.xz | tar xJC /
 RUN wget -q -O- https://github.com/sudar/Arduino-Makefile/archive/1.6.0.tar.gz | tar xzC /
 
-COPY . . # copy parent directory since it's run with parent docker-compose. Required to get .git for submodules
+# copy parent directory since its run with parent docker-compose. Required to get .git for submodules
+COPY . .
 
 WORKDIR /arduino
 
