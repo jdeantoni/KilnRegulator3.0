@@ -9,7 +9,7 @@
  */
 exports.handler = function setSetpoint(req, res, next) {
   let params = req.body;
-  if (!req.body.setpoint) {
+  if (!req.body.hasOwnProperty('setpoint')) {
     res.status(400);
     res.send('Missing setpoint');
     return;
