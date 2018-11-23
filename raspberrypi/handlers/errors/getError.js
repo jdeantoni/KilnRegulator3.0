@@ -5,6 +5,9 @@
  *
  */
 exports.handler = function getError(req, res, next) {
-  res.send("");
+  const eh = require('../../services/errorhandler');
+
+  res.send(eh.logfile);
+
   next()
 }

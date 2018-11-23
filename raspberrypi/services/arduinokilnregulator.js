@@ -2,6 +2,8 @@ const ArduinoMessagePack = require('./arduinomessagepack');
 const ElementState = require('../model/elementState')
 const KilnState = require('../model/kilnState')
 
+const eh = require('./errorhandler');
+
 class ArduinoKilnRegulator {
   constructor(dev, baudRate) {
     this.arduino = new ArduinoMessagePack(dev, baudRate);
@@ -14,7 +16,7 @@ class ArduinoKilnRegulator {
   }
 
   handleError(akr, err, msg) {
-    console.error(err);
+    eh.error(err);
     if (msg && msg[0] == 'stop') { // we tried to send a stop command and it failed, try again…
       console.log('Trying to send stop again…');
       akr.stop();

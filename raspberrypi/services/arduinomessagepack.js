@@ -22,7 +22,7 @@ class ArduinoMessagePack extends Arduino {
     for (var id in arduino.msgBacklog) {
       if (arduino.msgBacklog.hasOwnProperty(id)) {
         if (arduino.msgBacklog[id].timestamp + arduino.timeout < Date.now()) { // aknowledgment not received, message timed out
-          arduino.emitter.emit('error', 'Aknowledgment not received for msg ' + id, arduino.msgBacklog[id].msg);
+          arduino.emitter.emit('error', 'Aknowledgment not received for ' + arduino.msgBacklog[id].msg, arduino.msgBacklog[id].msg);
           delete arduino.msgBacklog[id];
         }
       }

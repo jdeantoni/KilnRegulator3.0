@@ -1,5 +1,7 @@
 var SerialPort = require('serialport');
 
+const eh = require('./errorhandler');
+
 class Arduino {
   constructor(dev, baudRate) {
     var arduino = this;
@@ -8,7 +10,7 @@ class Arduino {
       autoOpen: false
     });
     this.serialPort.on('error', function(err) {
-      console.log(err);
+      eh.error(err.message);
       if (arduino.serialPort.isOpen)
         arduino.serialPort.close();
       setTimeout(function() {
@@ -17,7 +19,7 @@ class Arduino {
       }, 5000);
     });
     this.serialPort.on('close', function(err) {
-      console.error('Connection to Arduino closed, ' + err);
+      eh.error('Connection to Arduino closed, ' + err);
       arduino.open();
     });
   }

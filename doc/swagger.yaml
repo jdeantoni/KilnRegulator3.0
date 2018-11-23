@@ -7,7 +7,7 @@ info:
     url: "https://github.com/jdeantoni/KilnRegulator3.0/issues"
   license:
     name: "MIT"
-host: "petstore.swagger.io"
+host: "127.0.0.1:3000"
 basePath: "/"
 tags:
 - name: "status"
@@ -15,8 +15,8 @@ tags:
 - name: "program"
 - name: "action"
 - name: "debug"
+- name: "errors"
 schemes:
-- "https"
 - "http"
 paths:
   /status:
@@ -34,21 +34,6 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Status"
-  /status/error:
-    get:
-      tags:
-      - "status"
-      summary: "Get error if any"
-      operationId: "getError"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "message"
-          schema:
-            $ref: "#/definitions/Error"
   /status/cooking:
     get:
       tags:
@@ -92,6 +77,31 @@ paths:
         500:
           description: "could not stop cooking"
     
+  /errors:
+    get:
+      tags:
+      - "errors"
+      summary: "Get error if any"
+      operationId: "getError"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "message"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "errors"
+      summary: "Clear error if any"
+      operationId: "clearError"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+
   /debug:
     get:
       tags:
