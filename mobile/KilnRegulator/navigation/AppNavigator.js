@@ -3,13 +3,13 @@ import {createAppContainer, createStackNavigator} from 'react-navigation';
 import ChooseProgramScreen from "../screens/ChooseProgramScreen";
 import FindKilnScreen from "../screens/FindKilnScreen";
 import TrackingCookingScreen from "../screens/TrackingCookingScreen";
-import CreateProgramScreen from "../screens/CreateProgramScreen";
+import EditProgramScreen from "../screens/EditProgramScreen";
 
 const MainStack = createStackNavigator({
     FindKiln: FindKilnScreen,
     ChooseProgram: ChooseProgramScreen,
     TrackingCooking: TrackingCookingScreen,
-    CreateProgram: CreateProgramScreen
+    EditProgram: EditProgramScreen
 });
 
 const AppContainer = createAppContainer(MainStack);

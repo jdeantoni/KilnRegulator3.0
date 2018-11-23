@@ -24,6 +24,11 @@ function togglePrograms(state = initialState, action) {
                 }
             }
             return nextState || state;
+        case "EDIT_PROGRAM":
+            nextState = { ...state };
+            nextState.programs[action.value.id-1] = action.value;
+            nextState.selectedProgram = action.value.id;
+            return nextState;
         default:
             return state;
     }

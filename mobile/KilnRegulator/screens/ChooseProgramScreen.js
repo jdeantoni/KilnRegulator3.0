@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
-import displayHamburger from "../helpers/NavigationHelper";
+import {View, StyleSheet, Button, Alert, BackHandler} from 'react-native';
+import { displayArrow } from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
 import {ActionAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'ChooseProgramScreen',
-        //headerLeft: displayHamburger(navigation),
+        headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
     });
 
     constructor(props) {
@@ -25,15 +25,12 @@ class ChooseProgramScreen extends React.Component {
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
                 />
-                <View style={styles.title}>
-                    <Text>ChooseProgramScreen</Text>
-                </View>
-                <View style={{flex: 6, backgroundColor: 'skyblue'}}>
+                <View style={{flex: 6}}>
                     <ProgramList programs={this.props.programs}/>
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
-                        <Button title={"Créer un nouveau programme"} onPress={() => this.props.navigation.navigate("CreateProgram")}/>
+                        <Button title={this.buttonNameEditProgram()} onPress={() => this.props.navigation.navigate("EditProgram")}/>
                     </View>
                     <View style={styles.button}>
                         <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === -1}/>
@@ -79,6 +76,10 @@ class ChooseProgramScreen extends React.Component {
             ]);
         return true;
     };
+
+    buttonNameEditProgram() {
+        return (this.props.selectedProgram === -1) ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
+    }
 }
 
 const styles = StyleSheet.create({
@@ -93,11 +94,6 @@ const styles = StyleSheet.create({
     },
     button: {
         padding: 10,
-    },
-    title: {
-        alignItems: 'center',
-        padding: 10,
-        fontSize: 16
     }
 });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
-import displayHamburger from "../helpers/NavigationHelper";
+import { displayArrow } from "../helpers/NavigationHelper";
 import {ActionAPI, StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
@@ -8,7 +8,7 @@ import {NavigationEvents} from "react-navigation";
 export default class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'TrackingCookingScreen',
-        //headerLeft: displayHamburger(navigation),
+        headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
     });
 
     constructor(props) {
