@@ -1,11 +1,12 @@
 import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { connect } from "react-redux";
 
-export default class ProgramItem extends React.Component {
+class ProgramItem extends React.Component {
     render() {
         const program = this.props.program.item;
         return (
-            <TouchableOpacity style={styles.main_container} onPress={() => {}}>
+            <TouchableOpacity style={[styles.main_container, this.isSelected()]} onPress={() => {this.toggleOnPress()}}>
                 <View style={styles.left_container}>
                     <Text style={styles.textId} adjustsFontSizeToFit>{program.id}</Text>
                 </View>
@@ -34,9 +35,26 @@ export default class ProgramItem extends React.Component {
 
         const hours = Math.floor(timeInSeconds / 3600);
         let minutes = Math.floor((timeInSeconds - (hours * 3600)) / 60);
-        if (minutes < 10) { minutes = "0" + minutes };
+        if (minutes < 10) { minutes = "0" + minutes }
 
         return hours + "h" + minutes + "min";
+    }
+
+    toggleOnPress() {
+        const action = { type: "SELECT_PROGRAM", value: this.props.program.item.id };
+        this.props.dispatch(action);
+    }
+
+    isSelected() {
+        if (this.props.selectedProgram === this.props.program.item.id) {
+            return {
+                backgroundColor: "lightgreen"
+            }
+        } else {
+            return {
+                backgroundColor: "white"
+            };
+        }
     }
 }
 
@@ -76,3 +94,10 @@ const styles = StyleSheet.create({
         flex: 1
     }
 });
+
+const mapStateToProps = (state) => {
+    return {
+        selectedProgram: state.selectedProgram,
+    };
+};
+export default connect(mapStateToProps)(ProgramItem);
