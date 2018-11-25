@@ -12,7 +12,7 @@ exports.handler = function stopCooking(req, res, next) {
     return;
   }
 
-  arduinoRepository.stop();
+  arduino.stop();
 
   res.send('')
   next()
