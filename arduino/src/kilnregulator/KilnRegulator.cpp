@@ -25,10 +25,13 @@ void KilnRegulator::regulate() {
 	if (now - windowStartTime > windowSize) { //time to shift the Relay Window
 		windowStartTime += windowSize;
 	}
-	if (windowSize * output / 255  > now - windowStartTime)
+	if (windowSize * output / 255  > now - windowStartTime) {
+		digitalWrite(2, HIGH);
 		digitalWrite(13, HIGH);
-	else
+	} else {
+		digitalWrite(2, LOW);
 		digitalWrite(13, LOW);
+	}
 }
 
 void KilnRegulator::updateState() {
@@ -69,7 +72,9 @@ int KilnRegulator::stop() {
 	if (state != KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
-	//digitalWrite(13, LOW);
+	digitalWrite(2, LOW);
+	digitalWrite(13, LOW);
+
 	state = KilnState::STOPPED;
 	windowStartTime = 0;
 	return 0;
