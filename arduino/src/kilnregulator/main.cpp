@@ -8,7 +8,7 @@
 
 MAX6675 thermocouple(/*thermoCLK*/6, /*thermoCS*/5, /*thermoDO*/4);
 
-KilnRegulator kilnRegulator(thermocouple);
+KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
 StreamCRC streamCRC(Serial);
 
@@ -140,9 +140,7 @@ void setup() {
 	delay(500); // wait for MAX chip to stabilize
 
 	// Shut off embedded LED
-	pinMode(2, OUTPUT);
 	pinMode(13, OUTPUT);
-	digitalWrite(2, LOW);
 	digitalWrite(13, LOW);
 
 	kilnRegulator.init();

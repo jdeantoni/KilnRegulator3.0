@@ -1,10 +1,12 @@
 #include "KilnRegulator.h"
 
-KilnRegulator::KilnRegulator(MAX6675 &thermocouple) : thermocouple(thermocouple),
+KilnRegulator::KilnRegulator(MAX6675 &thermocouple, int outputPin) : thermocouple(thermocouple), outputPin(outputPin),
 	pid(&temperature, &output, &setpoint, consKp, consKi, consKd, DIRECT) {
 }
 
 void KilnRegulator::init() {
+	pinMode(outputPin, OUTPUT);
+	digitalWrite(outputPin, LOW);
 	pid.SetMode(AUTOMATIC);
 	//pid.SetOutputLimits(0, windowSize);
 }
@@ -26,10 +28,10 @@ void KilnRegulator::regulate() {
 		windowStartTime += windowSize;
 	}
 	if (windowSize * output / 255  > now - windowStartTime) {
-		digitalWrite(2, HIGH);
+		digitalWrite(outputPin, HIGH);
 		digitalWrite(13, HIGH);
 	} else {
-		digitalWrite(2, LOW);
+		digitalWrite(outputPin, LOW);
 		digitalWrite(13, LOW);
 	}
 }
@@ -72,7 +74,7 @@ int KilnRegulator::stop() {
 	if (state != KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
-	digitalWrite(2, LOW);
+	digitalWrite(outputPin, LOW);
 	digitalWrite(13, LOW);
 
 	state = KilnState::STOPPED;

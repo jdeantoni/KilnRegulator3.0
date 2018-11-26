@@ -10,7 +10,7 @@
 
 class KilnRegulator {
 public:
-	KilnRegulator(MAX6675&);
+	KilnRegulator(MAX6675&, int);
 	void init();
 
 	void updateState();
@@ -41,6 +41,7 @@ private:
 	double aggKp=4, aggKi=0.2, aggKd=1;
 	double consKp=1, consKi=0.05, consKd=0.25;
 
+	int outputPin = -1;
 };
 
 #endif //_KILNREGULATOR_H_
