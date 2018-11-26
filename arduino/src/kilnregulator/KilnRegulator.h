@@ -23,13 +23,13 @@ public:
 	int stop();
 	int setSetpoint(double);
 	double output = 0.0;
+	double setpoint = -1.0;
 private:
 	double temperature = 0.0;
 	int state = KilnState::READY;
 	int elementState = ElementState::STALE;
 	int currentSegment = -1;
 
-	double setpoint = -1.0;
 	unsigned long windowSize = 5000;
 	unsigned long windowStartTime = 0;
 
@@ -37,6 +37,10 @@ private:
 	PID pid;
 
 	void regulate();
+	double computeSetPoint();
+	unsigned long startDate = 0;
+	unsigned long currentSegmentStartDate = 0;
+	unsigned long endDate = 0;
 
 	double aggKp=4, aggKi=0.2, aggKd=1;
 	double consKp=1, consKi=0.05, consKd=0.25;

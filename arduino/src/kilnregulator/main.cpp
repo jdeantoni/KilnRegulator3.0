@@ -151,7 +151,7 @@ readerror:
 }
 
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
-	size_t mapSize = 7;
+	size_t mapSize = 8;
 
 	int state =  kilnRegulator.getState();
 	int elementState =  kilnRegulator.getElementState();
@@ -177,6 +177,9 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::writeString(stream, "output");
 	msgpack::writeFloat32(stream, kilnRegulator.output);
+
+	msgpack::writeString(stream, "setPoint");
+	msgpack::writeFloat32(stream, kilnRegulator.setpoint);
 
 	msgpack::writeString(stream, "timestamp");
 	msgpack::writeIntU32(stream, now());

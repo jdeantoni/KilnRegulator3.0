@@ -1,4 +1,6 @@
 #include "KilnRegulator.h"
+#include "Segment.h"
+#include "Time.h"
 
 KilnRegulator::KilnRegulator(MAX6675 &thermocouple, int outputPin) : thermocouple(thermocouple),
 	pid(&temperature, &output, &setpoint, consKp, consKi, consKd, DIRECT),
@@ -12,7 +14,28 @@ void KilnRegulator::init() {
 	//pid.SetOutputLimits(0, windowSize);
 }
 
+double KilnRegulator::computeSetPoint() {
+	double setPoint = 0;
+	if (currentSegmentStartDate + segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
+		 currentSegment++;
+		 currentSegmentStartDate = now();
+	}
+	if (currentSegment >= SEGMENT_COUNT) { // finished
+		stop();
+	}
+	if (currentSegment > 0) { // not first segment so start from previous temp
+		setPoint += segments[currentSegment - 1].temperature;
+	}
+	setPoint += segments[currentSegment].slope * (now() - currentSegmentStartDate); // current position on the curve y = time * slope
+	if (setPoint > segments[currentSegment].temperature) { // reached max temperature for this segment
+		setPoint = segments[currentSegment].temperature;
+	}
+	return setPoint;
+}
+
 void KilnRegulator::regulate() {
+	setpoint = computeSetPoint();
+
 	double gap = abs(setpoint-temperature); //distance away from setpoint
 	if (gap < 10) //we're close to setpoint, use conservative tuning parameters
 		pid.SetTunings(consKp, consKi, consKd);
@@ -39,7 +62,7 @@ void KilnRegulator::regulate() {
 
 void KilnRegulator::updateState() {
 	temperature = thermocouple.readCelsius();
-	if (setpoint > -1 && state == KilnState::RUNNING)
+	if (/*setpoint > -1 && */state == KilnState::RUNNING)
 		regulate();
 }
 
@@ -63,11 +86,19 @@ int KilnRegulator::start() {
 	if (state == KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
-	if (setpoint < 0) {
+	/*if (setpoint < 0) {
+		return ErrorCode::INVALID_STATE;
+	}*/
+	if  (SEGMENT_COUNT < 1) {
 		return ErrorCode::INVALID_STATE;
 	}
 	//digitalWrite(13, HIGH);
 	state = KilnState::RUNNING;
+
+	currentSegment = 0;
+	startDate = now();
+	currentSegmentStartDate = now();
+
 	return 0;
 }
 
@@ -77,6 +108,8 @@ int KilnRegulator::stop() {
 	}
 	digitalWrite(outputPin, LOW);
 	digitalWrite(13, LOW);
+
+	endDate = now();
 
 	state = KilnState::STOPPED;
 	windowStartTime = 0;
