@@ -40,15 +40,22 @@ class ArduinoKilnRegulator {
     }
   }
 
+  handleMessage(msg) {
+    console.log(msg);
+    if (msg.command == 'status') {
+      this.updateState(msg);
+    } else if (msg.command == 'timesync') {
+      this.arduino.write(['timesync', Math.floor(Date.now() / 1000)]); // send timestamp in seconds
+    }
+  }
+
   open() {
     const akr = this;
     this.arduino.on('data', function(msg, error, originalmsg) {
       if (error) {
         akr.handleError(akr, error, originalmsg);
       } else {
-        console.log(msg);
-        if (msg.command == 'status')
-          akr.updateState(msg);
+        akr.handleMessage(msg);
       }
     });
     this.arduino.on('error', function(err, originalmsg) {
