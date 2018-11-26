@@ -1,7 +1,8 @@
 #include "KilnRegulator.h"
 
-KilnRegulator::KilnRegulator(MAX6675 &thermocouple, int outputPin) : thermocouple(thermocouple), outputPin(outputPin),
-	pid(&temperature, &output, &setpoint, consKp, consKi, consKd, DIRECT) {
+KilnRegulator::KilnRegulator(MAX6675 &thermocouple, int outputPin) : thermocouple(thermocouple),
+	pid(&temperature, &output, &setpoint, consKp, consKi, consKd, DIRECT),
+	outputPin(outputPin) {
 }
 
 void KilnRegulator::init() {

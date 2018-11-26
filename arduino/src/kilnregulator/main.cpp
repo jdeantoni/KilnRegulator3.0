@@ -1,3 +1,9 @@
+/*
+ * Warning: this code relies on millis which will overflow after 50 days.
+ * No garantuee are made about this code working when millis overflows
+ * Absolute timestamp is in seconds, 32-bit unsigned int. Should overflow after year 2106
+ */
+
 #include <msgpack.hpp>
 #include <util/crc16.h>
 
@@ -14,6 +20,10 @@ KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 StreamCRC streamCRC(Serial);
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
+
+time_t lastTimesyncRequest = 0;
+int timeout = 5000;
+int timeoutCounter = 0;
 
 void sendAck(StreamCRC &stream, unsigned long msgId, char action[], int code) {
 	size_t mapSize = 4;
@@ -34,6 +44,10 @@ void sendAck(StreamCRC &stream, unsigned long msgId, char action[], int code) {
 
 time_t requestTime() {
 	size_t mapSize = 1;
+	if (lastTimesyncRequest > 0) // request already pending, don't try again before timeout
+		return 0;
+	lastTimesyncRequest = millis();
+
 	msgpack::writeMapSize(streamCRC, mapSize);
 
 	msgpack::writeString(streamCRC, "command");
@@ -104,6 +118,8 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		if (errCode) { // not error code but success
 			setTime(timestamp);
 			errCode = timestamp;
+			lastTimesyncRequest = 0;
+			timeoutCounter = 0;
 		} else {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
@@ -178,6 +194,7 @@ void setup() {
 
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
+	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
 }
 
 void loop() {
@@ -186,5 +203,16 @@ void loop() {
 	}
 	kilnRegulator.updateState();
 	sendState(streamCRC, kilnRegulator);
+
+	if (lastTimesyncRequest > 0 && lastTimesyncRequest + timeout < millis()) { // timed out
+		strcpy(key, "timesync");
+		sendAck(streamCRC, 0, key, ErrorCode::TIMEOUT);
+		lastTimesyncRequest = 0;
+		timeoutCounter++;
+		if (timeoutCounter > 3) {
+			// 3 timesync requests timed out, raspberry most likely not answering, do something…
+		}
+	}
+
 	delay(500);
 }

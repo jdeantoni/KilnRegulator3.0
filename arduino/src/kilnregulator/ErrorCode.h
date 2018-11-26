@@ -5,7 +5,8 @@ struct ErrorCode {
 	enum {
 		TEMP_OUT_OF_BOUNDS,
 		BAD_REQUEST,
-		INVALID_STATE
+		INVALID_STATE,
+		TIMEOUT
 	};
 };
 
