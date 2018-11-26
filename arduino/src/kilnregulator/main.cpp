@@ -3,6 +3,7 @@
 
 #include "KilnRegulator.h"
 #include "StreamCRC.h"
+#include "Time.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -29,6 +30,16 @@ void sendAck(StreamCRC &stream, unsigned long msgId, char action[], int code) {
 
 	msgpack::writeString(stream, "crc");
 	msgpack::writeIntU8(stream, stream.getCRC());
+}
+
+time_t requestTime() {
+	size_t mapSize = 1;
+	msgpack::writeMapSize(streamCRC, mapSize);
+
+	msgpack::writeString(streamCRC, "command");
+	msgpack::writeString(streamCRC, "timesync");
+
+	return 0; // the time will be sent later in response to serial msg
 }
 
 /*
@@ -81,8 +92,22 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	} else if (!strncmp(key, "stop", keyLength+1)) {
 		errCode = kilnRegulator.stop();
 		//stop cooking
-	} else if (!strncmp(key, "time", keyLength+1)) {
+	} else if (!strncmp(key, "timesync", keyLength+1)) {
+		if (arraySize < 2) {
+			errCode = ErrorCode::BAD_REQUEST;
+			goto readerror;
+		}
+
 		//time synchronisation
+		unsigned long timestamp = -1;
+		errCode = msgpack::readInt(stream, timestamp);
+		if (errCode) { // not error code but success
+			setTime(timestamp);
+			errCode = timestamp;
+		} else {
+			errCode = ErrorCode::BAD_REQUEST;
+			goto readerror;
+		}
 	} else if (!strncmp(key, "setpoint", keyLength+1)) {
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;
@@ -91,7 +116,12 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 
 		long setpoint = -1;
 		errCode = msgpack::readInt(stream, setpoint);
-		errCode = kilnRegulator.setSetpoint(setpoint);
+		if (errCode) { // not error code but success
+			errCode = kilnRegulator.setSetpoint(setpoint);
+		} else {
+			errCode = ErrorCode::BAD_REQUEST;
+			goto readerror;
+		}
 		//set setpoint
 	} else if (!strncmp(key, "getprogram", keyLength+1)) {
 		//send current program
@@ -105,7 +135,7 @@ readerror:
 }
 
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
-	size_t mapSize = 6;
+	size_t mapSize = 7;
 
 	int state =  kilnRegulator.getState();
 	int elementState =  kilnRegulator.getElementState();
@@ -131,6 +161,9 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::writeString(stream, "output");
 	msgpack::writeFloat32(stream, kilnRegulator.output);
+
+	msgpack::writeString(stream, "timestamp");
+	msgpack::writeIntU32(stream, now());
 }
 
 
@@ -144,6 +177,7 @@ void setup() {
 	digitalWrite(13, LOW);
 
 	kilnRegulator.init();
+	setSyncProvider(requestTime);
 }
 
 void loop() {

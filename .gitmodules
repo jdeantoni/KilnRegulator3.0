@@ -7,3 +7,6 @@
 [submodule "arduino/src/msgpack-arduino"]
 	path = arduino/src/msgpack-arduino
 	url = https://github.com/piernov/msgpack-arduino
+[submodule "arduino/src/Time"]
+	path = arduino/src/Time
+	url = https://github.com/PaulStoffregen/Time.git
