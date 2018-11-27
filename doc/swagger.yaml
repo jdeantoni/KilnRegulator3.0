@@ -98,18 +98,16 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "uuid"
+        type: "string"
+        required: true
+        format: "uuid"
       - in: "body"
         name: "body"
         required: true
         schema:
           $ref: "#/definitions/Program"
-      - in: "path"
-        name: "uuid"
-        required: true
-        schema:
-          type: "string"
-          description: "Program UUID to edit"
-          format: "uuid"
       responses:
         200:
           description: "successful operation"
@@ -126,7 +124,7 @@ paths:
         required: true
         schema:
           type: "string"
-          descrition: "UUID of program to start on oven"
+          description: "UUID of program to start on oven"
           format: "uuid"
       responses:
         200:
@@ -189,6 +187,9 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      responses:
+        200:
+          description: "deleted all errors"
 
   /debug:
     get:
