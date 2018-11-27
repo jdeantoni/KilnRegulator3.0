@@ -13,9 +13,28 @@ class ArduinoMessagePack extends Arduino {
     this.msgId = 0;
     this.msgBacklog = {};
 
+    // Accomodate Arduino's receive buffer
+    this.bufferFill = 0;
+    this.maxBufferSize = 64;
+    this.outputBuffer = [];
+
     this.timeout = 5000; // 5secs
     const arduino = this;
     setInterval(function() { arduino.checkBacklog(arduino); }, this.timeout);
+  }
+
+  deleteFromBacklog(id) {
+    this.bufferFill -= this.msgBacklog[id].length; // decrease buffer filling since Arduino cleared it from its receive buffer
+    delete this.msgBacklog[id];
+
+    if (this.outputBuffer.length > 0) {
+      const nextMsg = this.outputBuffer[this.outputBuffer.length - 1];
+      if (nextMsg.emsg.length + this.bufferFill < this.maxBufferSize) {
+        this.writeImmediate(nextMsg.msg, nextMsg.emsg, nextMsg.cb);
+
+        this.outputBuffer.splice(this.outputBuffer.length - 1, 1); // delete from outputBuffer
+      }
+    }
   }
 
   checkBacklog(arduino) {
@@ -23,7 +42,7 @@ class ArduinoMessagePack extends Arduino {
       if (arduino.msgBacklog.hasOwnProperty(id)) {
         if (arduino.msgBacklog[id].timestamp + arduino.timeout < Date.now()) { // aknowledgment not received, message timed out
           arduino.emitter.emit('error', 'Aknowledgment not received for ' + arduino.msgBacklog[id].msg, arduino.msgBacklog[id].msg);
-          delete arduino.msgBacklog[id];
+          this.deleteFromBacklog(id); // assume it has been read and cleared from the buffer by the Arduino anyway, to prevent blocking subsequent message sending
         }
       }
     }
@@ -45,14 +64,16 @@ class ArduinoMessagePack extends Arduino {
             return;
           }
 
+          this.bufferFill -= arduino.msgBacklog[msg.id].length; // decrease buffer filling since Arduino cleared it from its receive buffer
+
           const expectedCrc = arduino.msgBacklog[msg.id].crc;
           const actualCrc = msg.crc;
           if (expectedCrc != actualCrc) {
             c(null, 'Arduino: CRC error', arduino.msgBacklog[msg.id].msg);
-            delete arduino.msgBacklog[msg.id];
+            arduino.deleteFromBacklog(msg.id);
             return;
           }
-          delete arduino.msgBacklog[msg.id];
+          arduino.deleteFromBacklog(msg.id);
         }
         c(msg, error);
       });
@@ -61,17 +82,41 @@ class ArduinoMessagePack extends Arduino {
     }
   }
 
-  write(m, c) {
-    m.unshift(this.msgId);
-    const emsg = msgpack.encode(m);
+  writeImmediate(m, emsg, c) {
+    const curMsgId = m[0];
+    console.log(m);
+    this.bufferFill += emsg.length;
 
     /*
      * Compute CRC and save it to backlog
      */
     const msgcrc8 = crc8(emsg);
-    this.msgBacklog[this.msgId] = {'msg': m.slice(1), 'crc': msgcrc8, 'timestamp': Date.now()};
+    this.msgBacklog[curMsgId] = {'msg': m.slice(1), 'crc': msgcrc8, 'timestamp': Date.now(), 'length': emsg.length};
 
     this.serialPort.write(emsg, c);
+  }
+
+  /*
+   * bufferize output messages since arduino's output buffer is 64 bytes only
+   * buffer overflow on arduino's side will cause message to be dropped or corrupted
+   */
+  write(m, c) {
+    m.unshift(this.msgId);
+
+    const emsg = msgpack.encode(m);
+    // make sure we don't enqueue message > maxBufferSize
+    if (emsg.length > this.maxBufferSize) {
+      this.emitter.emit('error', 'Message too long, ' + emsg.length + ' > 64');
+      return;
+    }
+
+    if (this.outputBuffer.length > 0 // output buffer not empty, enqueue after
+      || (this.bufferFill + emsg.length > this.maxBufferSize)) { // won't fit in Arduino's receive buffer, enqueue…
+      this.outputBuffer.unshift({'msg': m, 'cb': c, 'emsg': emsg}); // put new message at the beginning, last message sent first;
+    } else { // can write immediately
+      this.writeImmediate(m, emsg, c);
+    }
+
     this.msgId++;
     if (this.msgId > (Math.pow(2, 32) - 1)) { // artificial uint32 overflow since it will overflow on the Arduino (Arduino's ulong = uint32)
       this.msgId = 0;

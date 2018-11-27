@@ -21,7 +21,7 @@ class ArduinoRepository extends Array {
      * Try to use udev?
      */
     glob.sync(this.pattern).forEach(function(f) { // Bloking enumeration to discover available Arduino for current client request
-      const arduino = new ArduinoKilnRegulator(f, 115200);
+      const arduino = new ArduinoKilnRegulator(f, DEFAULT_BAUDRATE);
       ar.push(arduino);
       arduino.open();
     });
