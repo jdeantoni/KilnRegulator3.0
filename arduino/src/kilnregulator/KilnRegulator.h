@@ -4,6 +4,7 @@
 #include <max6675.h>
 #include <PID_v1.h>
 
+#include "Program.h"
 #include "ElementState.h"
 #include "KilnState.h"
 #include "ErrorCode.h"
@@ -19,7 +20,7 @@ public:
 	int getElementState() const;
 	int getCurrentSegment() const;
 
-	int start();
+	int start(const Program &program);
 	int stop();
 	int setSetpoint(double);
 	double output = 0.0;
@@ -46,6 +47,8 @@ private:
 	double consKp=1, consKi=0.05, consKd=0.25;
 
 	int outputPin = -1;
+
+	const Program *program = nullptr;
 };
 
 #endif //_KILNREGULATOR_H_

@@ -15,20 +15,23 @@ void KilnRegulator::init() {
 }
 
 double KilnRegulator::computeSetPoint() {
+	if (program == nullptr) {
+		return -1;
+	}
 	double setPoint = 0;
-	if (currentSegmentStartDate + segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
+	if (currentSegmentStartDate + program->segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
 		 currentSegment++;
 		 currentSegmentStartDate = now();
 	}
-	if (currentSegment >= SEGMENT_COUNT) { // finished
+	if (currentSegment >= program->count) { // finished
 		stop();
 	}
 	if (currentSegment > 0) { // not first segment so start from previous temp
-		setPoint += segments[currentSegment - 1].temperature;
+		setPoint += program->segments[currentSegment - 1].temperature;
 	}
-	setPoint += segments[currentSegment].slope * (now() - currentSegmentStartDate); // current position on the curve y = time * slope
-	if (setPoint > segments[currentSegment].temperature) { // reached max temperature for this segment
-		setPoint = segments[currentSegment].temperature;
+	setPoint += program->segments[currentSegment].slope * (now() - currentSegmentStartDate); // current position on the curve y = time * slope
+	if (setPoint > program->segments[currentSegment].temperature) { // reached max temperature for this segment
+		setPoint = program->segments[currentSegment].temperature;
 	}
 	return setPoint;
 }
@@ -82,17 +85,19 @@ int KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
 }
 
-int KilnRegulator::start() {
+int KilnRegulator::start(const Program &program) {
+
 	if (state == KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
 	/*if (setpoint < 0) {
 		return ErrorCode::INVALID_STATE;
 	}*/
-	if  (SEGMENT_COUNT < 1) {
+	if  (program.count < 1) {
 		return ErrorCode::INVALID_STATE;
 	}
 	//digitalWrite(13, HIGH);
+	this->program = &program;
 	state = KilnState::RUNNING;
 
 	currentSegment = 0;

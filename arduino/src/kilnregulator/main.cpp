@@ -8,8 +8,11 @@
 #include <util/crc16.h>
 
 #include "KilnRegulator.h"
+#include "Segment.h"
+#include "Program.h"
 #include "StreamCRC.h"
 #include "Time.h"
+#include "IEEE754tools.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -19,12 +22,15 @@ KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
 StreamCRC streamCRC(Serial);
 
+Program program;
+
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
 time_t lastTimesyncRequest = 0;
 int timeout = 5000;
 int timeoutCounter = 0;
 
+// Acknowledgment or error if code != 0
 void sendAck(StreamCRC &stream, unsigned long msgId, char action[], int code) {
 	size_t mapSize = 4;
 	msgpack::writeMapSize(stream, mapSize);
@@ -56,9 +62,34 @@ time_t requestTime() {
 	return 0; // the time will be sent later in response to serial msg
 }
 
+// just because the encoding process on the NodeJS side will encore a decimal number into an integer if it's dividable by 1
+bool forceReadDouble(StreamCRC &stream, double &value) {
+	msgpack::DataType dataFormat;
+	msgpack::getNextDataType(stream, dataFormat, true);
+
+	if (dataFormat == msgpack::Float64) { // NodeJS sends 64-bit float, we don't support double precision, try it anyway…
+		uint64_t v;
+		bool e = msgpack::readIntU64(stream, v, false); // read it in a uint64_t which is 8 bytes long, same as the received double, bypassing check since it's not the correct type
+		value = doublePacked2Float(reinterpret_cast<unsigned char*>(&v)); // decode the 8bytes "buffer" to a 32bit float
+		return e;
+	} else if (dataFormat == msgpack::Float32) {
+		float v;
+		bool e = msgpack::readFloat32(stream, v);
+		value = v;
+		return e;
+	} else { // assume it's an Integer. Bad assumption but who cares at this point
+		int v;
+		bool e = msgpack::readInt(stream, v);
+		value = v;
+		return e;
+	}
+}
+
 /*
  * Message format:
  * [ "command", param]
+ *
+ * TODO: handle errCode from msgpack functions properly
  */
 bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	size_t arraySize;
@@ -99,10 +130,39 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		goto readerror;
 	}
 
-	if (!strncmp(key, "start", keyLength+1)) { //keyLength+1 because we want to compare null character as well
-		errCode = kilnRegulator.start();
+	if (!strncmp(key, "segment", keyLength+1)) {
+		int id = -1;
+		double temperature = -1;
+		double slope = -1;
+		unsigned long duration = 0;
+		errCode = msgpack::readArraySize(stream, arraySize);
+		//assert arraySize == 3
+
+		errCode = msgpack::readInt(stream, id);
+		errCode = forceReadDouble(stream, temperature);
+		errCode = forceReadDouble(stream, slope);
+		errCode = msgpack::readInt(stream, duration);
+
+		//assert id >= 0 && id < MAX_SEGMENT_COUNT
+
+		program.segments[id] = {
+			.temperature = temperature,
+			.slope = slope,
+			.duration = duration
+		};
+		program.count++;
+	}
+
+	else if (!strncmp(key, "start", keyLength+1)) { //keyLength+1 because we want to compare null character as well
 		//start cooking
 		//read program
+
+		// number of segments in the program
+		int v = 0;
+		errCode = msgpack::readInt(stream, v);
+		//assert v == program.count
+
+		errCode = kilnRegulator.start(program);
 	} else if (!strncmp(key, "stop", keyLength+1)) {
 		errCode = kilnRegulator.stop();
 		//stop cooking
