@@ -1,7 +1,7 @@
 # Arduino Make file. Refer to https://github.com/sudar/Arduino-Makefile
 
 
-ARDUINO_LIBS = msgpack-arduino MAX6675-library Arduino-PID-Library Time
+ARDUINO_LIBS = msgpack-arduino MAX6675-library Arduino-PID-Library Time Arduino/libraries/IEEE754tools
 USER_LIB_PATH := src/
 BOARD_TAG    = uno
 
