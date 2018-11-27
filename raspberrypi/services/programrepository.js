@@ -7,16 +7,20 @@ class ProgramRepository {
     this.programs = new Map();
   }
 
-  add(p) {
-    this.programs[p.uuid] = p;
+  exists(uuid) {
+    return this.programs.hasOwnProperty(uuid);
   }
 
   get(uuid) {
     return this.programs[uuid];
   }
 
-  exists(uuid) {
-    return this.programs.hasOwnProperty(uuid);
+  add(p) {
+    this.programs[p.uuid] = p;
+  }
+
+  remove(uuid) {
+    delete this.programs[uuid];
   }
 
   all() {

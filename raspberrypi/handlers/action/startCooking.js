@@ -5,6 +5,21 @@
  *
  */
 exports.handler = function startCooking(req, res, next) {
+  const programRepository = require('../../services/programrepository');
+
+  if (!req.body.hasOwnProperty('uuid')) {
+    res.status(400);
+    res.send('Missing uuid');
+    return;
+  }
+
+	if (!programRepository.exists(req.body.uuid)) {
+		res.status(400);
+		res.send('Program ' + uuid + ' not found');
+	}
+
+  const program = programRepository.get(req.body.uuid);
+
   const arduino = require('../../services/arduinorepository').first();
   if (!arduino) {
     res.status(503);
@@ -12,7 +27,7 @@ exports.handler = function startCooking(req, res, next) {
     return;
   }
 
-  arduino.start();
+  arduino.start(program);
 
   res.send('');
   next()

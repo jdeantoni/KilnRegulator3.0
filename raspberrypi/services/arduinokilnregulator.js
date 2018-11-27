@@ -52,6 +52,7 @@ class ArduinoKilnRegulator {
   open() {
     const akr = this;
     this.arduino.on('data', function(msg, error, originalmsg) {
+      console.log(msg);
       if (error) {
         akr.handleError(akr, error, originalmsg);
       } else {
@@ -83,8 +84,21 @@ class ArduinoKilnRegulator {
     this.arduino.write(["stop"]);
   }
 
-  start() {
-    this.arduino.write(["start"]);
+  start(program) {
+    const arduino = this.arduino;
+    const segments = program.segments;
+
+    for (const i in segments) {
+      const segment = segments[i];
+      arduino.write(['segment', [
+        parseInt(i),
+        segment.targetTemperature,
+        segment.slope,
+        segment.duration
+      ]]);
+    }
+
+    this.arduino.write(["start", program.segments.length]);
   }
 
   setSetpoint(setpoint) {
