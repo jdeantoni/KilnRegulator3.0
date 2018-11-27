@@ -10,3 +10,6 @@
 [submodule "arduino/src/Time"]
 	path = arduino/src/Time
 	url = https://github.com/PaulStoffregen/Time.git
+[submodule "arduino/src/Arduino"]
+	path = arduino/src/Arduino
+	url = https://github.com/RobTillaart/Arduino.git
