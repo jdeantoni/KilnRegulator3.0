@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput} from "react-native";
+import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert} from "react-native";
 import images from "../helpers/ImageLoader";
 
 export default class Table extends React.Component {
@@ -82,20 +82,28 @@ export default class Table extends React.Component {
     }
 
     addSegment() {
-        this.setState({data: [...this.state.data, {}]});
+        if (this.state.data.length >= 12) {
+            Alert.alert("Erreur", "Vous ne pouvez pas ajouter plus de 12 segments.", [{text: 'Ok', onPress: () => {}}]);
+        } else {
+            this.setState({data: [...this.state.data, {}]});
+        }
     }
 
     removeSegment(index) {
         let array = [...this.state.data];
         array.splice(index, 1);
         this.setState({data: array});
+        this.props.onChangeValue(array);
     }
 
     changeValueInData(rowId, headerKey, value) {
+        if (Number.isNaN(Number.parseFloat(value)) && value !== "") {
+            return false;
+        }
         let array = [...this.state.data];
         array[rowId][headerKey] = value;
         this.setState({data: array});
-        this.props.onChangeValue(this.state.data);
+        this.props.onChangeValue(array);
     }
 
     giveValue(val) {

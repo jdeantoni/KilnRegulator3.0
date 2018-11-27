@@ -6,9 +6,9 @@ export default class ProgramList extends React.Component {
     render() {
         return (
             <FlatList
-                data={this.props.programs}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({item}) => <ProgramItem program={{item}}/>}
+                data={this.props.ids}
+                keyExtractor={(item) => item.toString()}
+                renderItem={({item}) => <ProgramItem id={{item}}/>}
             />
         );
     }

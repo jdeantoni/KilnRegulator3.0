@@ -28,7 +28,8 @@ export default class FindKilnScreen extends React.Component {
                 <View style={styles.container}>
                     <TextInput placeholder={"Adresse IP"}
                                onChangeText={(text) => this.setState({ip: text})}
-                               value={this.state.ip}/>
+                               value={this.state.ip}
+                               keyboardType="numeric"/>
                 </View>
                 <View style={styles.container}>
                     <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>

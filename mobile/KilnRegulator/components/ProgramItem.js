@@ -4,7 +4,8 @@ import { connect } from "react-redux";
 
 class ProgramItem extends React.Component {
     render() {
-        const program = this.props.program.item;
+        const program = this.props.programs[this.props.id.item - 1];
+
         return (
             <TouchableOpacity style={[styles.main_container, this.isSelected()]} onPress={() => {this.toggleOnPress()}}>
                 <View style={styles.left_container}>
@@ -41,12 +42,12 @@ class ProgramItem extends React.Component {
     }
 
     toggleOnPress() {
-        const action = { type: "SELECT_PROGRAM", value: this.props.program.item.id };
+        const action = { type: "SELECT_PROGRAM", value: this.props.id.item };
         this.props.dispatch(action);
     }
 
     isSelected() {
-        if (this.props.selectedProgram === this.props.program.item.id) {
+        if (this.props.selectedProgram === this.props.id.item) {
             return {
                 backgroundColor: "lightgreen"
             }
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
     return {
         selectedProgram: state.selectedProgram,
+        programs: state.programs
     };
 };
 export default connect(mapStateToProps)(ProgramItem);

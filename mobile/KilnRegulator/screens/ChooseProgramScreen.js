@@ -16,6 +16,9 @@ class ChooseProgramScreen extends React.Component {
     constructor(props) {
         super(props);
         this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
+        this.state = {
+            ids: [],
+        };
     }
 
     render() {
@@ -26,7 +29,7 @@ class ChooseProgramScreen extends React.Component {
                     onWillBlur={() => this.removeBackListener()}
                 />
                 <View style={{flex: 6}}>
-                    <ProgramList programs={this.props.programs}/>
+                    <ProgramList ids={this.state.ids}/>
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
@@ -41,6 +44,7 @@ class ChooseProgramScreen extends React.Component {
     }
 
     addBackListener() {
+        this.setState({ids: Array.from({length: this.props.programs.length}, (v, k) => k+1)});
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 

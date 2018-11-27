@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
 import Table from "../components/Table";
 import connect from "react-redux/es/connect/connect";
 import {displayArrow} from "../helpers/NavigationHelper";
@@ -22,7 +22,7 @@ class EditProgramScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.main_container}>
+            <KeyboardAvoidingView style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
@@ -46,10 +46,10 @@ class EditProgramScreen extends React.Component {
                         title={"Sauvegarder le programme"}
                         onPress={() => this.saveProgram()}/>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
-//TODO Check int for text input
+
     handleChangeValue = e => this.setState({segments: e});
 
     saveProgram() {
@@ -84,6 +84,19 @@ class EditProgramScreen extends React.Component {
             Alert.alert("Erreur", "Les segments n'ont pas été spécifiés.", [{text: 'Ok', onPress: () => {}}]);
             return false;
         }
+        let segments = [...this.state.segments];
+        for (let i = 0; i < segments.length; i++) {
+            for (let key in segments[i]) {
+                if (Number.isNaN(Number.parseFloat(segments[i][key]))) {
+                    Alert.alert("Erreur", "Les segments comportent des erreurs de syntaxe.", [{text: 'Ok', onPress: () => {}}]);
+                    return false;
+                }
+                if (Number.parseFloat(segments[i][key]) !== segments[i][key]) {
+                    segments[i][key] = Number.parseFloat(segments[i][key]);
+                }
+            }
+        }
+        this.setState({segments: segments});
         return true;
     }
 
