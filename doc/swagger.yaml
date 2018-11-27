@@ -123,14 +123,17 @@ paths:
         name: "body"
         required: true
         schema:
-          type: "string"
-          description: "UUID of program to start on oven"
-          format: "uuid"
+          type: "object"
+          properties:
+            uuid:
+              type: "string"
+              description: "UUID of program to start on oven"
+              format: "uuid"
       responses:
         200:
           description: "successful operation"
         400:
-          description: "invalid operation, ex. already started"
+          description: "invalid operation, ex. already started or program not found"
         500:
           description: "could not start cooking"
   /action/stop:
