@@ -12,7 +12,7 @@ basePath: "/"
 tags:
 - name: "status"
 - name: "cooking"
-- name: "program"
+- name: "programs"
 - name: "action"
 - name: "debug"
 - name: "errors"
@@ -49,6 +49,70 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Cooking"
+
+  /programs:
+    get:
+      tags:
+      - "programs"
+      summary: "Get all programs"
+      operationId: "getPrograms"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "all programs"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Program"
+    post:
+      tags:
+      - "programs"
+      summary: "add new program"
+      operationId: "addProgram"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Program"
+      responses:
+        200:
+          description: "successful operation"
+        409:
+          description: "program already exists (uuid not unique)"
+  /programs/{uuid}:
+    put:
+      tags:
+      - "programs"
+      summary: "edit program, ie. archive old program if referenced or delete it, and add new program"
+      operationId: "editProgram"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Program"
+      - in: "path"
+        name: "uuid"
+        required: true
+        schema:
+          type: "string"
+          description: "Program UUID to edit"
+          format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
 
   /action/start:
     post:
@@ -105,7 +169,9 @@ paths:
         200:
           description: "message"
           schema:
-            $ref: "#/definitions/Error"
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
     delete:
       tags:
       - "errors"
@@ -199,6 +265,39 @@ definitions:
       segment:
         type: "integer"
         format: "int32"
+  Segment:
+    type: "object"
+    properties:
+      targetTemperature:
+        type: "integer"
+        description: "target temperature at the end of the segment"
+        format: "int64"
+      slope:
+        type: "number"
+        description: "slope in °C/second"
+        format: "float"
+      duration:
+        type: "integer"
+        description: "duration in seconds"
+        format: "int64"
+  Program:
+    type: "object"
+    properties:
+      uuid:
+        type: "string"
+        description: "Program UUID used for this cooking"
+        format: "uuid"
+      name:
+        type: "string"
+        description: "Program name"
+      lastModificationDate:
+        type: "string"
+        description: "Date and time when this program was last modified"
+        format: "date-time"
+      segments:
+        type: "array"
+        items:
+          $ref: "#/definitions/Segment"
   Sample:
     type: "object"
     properties:
@@ -221,7 +320,9 @@ definitions:
         description: "Date and time when this cooking started"
         format: "date-time"
       samples:
-        $ref: "#/definitions/Sample"
+        type: "array"
+        items:
+          $ref: "#/definitions/Sample"
       error:
         type: "string"
         description: "If present something bad happened"
