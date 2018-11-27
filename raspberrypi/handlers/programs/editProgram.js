@@ -14,7 +14,32 @@
  *
  */
 exports.handler = function editProgram(req, res, next) {
-  res.status(500);
-  res.send({error: 'Not implemented.'})
+  const programRepository = require('../../services/programrepository');
+
+  const keys = ['uuid', 'name', 'segments', 'lastModificationDate'];
+  for (const k in keys) {
+    if (!req.body.hasOwnProperty(keys[k])) {
+      res.status(400);
+      res.send('Missing ' + keys[k]);
+      return;
+    }
+  }
+
+  if (!programRepository.exists(req.params.uuid)) {
+    res.status(404);
+    res.send({error: 'Program with uuid ' + req.body.uuid + ' does not exist.'});
+    return;
+  }
+
+  programRepository.remove(req.params.uuid);
+
+  programRepository.add({
+    uuid: req.body.uuid,
+    name: req.body.name,
+    segments: req.body.segments,
+    lastModificationDate: req.body.lastModificationDate
+  });
+
+  res.send('');
   next()
 }
