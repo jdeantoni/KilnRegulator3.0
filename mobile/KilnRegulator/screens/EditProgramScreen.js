@@ -16,7 +16,7 @@ class EditProgramScreen extends React.Component {
 
         this.state = {
             programName: (this.props.selectedProgram !== -1) ? this.props.programs[this.props.selectedProgram-1].name : "",
-            segments: (this.props.selectedProgram !== -1) ? this.props.programs[this.props.selectedProgram-1].segments : [{}]
+            segments: (this.props.selectedProgram !== -1) ? this.unitToUser(this.props.programs[this.props.selectedProgram-1].segments) : [{}]
         };
     }
 
@@ -63,7 +63,7 @@ class EditProgramScreen extends React.Component {
                         const newProgram = {
                             id: (this.props.selectedProgram !== -1) ? this.props.selectedProgram : this.props.programs.length+1,
                             name: this.state.programName,
-                            segments: this.state.segments
+                            segments: this.unitToDev(this.state.segments)
                         };
 
                         const action = { type: "EDIT_PROGRAM", value: newProgram };
@@ -116,6 +116,34 @@ class EditProgramScreen extends React.Component {
             ]);
         return true;
     };
+
+    unitToUser(segments) {
+        let newSegments = JSON.parse(JSON.stringify(segments));
+
+        for (let i = 0; i < segments.length; i++) {
+            if (segments[i].hasOwnProperty("duration")) {
+                newSegments[i]["duration"] = segments[i]["duration"] / 3600;
+            }
+            if (segments[i].hasOwnProperty("slope")) {
+                newSegments[i]["slope"] = segments[i]["slope"] * 3600;
+            }
+        }
+
+        return newSegments;
+    }
+
+    unitToDev(segments) {
+        for (let i = 0; i < segments.length; i++) {
+            if (segments[i].hasOwnProperty("duration")) {
+                segments[i]["duration"] *= 3600;
+            }
+            if (segments[i].hasOwnProperty("slope")) {
+                segments[i]["slope"] /= 3600
+            }
+        }
+
+        return segments;
+    }
 }
 
 const styles = StyleSheet.create({
