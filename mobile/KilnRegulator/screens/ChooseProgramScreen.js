@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Button, Alert, BackHandler} from 'react-native';
 import { displayArrow } from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
-import {ActionAPI} from "../network/APIClient";
+import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
 import { connect } from "react-redux";
@@ -15,7 +15,10 @@ class ChooseProgramScreen extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
+        this.programsAPI = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+
         this.state = {
             ids: [],
         };
@@ -25,8 +28,8 @@ class ChooseProgramScreen extends React.Component {
         return (
             <View style={styles.main_container}>
                 <NavigationEvents
-                    onWillFocus={() => this.addBackListener()}
-                    onWillBlur={() => this.removeBackListener()}
+                    onWillFocus={() => this.onWillFocus()}
+                    onWillBlur={() => this.onWillBlur()}
                 />
                 <View style={{flex: 6}}>
                     <ProgramList ids={this.state.ids}/>
@@ -36,19 +39,20 @@ class ChooseProgramScreen extends React.Component {
                         <Button title={this.buttonNameEditProgram()} onPress={() => this.props.navigation.navigate("EditProgram")}/>
                     </View>
                     <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === -1}/>
+                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === ""}/>
                     </View>
                 </View>
             </View>
         );
     }
 
-    addBackListener() {
-        this.setState({ids: Array.from({length: this.props.programs.length}, (v, k) => k+1)});
+    onWillFocus() {
+        this.getPrograms();
+
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
-    removeBackListener() {
+    onWillBlur() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     }
 
@@ -57,7 +61,7 @@ class ChooseProgramScreen extends React.Component {
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
                 {text: 'Oui', onPress: () =>
-                        this.actionAPI.startCooking()
+                        this.actionAPI.startCooking({uuid: this.props.selectedProgram})
                             .then((response) => {
                                 if (response.ok) {
                                     this.props.navigation.navigate("TrackingCooking");
@@ -82,7 +86,31 @@ class ChooseProgramScreen extends React.Component {
     };
 
     buttonNameEditProgram() {
-        return (this.props.selectedProgram === -1) ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
+        return (this.props.selectedProgram === "") ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
+    }
+
+    getPrograms() {
+        this.programsAPI.getPrograms()
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else throw new Error("HTTP response status not code 200 as expected.");
+            })
+            .then((response) => {
+                const action = { type: "UPDATE_PROGRAMS", value: response };
+                this.props.dispatch(action);
+
+                const ids = [];
+                for (let id in response) {
+                    ids.push(response[id].uuid);
+                }
+                this.setState({ids: ids});
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Connexion réseau échouée")
+            });
     }
 }
 

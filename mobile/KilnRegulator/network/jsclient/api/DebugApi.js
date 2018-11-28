@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Body', 'model/Debug'], factory);
+    define(['ApiClient', 'model/Body1', 'model/Debug'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Body'), require('../model/Debug'));
+    module.exports = factory(require('../ApiClient'), require('../model/Body1'), require('../model/Debug'));
   } else {
     // Browser globals (root is window)
     if (!root.KilnRegulator) {
       root.KilnRegulator = {};
     }
-    root.KilnRegulator.DebugApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Body, root.KilnRegulator.Debug);
+    root.KilnRegulator.DebugApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Body1, root.KilnRegulator.Debug);
   }
-}(this, function(ApiClient, Body, Debug) {
+}(this, function(ApiClient, Body1, Debug) {
   'use strict';
 
   /**
@@ -97,7 +97,7 @@
 
     /**
      * set target temperature
-     * @param {module:model/Body} body 
+     * @param {module:model/Body1} body 
      * @param {module:api/DebugApi~setSetpointCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.setSetpoint = function(body, callback) {

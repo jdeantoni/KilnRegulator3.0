@@ -4,20 +4,18 @@ import { connect } from "react-redux";
 
 class ProgramItem extends React.Component {
     render() {
-        const program = this.props.programs[this.props.id.item - 1];
+        const program = this.props.programs[this.props.id.item];
 
         return (
             <TouchableOpacity style={[styles.main_container, this.isSelected()]} onPress={() => {this.toggleOnPress()}}>
-                <View style={styles.left_container}>
-                    <Text style={styles.textId} adjustsFontSizeToFit>{program.id}</Text>
-                </View>
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
                         <Text style={styles.title_text}>{program.name}</Text>
                     </View>
                     <View style={styles.description_container}>
-                        <Text style={styles.description_text}>{program.segments.length} segments</Text>
+                        <Text style={styles.description_text}>{program.segments.length} segment{this.writeS(program.segments.length)}</Text>
                         <Text style={styles.description_text}>{this.computeTime(program.segments)}</Text>
+                        <Text style={styles.description_text}>Dernière modification le {program.lastModificationDate.split("T")[0]}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -29,8 +27,8 @@ class ProgramItem extends React.Component {
         segments.forEach((segment) => {
             if (segment.hasOwnProperty("duration")) {
                 timeInSeconds += segment["duration"];
-            } else if (segment.hasOwnProperty("target") && segment.hasOwnProperty("slope")) {
-                timeInSeconds += segment["target"] / segment["slope"];
+            } else if (segment.hasOwnProperty("targetTemperature") && segment.hasOwnProperty("slope")) {
+                timeInSeconds += segment["targetTemperature"] / segment["slope"];
             }
         });
 
@@ -57,24 +55,21 @@ class ProgramItem extends React.Component {
             };
         }
     }
+
+    writeS(nbSegments) {
+        return (nbSegments > 1) ? "s" : "";
+    }
 }
 
 const styles = StyleSheet.create({
     main_container: {
-        height: 80,
+        height: 100,
         flexDirection: 'row',
-    },
-    left_container: {
-        flex: 1,
-        resizeMode: 'center',
-        justifyContent: 'center',
-        alignItems: 'center'
     },
     textId: {
         fontSize: 40
     },
     content_container: {
-        flex: 3,
         margin: 5
     },
     header_container: {
@@ -87,7 +82,7 @@ const styles = StyleSheet.create({
         paddingRight: 5
     },
     description_container: {
-        flex: 3,
+        flex: 4,
     },
     description_text: {
         fontStyle: 'italic',

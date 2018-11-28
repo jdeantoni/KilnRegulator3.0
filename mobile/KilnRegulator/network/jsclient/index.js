@@ -16,12 +16,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Body', 'model/Cooking', 'model/Debug', 'model/Error', 'model/Sample', 'model/Status', 'api/ActionApi', 'api/DebugApi', 'api/StatusApi'], factory);
+    define(['ApiClient', 'model/Body', 'model/Cooking', 'model/Debug', 'model/Error', 'model/Program', 'model/Sample', 'model/Segment', 'model/Status', 'api/ActionApi', 'api/DebugApi', 'api/ErrorsApi', 'api/ProgramsApi', 'api/StatusApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/Body'), require('./model/Cooking'), require('./model/Debug'), require('./model/Error'), require('./model/Sample'), require('./model/Status'), require('./api/ActionApi'), require('./api/DebugApi'), require('./api/StatusApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/Body'), require('./model/Cooking'), require('./model/Debug'), require('./model/Error'), require('./model/Program'), require('./model/Sample'), require('./model/Segment'), require('./model/Status'), require('./api/ActionApi'), require('./api/DebugApi'), require('./api/ErrorsApi'), require('./api/ProgramsApi'), require('./api/StatusApi'));
   }
-}(function(ApiClient, Body, Cooking, Debug, Error, Sample, Status, ActionApi, DebugApi, StatusApi) {
+}(function(ApiClient, Body, Cooking, Debug, Error, Program, Sample, Segment, Status, ActionApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi) {
   'use strict';
 
   /**
@@ -82,10 +82,20 @@
      */
     Error: Error,
     /**
+     * The Program model constructor.
+     * @property {module:model/Program}
+     */
+    Program: Program,
+    /**
      * The Sample model constructor.
      * @property {module:model/Sample}
      */
     Sample: Sample,
+    /**
+     * The Segment model constructor.
+     * @property {module:model/Segment}
+     */
+    Segment: Segment,
     /**
      * The Status model constructor.
      * @property {module:model/Status}
@@ -101,6 +111,16 @@
      * @property {module:api/DebugApi}
      */
     DebugApi: DebugApi,
+    /**
+     * The ErrorsApi service constructor.
+     * @property {module:api/ErrorsApi}
+     */
+    ErrorsApi: ErrorsApi,
+    /**
+     * The ProgramsApi service constructor.
+     * @property {module:api/ProgramsApi}
+     */
+    ProgramsApi: ProgramsApi,
     /**
      * The StatusApi service constructor.
      * @property {module:api/StatusApi}

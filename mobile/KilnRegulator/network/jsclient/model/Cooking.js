@@ -71,7 +71,7 @@
         obj['startDate'] = ApiClient.convertToType(data['startDate'], 'Date');
       }
       if (data.hasOwnProperty('samples')) {
-        obj['samples'] = Sample.constructFromObject(data['samples']);
+        obj['samples'] = ApiClient.convertToType(data['samples'], [Sample]);
       }
       if (data.hasOwnProperty('error')) {
         obj['error'] = ApiClient.convertToType(data['error'], 'String');
@@ -91,7 +91,7 @@
    */
   exports.prototype['startDate'] = undefined;
   /**
-   * @member {module:model/Sample} samples
+   * @member {Array.<module:model/Sample>} samples
    */
   exports.prototype['samples'] = undefined;
   /**

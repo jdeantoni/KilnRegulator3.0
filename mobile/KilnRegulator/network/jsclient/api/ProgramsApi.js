@@ -16,29 +16,29 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Body'], factory);
+    define(['ApiClient', 'model/Program'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Body'));
+    module.exports = factory(require('../ApiClient'), require('../model/Program'));
   } else {
     // Browser globals (root is window)
     if (!root.KilnRegulator) {
       root.KilnRegulator = {};
     }
-    root.KilnRegulator.ActionApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Body);
+    root.KilnRegulator.ProgramsApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Program);
   }
-}(this, function(ApiClient, Body) {
+}(this, function(ApiClient, Program) {
   'use strict';
 
   /**
-   * Action service.
-   * @module api/ActionApi
+   * Programs service.
+   * @module api/ProgramsApi
    * @version 0.1.0
    */
 
   /**
-   * Constructs a new ActionApi. 
-   * @alias module:api/ActionApi
+   * Constructs a new ProgramsApi. 
+   * @alias module:api/ProgramsApi
    * @class
    * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
@@ -48,65 +48,25 @@
 
 
     /**
-     * Callback function to receive the result of the emergencyStop operation.
-     * @callback module:api/ActionApi~emergencyStopCallback
+     * Callback function to receive the result of the addProgram operation.
+     * @callback module:api/ProgramsApi~addProgramCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * PANIC
-     * @param {module:api/ActionApi~emergencyStopCallback} callback The callback function, accepting three arguments: error, data, response
+     * add new program
+     * @param {module:model/Program} body 
+     * @param {module:api/ProgramsApi~addProgramCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.emergencyStop = function(callback) {
-      var postBody = null;
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var collectionQueryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = [];
-      var accepts = [];
-      var returnType = null;
-
-      return this.apiClient.callApi(
-        '/action/emergencystop', 'POST',
-        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the startCooking operation.
-     * @callback module:api/ActionApi~startCookingCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Start cooking
-     * @param {module:model/Body} body 
-     * @param {module:api/ActionApi~startCookingCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.startCooking = function(body, callback) {
+    this.addProgram = function(body, callback) {
       var postBody = body;
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling startCooking");
+        throw new Error("Missing the required parameter 'body' when calling addProgram");
       }
-
 
       var pathParams = {
       };
@@ -120,30 +80,82 @@
       };
 
       var authNames = [];
-      var contentTypes = [];
-      var accepts = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/action/start', 'POST',
+        '/programs', 'POST',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
     }
 
     /**
-     * Callback function to receive the result of the stopCooking operation.
-     * @callback module:api/ActionApi~stopCookingCallback
+     * Callback function to receive the result of the editProgram operation.
+     * @callback module:api/ProgramsApi~editProgramCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Stop cooking
-     * @param {module:api/ActionApi~stopCookingCallback} callback The callback function, accepting three arguments: error, data, response
+     * edit program, ie. archive old program if referenced or delete it, and add new program
+     * @param {String} uuid 
+     * @param {module:model/Program} body 
+     * @param {module:api/ProgramsApi~editProgramCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.stopCooking = function(callback) {
+    this.editProgram = function(uuid, body, callback) {
+      var postBody = body;
+
+      // verify the required parameter 'uuid' is set
+      if (uuid === undefined || uuid === null) {
+        throw new Error("Missing the required parameter 'uuid' when calling editProgram");
+      }
+
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling editProgram");
+      }
+
+      var pathParams = {
+        'uuid': uuid
+      };
+      var queryParams = {
+      };
+      var collectionQueryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/programs/{uuid}', 'PUT',
+        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getPrograms operation.
+     * @callback module:api/ProgramsApi~getProgramsCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Program>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get all programs
+     * @param {module:api/ProgramsApi~getProgramsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Program>}
+     */
+    this.getPrograms = function(callback) {
       var postBody = null;
 
 
@@ -159,12 +171,12 @@
       };
 
       var authNames = [];
-      var contentTypes = [];
-      var accepts = [];
-      var returnType = null;
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [Program];
 
       return this.apiClient.callApi(
-        '/action/stop', 'POST',
+        '/programs', 'GET',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

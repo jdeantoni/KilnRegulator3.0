@@ -46,9 +46,9 @@
     /**
      * The base URL against which to resolve every API call's (relative) path.
      * @type {String}
-     * @default https://petstore.swagger.io
+     * @default http://127.0.0.1:3000
      */
-    this.basePath = 'http://10.212.100.10:3000'.replace(/\/+$/, '');
+    this.basePath = 'http://127.0.0.1:3000'.replace(/\/+$/, '');
 
     /**
      * The authentication methods to be included for all API calls.
@@ -174,16 +174,6 @@
    * @returns {Boolean} <code>true</code> if <code>param</code> represents a file.
    */
   exports.prototype.isFileParam = function(param) {
-    // fs.ReadStream in Node.js and Electron (but not in runtime like browserify)
-    if (typeof require === 'function') {
-      var fs;
-      try {
-       // fs = require('fs');
-      } catch (err) {}
-      //if (fs && fs.ReadStream && param instanceof fs.ReadStream) {
-        return true;
-      //}
-    }
     // Buffer in Node.js
     if (typeof Buffer === 'function' && param instanceof Buffer) {
       return true;
@@ -586,13 +576,13 @@
     }
   };
 
-    /**
-     * Set path.
-     * @param {String} address
-     */
-    exports.prototype.setAddress = function(address) {
-        this.basePath = ('http://'+address).replace(/\/+$/, '');
-    };
+  /**
+   * Set path.
+   * @param {String} address
+   */
+  exports.prototype.setAddress = function(address) {
+    this.basePath = ('http://'+address).replace(/\/+$/, '');
+  };
 
   /**
    * The default API client implementation.

@@ -44,7 +44,7 @@ export default class Table extends React.Component {
                 <View style={styles.cell}>
                     <Text>{key+1}</Text>
                 </View>
-                {this.renderCell("target", 500, 4, key)}
+                {this.renderCell("targetTemperature", 500, 4, key)}
                 {this.renderCell("duration", 6.5, 4, key)}
                 {this.renderCell("slope", 100, 4, key)}
                 <View style={styles.suppr_cell}>

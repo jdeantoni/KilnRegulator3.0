@@ -25,7 +25,7 @@
     if (!root.KilnRegulator) {
       root.KilnRegulator = {};
     }
-    root.KilnRegulator.Body = factory(root.KilnRegulator.ApiClient);
+    root.KilnRegulator.Body1 = factory(root.KilnRegulator.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -34,14 +34,14 @@
 
 
   /**
-   * The Body model module.
-   * @module model/Body
+   * The Body1 model module.
+   * @module model/Body1
    * @version 0.1.0
    */
 
   /**
-   * Constructs a new <code>Body</code>.
-   * @alias module:model/Body
+   * Constructs a new <code>Body1</code>.
+   * @alias module:model/Body1
    * @class
    */
   var exports = function() {
@@ -51,28 +51,27 @@
   };
 
   /**
-   * Constructs a <code>Body</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>Body1</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/Body} obj Optional instance to populate.
-   * @return {module:model/Body} The populated <code>Body</code> instance.
+   * @param {module:model/Body1} obj Optional instance to populate.
+   * @return {module:model/Body1} The populated <code>Body1</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('uuid')) {
-        obj['uuid'] = ApiClient.convertToType(data['uuid'], 'String');
+      if (data.hasOwnProperty('setpoint')) {
+        obj['setpoint'] = ApiClient.convertToType(data['setpoint'], 'Number');
       }
     }
     return obj;
   }
 
   /**
-   * UUID of program to start on oven
-   * @member {String} uuid
+   * @member {Number} setpoint
    */
-  exports.prototype['uuid'] = undefined;
+  exports.prototype['setpoint'] = undefined;
 
 
 
