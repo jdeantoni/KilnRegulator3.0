@@ -32,7 +32,7 @@ class ProgramRepository {
     });
     return {
       uuid: mProgram.uuid,
-      name: mProgram.date,
+      name: mProgram.name,
       lastModificationDate: mProgram.lastModificationDate,
       segments: segments
     }
