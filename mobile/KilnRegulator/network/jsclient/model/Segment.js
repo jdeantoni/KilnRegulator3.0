@@ -25,7 +25,7 @@
     if (!root.KilnRegulator) {
       root.KilnRegulator = {};
     }
-    root.KilnRegulator.Body = factory(root.KilnRegulator.ApiClient);
+    root.KilnRegulator.Segment = factory(root.KilnRegulator.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -34,45 +34,63 @@
 
 
   /**
-   * The Body model module.
-   * @module model/Body
+   * The Segment model module.
+   * @module model/Segment
    * @version 0.1.0
    */
 
   /**
-   * Constructs a new <code>Body</code>.
-   * @alias module:model/Body
+   * Constructs a new <code>Segment</code>.
+   * @alias module:model/Segment
    * @class
    */
   var exports = function() {
     var _this = this;
 
 
+
+
   };
 
   /**
-   * Constructs a <code>Body</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>Segment</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/Body} obj Optional instance to populate.
-   * @return {module:model/Body} The populated <code>Body</code> instance.
+   * @param {module:model/Segment} obj Optional instance to populate.
+   * @return {module:model/Segment} The populated <code>Segment</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('uuid')) {
-        obj['uuid'] = ApiClient.convertToType(data['uuid'], 'String');
+      if (data.hasOwnProperty('targetTemperature')) {
+        obj['targetTemperature'] = ApiClient.convertToType(data['targetTemperature'], 'Number');
+      }
+      if (data.hasOwnProperty('slope')) {
+        obj['slope'] = ApiClient.convertToType(data['slope'], 'Number');
+      }
+      if (data.hasOwnProperty('duration')) {
+        obj['duration'] = ApiClient.convertToType(data['duration'], 'Number');
       }
     }
     return obj;
   }
 
   /**
-   * UUID of program to start on oven
-   * @member {String} uuid
+   * target temperature at the end of the segment
+   * @member {Number} targetTemperature
    */
-  exports.prototype['uuid'] = undefined;
+  exports.prototype['targetTemperature'] = undefined;
+  /**
+   * slope in °C/second
+   * @member {Number} slope
+   */
+  exports.prototype['slope'] = undefined;
+  /**
+   * duration in seconds
+   * @member {Number} duration
+   */
+  exports.prototype['duration'] = undefined;
 
 
 

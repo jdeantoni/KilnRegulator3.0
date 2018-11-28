@@ -1,4 +1,4 @@
-import { ActionApi, DebugApi, StatusApi, ApiClient } from './jsclient';
+import { ActionApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi, ApiClient } from './jsclient';
 
 class APIClient extends ApiClient {
     constructor(address) {
@@ -8,9 +8,14 @@ class APIClient extends ApiClient {
 
     callApi(path, httpMethod, pathParams, queryParams, collectionQueryParams, headerParams, formParams,
             bodyParam, authNames, contentTypes, accepts, returnType, callback) {
-        return fetch(`${this.basePath}${path}`,
+        return fetch(this.buildUrl(path, pathParams),
             {
-                method: httpMethod
+                method: httpMethod,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: bodyParam === null ? null : JSON.stringify(bodyParam)
             });
     }
 }
@@ -27,6 +32,18 @@ class DebugAPI extends DebugApi {
     }
 }
 
+class ErrorsAPI extends ErrorsApi {
+    constructor(address) {
+        super(new APIClient(address));
+    }
+}
+
+class ProgramsAPI extends ProgramsApi {
+    constructor(address) {
+        super(new APIClient(address));
+    }
+}
+
 class StatusAPI extends StatusApi {
     constructor(address) {
         super(new APIClient(address));
@@ -36,5 +53,7 @@ class StatusAPI extends StatusApi {
 export {
     ActionAPI,
     DebugAPI,
+    ErrorsAPI,
+    ProgramsAPI,
     StatusAPI
 }

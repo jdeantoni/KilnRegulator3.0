@@ -50,6 +50,7 @@
 
 
 
+
   };
 
   /**
@@ -63,6 +64,9 @@
     if (data) {
       obj = obj || new exports();
 
+      if (data.hasOwnProperty('errored')) {
+        obj['errored'] = ApiClient.convertToType(data['errored'], 'Boolean');
+      }
       if (data.hasOwnProperty('state')) {
         obj['state'] = ApiClient.convertToType(data['state'], 'String');
       }
@@ -76,6 +80,10 @@
     return obj;
   }
 
+  /**
+   * @member {Boolean} errored
+   */
+  exports.prototype['errored'] = undefined;
   /**
    * @member {module:model/Status.StateEnum} state
    */

@@ -4,6 +4,9 @@ import Table from "../components/Table";
 import connect from "react-redux/es/connect/connect";
 import {displayArrow} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
+import uuidv4 from "uuid/v4"
+import {ProgramsAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -14,9 +17,11 @@ class EditProgramScreen extends React.Component {
     constructor(props) {
         super(props);
 
+        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+
         this.state = {
-            programName: (this.props.selectedProgram !== -1) ? this.props.programs[this.props.selectedProgram-1].name : "",
-            segments: (this.props.selectedProgram !== -1) ? this.unitToUser(this.props.programs[this.props.selectedProgram-1].segments) : [{}]
+            programName: (this.props.selectedProgram !== "") ? this.props.programs[this.props.selectedProgram].name : "",
+            segments: (this.props.selectedProgram !== "") ? this.unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
         };
     }
 
@@ -61,15 +66,36 @@ class EditProgramScreen extends React.Component {
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
                 {text: 'Oui', onPress: () => {
                         const newProgram = {
-                            id: (this.props.selectedProgram !== -1) ? this.props.selectedProgram : this.props.programs.length+1,
-                            name: this.state.programName,
-                            segments: this.unitToDev(this.state.segments)
+                            uuid: uuidv4(),
+                            name: this.state.programName.trim(),
+                            segments: this.unitToDev(this.state.segments),
+                            lastModificationDate: (new Date()).toISOString()
                         };
 
-                        const action = { type: "EDIT_PROGRAM", value: newProgram };
-                        this.props.dispatch(action);
+                        if (this.props.selectedProgram === "") {
+                            this.programApi.addProgram(newProgram)
+                                .then((response) => {
+                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    alert("Connexion réseau échouée")
+                                });
+                        } else {
+                            console.log(this.props.selectedProgram, newProgram);
 
-                        this.props.navigation.navigate("ChooseProgram")
+                            this.programApi.editProgram(this.props.selectedProgram, newProgram)
+                                .then((response) => {
+                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    alert("Connexion réseau échouée")
+                                });
+                        }
+                        this.props.dispatch({ type: "SELECT_PROGRAM", value: newProgram.uuid });
+
+                        this.props.navigation.navigate("ChooseProgram");
                     }
                 },
             ]);
@@ -139,6 +165,9 @@ class EditProgramScreen extends React.Component {
             }
             if (segments[i].hasOwnProperty("slope")) {
                 segments[i]["slope"] /= 3600
+            }
+            if (segments[i].hasOwnProperty("_id")) {
+                delete segments[i]["_id"];
             }
         }
 

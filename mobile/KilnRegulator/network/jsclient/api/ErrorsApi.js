@@ -16,29 +16,29 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Cooking', 'model/Status'], factory);
+    define(['ApiClient', 'model/Error'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Cooking'), require('../model/Status'));
+    module.exports = factory(require('../ApiClient'), require('../model/Error'));
   } else {
     // Browser globals (root is window)
     if (!root.KilnRegulator) {
       root.KilnRegulator = {};
     }
-    root.KilnRegulator.StatusApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Cooking, root.KilnRegulator.Status);
+    root.KilnRegulator.ErrorsApi = factory(root.KilnRegulator.ApiClient, root.KilnRegulator.Error);
   }
-}(this, function(ApiClient, Cooking, Status) {
+}(this, function(ApiClient, Error) {
   'use strict';
 
   /**
-   * Status service.
-   * @module api/StatusApi
+   * Errors service.
+   * @module api/ErrorsApi
    * @version 0.1.0
    */
 
   /**
-   * Constructs a new StatusApi. 
-   * @alias module:api/StatusApi
+   * Constructs a new ErrorsApi. 
+   * @alias module:api/ErrorsApi
    * @class
    * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
@@ -48,19 +48,18 @@
 
 
     /**
-     * Callback function to receive the result of the getCurrentCooking operation.
-     * @callback module:api/StatusApi~getCurrentCookingCallback
+     * Callback function to receive the result of the clearError operation.
+     * @callback module:api/ErrorsApi~clearErrorCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/Cooking} data The data returned by the service call.
+     * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Get current cooking info from the beginning
-     * @param {module:api/StatusApi~getCurrentCookingCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/Cooking}
+     * Clear error if any
+     * @param {module:api/ErrorsApi~clearErrorCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.getCurrentCooking = function(callback) {
+    this.clearError = function(callback) {
       var postBody = null;
 
 
@@ -78,29 +77,29 @@
       var authNames = [];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = Cooking;
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/status/cooking', 'GET',
+        '/errors', 'DELETE',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
     }
 
     /**
-     * Callback function to receive the result of the getStatus operation.
-     * @callback module:api/StatusApi~getStatusCallback
+     * Callback function to receive the result of the getError operation.
+     * @callback module:api/ErrorsApi~getErrorCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/Status} data The data returned by the service call.
+     * @param {Array.<module:model/Error>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Get current status of oven
-     * @param {module:api/StatusApi~getStatusCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/Status}
+     * Get error if any
+     * @param {module:api/ErrorsApi~getErrorCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Error>}
      */
-    this.getStatus = function(callback) {
+    this.getError = function(callback) {
       var postBody = null;
 
 
@@ -118,10 +117,10 @@
       var authNames = [];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = Status;
+      var returnType = [Error];
 
       return this.apiClient.callApi(
-        '/status', 'GET',
+        '/errors', 'GET',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
