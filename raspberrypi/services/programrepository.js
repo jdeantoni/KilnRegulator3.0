@@ -50,11 +50,12 @@ class ProgramRepository {
   }
 
   remove(uuid, c) {
-    this.get(uuid, function(err, program) {
+    const pr = this;
+    mongoose.model('program').findOne({uuid: uuid}, function(err, program) {
       if (!err) {
         program.remove();
       }
-      c(err, program);
+      c(err, pr.parseMongoProgram(program));
     });
   }
 
