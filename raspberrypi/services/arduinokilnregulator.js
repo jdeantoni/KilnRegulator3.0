@@ -87,9 +87,16 @@ class ArduinoKilnRegulator {
   start(program) {
     const arduino = this.arduino;
     const segments = program.segments;
-
     for (const i in segments) {
       const segment = segments[i];
+
+      if (segment.targetTemperature == null)
+        segment.targetTemperature = 0;
+      if (segment.slope == null)
+        segment.slope = 0;
+      if (segment.duration == null)
+        segment.duration = 0;
+
       arduino.write(['segment', [
         parseInt(i),
         segment.targetTemperature,

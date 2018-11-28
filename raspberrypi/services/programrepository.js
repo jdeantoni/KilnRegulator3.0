@@ -18,8 +18,31 @@ class ProgramRepository {
     });
   }
 
+  parseMongoProgram(mProgram) {
+    let segments = [];
+    mProgram.segments.forEach(function(mSegment) {
+      let segment = {};
+      if (mSegment.targetTemperature != null)
+        segment.targetTemperature = mSegment.targetTemperature;
+      if (mSegment.slope != null)
+        segment.slope = mSegment.slope;
+      if (mSegment.duration != null)
+        segment.duration = mSegment.duration;
+      segments.push(segment);
+    });
+    return {
+      uuid: mProgram.uuid,
+      name: mProgram.date,
+      lastModificationDate: mProgram.lastModificationDate,
+      segments: segments
+    }
+  }
+
   get(uuid, c) {
-    mongoose.model('program').findOne({uuid: uuid}, c);
+    const pr = this;
+    mongoose.model('program').findOne({uuid: uuid}, function(err, program) {
+      c(err, pr.parseMongoProgram(program));
+    });
   }
 
   add(p, c) {
@@ -36,9 +59,15 @@ class ProgramRepository {
   }
 
   all(c) {
+    const pr = this;
     mongoose.model('program').find({})
       .sort({name: 'ascending'})
-      .exec(c);
+      .exec(function(err, programs) {
+        programs = programs.map(function(program) {
+          return pr.parseMongoProgram(program);
+        });
+        c(err, programs);
+      });
   }
 }
 
