@@ -36,7 +36,9 @@ class ProgramRepository {
   }
 
   all(c) {
-    mongoose.model('program').find({}, c);
+    mongoose.model('program').find({})
+      .sort({name: 'ascending'})
+      .exec(c);
   }
 }
 
