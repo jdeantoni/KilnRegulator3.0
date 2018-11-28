@@ -13,22 +13,35 @@ exports.handler = function startCooking(req, res, next) {
     return;
   }
 
-	if (!programRepository.exists(req.body.uuid)) {
-		res.status(400);
-		res.send('Program ' + uuid + ' not found');
-	}
+	programRepository.exists(req.body.uuid, function(err, exists) {
+    if (err) {
+      res.status(500);
+      res.send({error: err});
+      console.error(err);
+    } else if (!exists) {
+      res.status(400);
+      res.send('Program ' + req.body.uuid + ' not found');
+    } else {
+      programRepository.get(req.body.uuid, function(err, program) {
+        if (err) {
+          res.status(500);
+          res.send({error: err});
+          console.error(err);
+        } else {
 
-  const program = programRepository.get(req.body.uuid);
+          const arduino = require('../../services/arduinorepository').first();
+          if (!arduino) {
+            res.status(503);
+            res.send({errored: true});
+            return;
+          }
 
-  const arduino = require('../../services/arduinorepository').first();
-  if (!arduino) {
-    res.status(503);
-    res.send({errored: true});
-    return;
-  }
+          arduino.start(program);
 
-  arduino.start(program);
-
-  res.send('');
-  next()
+          res.send('');
+          next()
+        }
+      });
+    }
+  });
 }
