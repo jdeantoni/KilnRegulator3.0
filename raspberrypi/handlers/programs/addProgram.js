@@ -22,19 +22,32 @@ exports.handler = function addProgram(req, res, next) {
     }
   }
 
-  if (programRepository.exists(req.body.uuid)) {
-    res.status(409);
-    res.send({error: 'Program with uuid ' + req.body.uuid + ' already exists.'});
-    return;
-  }
-
-  programRepository.add({
-    uuid: req.body.uuid,
-    name: req.body.name,
-    segments: req.body.segments,
-    lastModificationDate: req.body.lastModificationDate
+  programRepository.exists(req.body.uuid, function(err, exists) {
+    if (err) {
+      res.status(500);
+      res.send({error: err});
+      console.error(err);
+    } else if (exists) {
+      res.status(409);
+      res.send({error: 'Program with uuid ' + req.body.uuid + ' already exists.'});
+    } else {
+      programRepository.add({
+        uuid: req.body.uuid,
+        name: req.body.name,
+        segments: req.body.segments,
+        lastModificationDate: req.body.lastModificationDate
+      }, function(err, program) {
+        if (err) {
+          res.status(500);
+          res.send({error: err});
+          console.error(err);
+        } else {
+          console.log("Created: " + program);
+          res.send(program);
+        }
+        next()
+      });
+    }
   });
 
-  res.send('');
-  next()
 }

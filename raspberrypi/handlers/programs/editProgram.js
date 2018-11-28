@@ -25,21 +25,39 @@ exports.handler = function editProgram(req, res, next) {
     }
   }
 
-  if (!programRepository.exists(req.params.uuid)) {
-    res.status(404);
-    res.send({error: 'Program with uuid ' + req.body.uuid + ' does not exist.'});
-    return;
-  }
-
-  programRepository.remove(req.params.uuid);
-
-  programRepository.add({
-    uuid: req.body.uuid,
-    name: req.body.name,
-    segments: req.body.segments,
-    lastModificationDate: req.body.lastModificationDate
+  programRepository.exists(req.params.uuid, function(err, exists) {
+    if (err) {
+      res.status(500);
+      res.send({error: err});
+      console.error(err);
+    } else if (!exists) {
+      res.status(404);
+      res.send({error: 'Program with uuid ' + req.body.uuid + ' does not exist.'});
+    } else {
+      programRepository.remove(req.params.uuid, function(err, doc) {
+        if (err) {
+          res.status(500);
+          res.send({error: err});
+          console.error(err);
+        } else {
+          programRepository.add({
+            uuid: req.body.uuid,
+            name: req.body.name,
+            segments: req.body.segments,
+            lastModificationDate: req.body.lastModificationDate
+          }, function(err, program) {
+            if (err) {
+              res.status(500);
+              res.send({error: err});
+              console.error(err);
+            } else {
+              console.log('Updated ' + req.body.uuid + ' with ' + program);
+              res.send(program);
+            }
+            next()
+          });
+        }
+      });
+    }
   });
-
-  res.send('');
-  next()
 }

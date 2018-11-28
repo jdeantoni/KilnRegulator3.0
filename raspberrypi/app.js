@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const swaggerRoutes = require('swagger-routes')
 
-//const db = require('./model/db');
+const db = require('./model/db');
 const model = require('./model/model');
 
 const YAML = require('yamljs');

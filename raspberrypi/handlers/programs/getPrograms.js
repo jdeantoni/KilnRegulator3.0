@@ -5,8 +5,16 @@
  *
  */
 exports.handler = function getPrograms(req, res, next) {
-  const programs = require('../../services/programrepository').all();
+  const programRepository = require('../../services/programrepository');
 
-  res.send(programs);
-  next()
+  programRepository.all(function(err, programs) {
+    if (err) {
+      res.status(500);
+      res.send({error: err});
+      console.error(err);
+    } else {
+      res.send(programs);
+    }
+    next()
+  });
 }

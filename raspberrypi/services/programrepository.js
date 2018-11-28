@@ -2,36 +2,41 @@
  * Should persist in database, in memory for now
  */
 
+var mongoose = require('mongoose');
+
 class ProgramRepository {
   constructor() {
-    this.programs = new Map();
   }
 
-  exists(uuid) {
-    return this.programs.hasOwnProperty(uuid);
-  }
-
-  get(uuid) {
-    return this.programs[uuid];
-  }
-
-  add(p) {
-    this.programs[p.uuid] = p;
-  }
-
-  remove(uuid) {
-    delete this.programs[uuid];
-  }
-
-  all() {
-    let a = [];
-
-    for (const uuid in this.programs) {
-      if (this.exists(uuid)) {
-        a.push(this.programs[uuid]);
+  exists(uuid, c) {
+    mongoose.model('program').count({uuid: uuid}, function (err, count){
+      if(count>0) {
+        c(err, true);
+      } else {
+        c(err, false);
       }
-    }
-    return a;
+    });
+  }
+
+  get(uuid, c) {
+    mongoose.model('program').findOne({uuid: uuid}, c);
+  }
+
+  add(p, c) {
+    mongoose.model('program').create(p, c);
+  }
+
+  remove(uuid, c) {
+    this.get(uuid, function(err, program) {
+      if (!err) {
+        program.remove();
+      }
+      c(err, program);
+    });
+  }
+
+  all(c) {
+    mongoose.model('program').find({}, c);
   }
 }
 

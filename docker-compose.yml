@@ -21,12 +21,13 @@ services:
       - "3000:3000"
     links:
       - arduino
+      - mongo
     volumes:
       - /dev:/dev
     privileged: true
-#  mongo:
-#    image: mongo
-#    volumes:
-#      - /srv/KilnRegulator:/data/db
-#    ports:
-#      - "27017:27017"
+  mongo:
+    image: mongo
+    volumes:
+      - /srv/KilnRegulator:/data/db
+    ports:
+      - "27017:27017"
