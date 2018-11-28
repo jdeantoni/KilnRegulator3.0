@@ -80,7 +80,12 @@ class ChooseProgramScreen extends React.Component {
         Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () => this.props.navigation.navigate("FindKiln")},
+                {text: 'Oui', onPress: () => {
+                    if (this.props.selectedProgram !== "") {
+                        this.props.dispatch({ type: "SELECT_PROGRAM", value: this.props.selectedProgram });
+                    }
+                    this.props.navigation.navigate("FindKiln");
+                }},
             ]);
         return true;
     };

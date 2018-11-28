@@ -82,8 +82,6 @@ class EditProgramScreen extends React.Component {
                                     alert("Connexion réseau échouée")
                                 });
                         } else {
-                            console.log(this.props.selectedProgram, newProgram);
-
                             this.programApi.editProgram(this.props.selectedProgram, newProgram)
                                 .then((response) => {
                                     if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
@@ -113,6 +111,10 @@ class EditProgramScreen extends React.Component {
         let segments = [...this.state.segments];
         for (let i = 0; i < segments.length; i++) {
             for (let key in segments[i]) {
+                if (segments[i][key] === "") {
+                    delete segments[i][key];
+                    continue;
+                }
                 if (Number.isNaN(Number.parseFloat(segments[i][key]))) {
                     Alert.alert("Erreur", "Les segments comportent des erreurs de syntaxe.", [{text: 'Ok', onPress: () => {}}]);
                     return false;
