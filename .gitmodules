@@ -13,3 +13,6 @@
 [submodule "arduino/src/Arduino"]
 	path = arduino/src/Arduino
 	url = https://github.com/RobTillaart/Arduino.git
+[submodule "arduino/src/Adafruit-MAX31855-library"]
+	path = arduino/src/Adafruit-MAX31855-library
+	url = https://github.com/adafruit/Adafruit-MAX31855-library.git
