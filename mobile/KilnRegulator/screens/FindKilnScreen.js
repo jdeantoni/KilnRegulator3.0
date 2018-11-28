@@ -22,8 +22,8 @@ export default class FindKilnScreen extends React.Component {
         return (
             <View style={styles.main_container}>
                 <NavigationEvents
-                    onWillFocus={() => this.addBackListener()}
-                    onWillBlur={() => this.removeBackListener()}
+                    onWillFocus={() => this.onWillFocus()}
+                    onWillBlur={() => this.onWillBlur()}
                 />
                 <View style={styles.container}>
                     <TextInput placeholder={"Adresse IP"}
@@ -38,11 +38,11 @@ export default class FindKilnScreen extends React.Component {
         );
     }
 
-    addBackListener() {
+    onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
-    removeBackListener() {
+    onWillBlur() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     }
 
