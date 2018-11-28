@@ -18,7 +18,7 @@ exports.handler = function editProgram(req, res, next) {
 
   const keys = ['uuid', 'name', 'segments', 'lastModificationDate'];
   for (const k in keys) {
-    if (!req.body.hasOwnProperty(keys[k])) {
+    if (!(req.body.hasOwnProperty(keys[k]) && req.body[keys[k]] != null)) {
       res.status(400);
       res.send('Missing ' + keys[k]);
       return;
