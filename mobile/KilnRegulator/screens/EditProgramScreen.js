@@ -123,6 +123,10 @@ class EditProgramScreen extends React.Component {
                     segments[i][key] = Number.parseFloat(segments[i][key]);
                 }
             }
+            if (Object.keys(segments[i]).length < 2) {
+                Alert.alert("Erreur", "Le segment " + (i+1) + " est incomplet.", [{text: 'Ok', onPress: () => {}}]);
+                return false;
+            }
         }
         this.setState({segments: segments});
         return true;
