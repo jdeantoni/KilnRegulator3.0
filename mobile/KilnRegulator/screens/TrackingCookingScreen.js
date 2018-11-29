@@ -18,15 +18,14 @@ export default class TrackingCookingScreen extends React.Component {
         };
         this.statusApi = new StatusAPI(NetworkRoute.getInstance().getAddress());
         this.actionApi = new ActionAPI(NetworkRoute.getInstance().getAddress());
-        this.getTemperature();
     }
 
     render() {
         return (
             <View style={styles.main_container}>
                 <NavigationEvents
-                    onWillFocus={() => this.addBackListener()}
-                    onWillBlur={() => this.removeBackListener()}
+                    onWillFocus={() => this.onWillFocus()}
+                    onWillBlur={() => this.onWillBlur()}
                 />
                 <View style={styles.container}>
                     <Text>{this.state.temperature}°C</Text>
@@ -41,12 +40,14 @@ export default class TrackingCookingScreen extends React.Component {
         );
     }
 
-    addBackListener() {
+    onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+
+        this.getTemperature();
         this.interval = setInterval(() => this.getTemperature(), 5000);
     }
 
-    removeBackListener() {
+    onWillBlur() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
         clearInterval(this.interval);
     }

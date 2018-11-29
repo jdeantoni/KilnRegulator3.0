@@ -75,8 +75,8 @@ export default class Table extends React.Component {
                 <ScrollView style={styles.container}>
                     {this.renderHeader()}
                     {this.renderRows()}
+                    <Button title={"Ajouter un segment"} onPress={() => this.addSegment()}/>
                 </ScrollView>
-                <Button title={"Ajouter un segment"} onPress={() => this.addSegment()}/>
             </View>
         )
     }
