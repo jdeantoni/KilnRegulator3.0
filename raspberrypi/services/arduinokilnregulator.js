@@ -80,6 +80,29 @@ class ArduinoKilnRegulator {
     return ElementState[state];
   }
 
+  // if a segment is missing a parameter, try to estimate it
+  fillSegment(segment, oldSegment) {
+    let oldTemperature = 0;
+    if (oldSegment)
+      oldTemperature = oldSegment.targetTemperature;
+
+    if (segment.targetTemperature == null) {
+      segment.targetTemperature = oldTemperature + segment.slope * segment.duration;
+    }
+
+    const deltaTemp = segment.targetTemperature - oldTemperature;
+    if (segment.slope == null) {
+      segment.slope = deltaTemp / segment.duration;
+    }
+
+    if (segment.duration == null) {
+
+      segment.duration = deltaTemp / segment.slope;
+    }
+
+    return segment;
+  }
+
   stop() {
     this.arduino.write(["stop"]);
   }
@@ -88,14 +111,11 @@ class ArduinoKilnRegulator {
     const arduino = this.arduino;
     const segments = program.segments;
     for (const i in segments) {
-      const segment = segments[i];
-
-      if (segment.targetTemperature == null)
-        segment.targetTemperature = 0;
-      if (segment.slope == null)
-        segment.slope = 0;
-      if (segment.duration == null)
-        segment.duration = 0;
+      let segment = segments[i];
+      let oldSegment = null;
+      if (i > 0)
+        oldSegment = segments[i-1];
+      segment = this.fillSegment(segment, oldSegment);
 
       arduino.write(['segment', [
         parseInt(i),
