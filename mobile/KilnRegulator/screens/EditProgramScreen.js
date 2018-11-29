@@ -7,6 +7,8 @@ import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import Chart from "../components/Chart";
+import {unitToDev, unitToUser} from "../helpers/UnitsManager";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -21,7 +23,7 @@ class EditProgramScreen extends React.Component {
 
         this.state = {
             programName: (this.props.selectedProgram !== "") ? this.props.programs[this.props.selectedProgram].name : "",
-            segments: (this.props.selectedProgram !== "") ? this.unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
+            segments: (this.props.selectedProgram !== "") ? unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
         };
     }
 
@@ -33,7 +35,7 @@ class EditProgramScreen extends React.Component {
                     onWillBlur={() => this.removeBackListener()}
                 />
                 <View style={styles.graph}>
-                    <Text>Graph</Text>
+                    <Chart data={this.dataToChart(this.state.segments)}/>
                 </View>
 
                 <View style={styles.table}>
@@ -43,10 +45,15 @@ class EditProgramScreen extends React.Component {
                 </View>
 
                 <View style={styles.bottom}>
-                    <TextInput
-                        placeholder={"Nom du programme"}
-                        onChangeText={(text) => this.setState({programName: text})}
-                        value={this.state.programName}/>
+                    <View style={styles.name_input}>
+                        <Text style={{flex: 1}}>Nom du programme</Text>
+                        <TextInput
+                            style={styles.text_input}
+                            placeholder={"Nom du programme"}
+                            onChangeText={(text) => this.setState({programName: text})}
+                            value={this.state.programName}/>
+                    </View>
+
                     <Button
                         title={"Sauvegarder le programme"}
                         onPress={() => this.saveProgram()}/>
@@ -68,7 +75,7 @@ class EditProgramScreen extends React.Component {
                         const newProgram = {
                             uuid: uuidv4(),
                             name: this.state.programName.trim(),
-                            segments: this.unitToDev(this.state.segments),
+                            segments: unitToDev(this.state.segments),
                             lastModificationDate: (new Date()).toISOString()
                         };
 
@@ -149,35 +156,25 @@ class EditProgramScreen extends React.Component {
         return true;
     };
 
-    unitToUser(segments) {
-        let newSegments = JSON.parse(JSON.stringify(segments));
-
-        for (let i = 0; i < segments.length; i++) {
+    dataToChart(segments) {
+        let chartData = [{time: 0, temperature: 0}];
+        let temp = 0;
+        let time = 0;
+        for (const i in segments) {
             if (segments[i].hasOwnProperty("duration")) {
-                newSegments[i]["duration"] = segments[i]["duration"] / 3600;
+                time = segments[i].duration + time;
+            } else {
+                time = (segments[i].targetTemperature / segments[i].slope) + time;
             }
-            if (segments[i].hasOwnProperty("slope")) {
-                newSegments[i]["slope"] = segments[i]["slope"] * 3600;
+            if (segments[i].hasOwnProperty("targetTemperature")) {
+                temp = segments[i].targetTemperature;
+            } else {
+                temp = (segments[i].duration * segments[i].slope) + temp;
             }
+            console.log("VALS", time, temp);
+            chartData[parseInt(i)+1] = {time: time, temperature: temp};
         }
-
-        return newSegments;
-    }
-
-    unitToDev(segments) {
-        for (let i = 0; i < segments.length; i++) {
-            if (segments[i].hasOwnProperty("duration")) {
-                segments[i]["duration"] *= 3600;
-            }
-            if (segments[i].hasOwnProperty("slope")) {
-                segments[i]["slope"] /= 3600
-            }
-            if (segments[i].hasOwnProperty("_id")) {
-                delete segments[i]["_id"];
-            }
-        }
-
-        return segments;
+        return chartData;
     }
 }
 
@@ -190,17 +187,26 @@ const styles = StyleSheet.create({
 
         flexDirection: 'column',
     },
-    button: {
-        padding: 10,
-    },
     graph: {
         flex: 4,
-        backgroundColor: "skyblue"
     },
     table: {
         flex: 4,
     },
     bottom: {
+        backgroundColor: "#dddddd",
+        padding: 10
+    },
+    name_input: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: "center",
+        paddingBottom: 3
+    },
+    text_input: {
+        backgroundColor: '#f2f2f2',
+        flex: 1,
+        padding: 3
     }
 });
 

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "KilnRegulator",
-    "description": "This project is really great.",
+    "description": "The objective is to provide a cheap and up to date kiln regulator based on a micro controller and a smart phone app.",
     "slug": "KilnRegulator",
     "privacy": "public",
     "sdkVersion": "31.0.0",
