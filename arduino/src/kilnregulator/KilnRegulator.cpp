@@ -26,12 +26,17 @@ double KilnRegulator::computeSetPoint() {
 	if (currentSegment >= program->count) { // finished
 		stop();
 	}
+	double temperature = program->segments[currentSegment].temperature;
+	double slope = program->segments[currentSegment].slope;
 	if (currentSegment > 0) { // not first segment so start from previous temp
 		setPoint += program->segments[currentSegment - 1].temperature;
 	}
 	setPoint += program->segments[currentSegment].slope * (now() - currentSegmentStartDate); // current position on the curve y = time * slope
-	if (setPoint > program->segments[currentSegment].temperature) { // reached max temperature for this segment
-		setPoint = program->segments[currentSegment].temperature;
+	if (slope >= 0.0 && setPoint > temperature) { // reached max temperature for this segment that has positive slope
+		setPoint = temperature;
+	}
+	if (slope <= 0.0 && setPoint < temperature) { // reached min temperature for this segment that has negative slope
+		setPoint = temperature;
 	}
 	return setPoint;
 }
