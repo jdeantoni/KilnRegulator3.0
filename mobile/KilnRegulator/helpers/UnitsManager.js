@@ -1,3 +1,5 @@
+import {TARGET_TEMPERATURE} from "./Constants";
+
 const DURATION = "duration";
 const SLOPE = "slope";
 const ID = "_id";
@@ -36,11 +38,11 @@ export function unitToDev(segments) {
 export function computeTimeFromSegments(segments) {
     let timeInSeconds = 0;
     for (let i in segments) {
-        if (segments[i].hasOwnProperty("duration")) {
-            timeInSeconds += segments[i]["duration"];
-        } else if (segments[i].hasOwnProperty("targetTemperature") && segments[i].hasOwnProperty("slope")) {
-            const lastTemp = (i === "0") ? 0 : segments[parseInt(i)-1]["targetTemperature"];
-            timeInSeconds += Math.abs(segments[i]["targetTemperature"] - lastTemp) / segments[i]["slope"];
+        if (segments[i].hasOwnProperty(DURATION)) {
+            timeInSeconds += segments[i][DURATION];
+        } else if (segments[i].hasOwnProperty(TARGET_TEMPERATURE) && segments[i].hasOwnProperty(SLOPE)) {
+            const lastTemp = (i === "0") ? 0 : segments[parseInt(i)-1][TARGET_TEMPERATURE];
+            timeInSeconds += Math.abs(segments[i][TARGET_TEMPERATURE] - lastTemp) / segments[i][SLOPE];
         }
     }
 
