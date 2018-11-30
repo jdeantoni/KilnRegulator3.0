@@ -1,7 +1,7 @@
 #ifndef _KILNREGULATOR_H_
 #define _KILNREGULATOR_H_
 
-#include <max6675.h>
+#include <Adafruit_MAX31856.h>
 #include <PID_v1.h>
 
 #include "Program.h"
@@ -11,7 +11,7 @@
 
 class KilnRegulator {
 public:
-	KilnRegulator(MAX6675&, int);
+	KilnRegulator(Adafruit_MAX31856&, int);
 	void init();
 
 	void updateState();
@@ -34,7 +34,7 @@ private:
 	unsigned long windowSize = 5000;
 	unsigned long windowStartTime = 0;
 
-	MAX6675 &thermocouple;
+	Adafruit_MAX31856 &thermocouple;
 	PID pid;
 
 	void regulate();

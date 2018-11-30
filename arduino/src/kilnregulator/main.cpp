@@ -16,7 +16,7 @@
 
 #define MAX_KEY_LENGTH 31
 
-MAX6675 thermocouple(/*thermoCLK*/6, /*thermoCS*/5, /*thermoDO*/4);
+Adafruit_MAX31856 thermocouple(/*thermoCS*/10, /*thermoDI*/11, /*thermoDO*/12, /*thermoCLK*/13);
 
 KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
@@ -249,6 +249,12 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 void setup() {
 	Serial.begin(115200);
 	while (!Serial) continue;
+
+
+	thermocouple.begin();
+
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+
 	delay(500); // wait for MAX chip to stabilize
 
 	// Shut off embedded LED

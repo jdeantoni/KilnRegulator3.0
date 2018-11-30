@@ -2,7 +2,7 @@
 #include "Segment.h"
 #include "Time.h"
 
-KilnRegulator::KilnRegulator(MAX6675 &thermocouple, int outputPin) : thermocouple(thermocouple),
+KilnRegulator::KilnRegulator(Adafruit_MAX31856 &thermocouple, int outputPin) : thermocouple(thermocouple),
 	pid(&temperature, &output, &setpoint, consKp, consKi, consKd, DIRECT),
 	outputPin(outputPin) {
 }
@@ -69,7 +69,7 @@ void KilnRegulator::regulate() {
 }
 
 void KilnRegulator::updateState() {
-	temperature = thermocouple.readCelsius();
+	temperature = thermocouple.readThermocoupleTemperature();
 	if (/*setpoint > -1 && */state == KilnState::RUNNING)
 		regulate();
 }
