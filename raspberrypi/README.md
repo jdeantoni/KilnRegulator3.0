@@ -31,15 +31,17 @@ docker-compose -f docker-compose-rpi.yml build
 
 ## Run
 
+Arduino container is started before the server for it to deploy the code first then free the serial port for the server.
+
 From the root of the project,
 
 ```
-docker-compose up
+docker-compose up arduino && docker-compose up mongo server
 ```
 
 Or on Raspberry Pi:
 ```
-docker-compose -f docker-compose-rpi.yml up
+docker-compose -f docker-compose-rpi.yml up arduino && docker-compose -f docker-compose-rpi.yml up mongo server
 ```
 
 
