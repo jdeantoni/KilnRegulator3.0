@@ -8,4 +8,4 @@ BOARD_TAG    = uno
 LOCAL_C_SRCS    ?= $(wildcard src/kilnregulator/*.c)
 LOCAL_CPP_SRCS  ?= $(wildcard src/kilnregulator/*.cpp)
 
-include ${ARDMK_DIR}/Arduino.mk
+include src/Arduino-Makefile/Arduino.mk

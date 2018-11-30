@@ -1,0 +1,33 @@
+version: "2"
+services:
+  arduino:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: arduino/Dockerfile-rpi
+      args:
+        prefix: arduino # no trailing / or COPY will fail
+    volumes:
+      - /dev:/dev
+    privileged: true
+  server:
+    restart: always
+    build:
+      context: .
+      dockerfile: raspberrypi/Dockerfile
+      args:
+        prefix: raspberrypi # no trailing / or COPY will fail
+    ports:
+      - "3000:3000"
+    links:
+      - arduino
+      - mongo
+    volumes:
+      - /dev:/dev
+    privileged: true
+  mongo:
+    image: andresvidal/rpi3-mongodb3
+    volumes:
+      - /srv/KilnRegulator:/data/db
+    ports:
+      - "27017:27017"

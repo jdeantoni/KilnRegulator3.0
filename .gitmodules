@@ -16,3 +16,6 @@
 [submodule "arduino/src/Adafruit-MAX31855-library"]
 	path = arduino/src/Adafruit-MAX31855-library
 	url = https://github.com/adafruit/Adafruit-MAX31855-library.git
+[submodule "arduino/src/Arduino-Makefile"]
+	path = arduino/src/Arduino-Makefile
+	url = https://github.com/sudar/Arduino-Makefile.git

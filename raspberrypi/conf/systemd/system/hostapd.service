@@ -1,0 +1,16 @@
+[Unit]
+Description=Hostapd IEEE 802.11 AP, IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator
+After=network.target
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/sbin/hostapd /etc/hostapd/hostapd.conf
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+
+

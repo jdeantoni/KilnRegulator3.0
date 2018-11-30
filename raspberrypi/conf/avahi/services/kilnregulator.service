@@ -1,0 +1,12 @@
+<service-group>
+
+  <name replace-wildcards="yes">%h-KilnRegulator</name>
+
+  <service>
+    <type>_http._tcp</type>
+    <subtype>_kilnregulator._sub._http._tcp</subtype>
+    <port>3000</port>
+  </service>
+
+</service-group>
+
