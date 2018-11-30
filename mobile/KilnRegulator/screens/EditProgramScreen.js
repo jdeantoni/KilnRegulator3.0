@@ -7,8 +7,17 @@ import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
-import Chart from "../components/Chart";
-import {unitToDev, unitToUser} from "../helpers/UnitsManager";
+import EditProgramLineChart from "../components/EditProgramLineChart";
+import {getDurationFromTempAndSlope, getTempFromDurationAndSlope, unitToDev, unitToUser} from "../helpers/UnitsManager";
+import {
+    DURATION,
+    NO_PROG_SELECTED,
+    SLOPE,
+    TABLE_KEYS,
+    TARGET_TEMPERATURE,
+    TEMP_ORIGIN,
+    TIME_ORIGIN
+} from "../helpers/Constants";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -22,8 +31,8 @@ class EditProgramScreen extends React.Component {
         this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
 
         this.state = {
-            programName: (this.props.selectedProgram !== "") ? this.props.programs[this.props.selectedProgram].name : "",
-            segments: (this.props.selectedProgram !== "") ? unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
+            programName: (this.props.selectedProgram !== NO_PROG_SELECTED) ? this.props.programs[this.props.selectedProgram].name : "",
+            segments: (this.props.selectedProgram !== NO_PROG_SELECTED) ? unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
         };
     }
 
@@ -35,7 +44,7 @@ class EditProgramScreen extends React.Component {
                     onWillBlur={() => this.removeBackListener()}
                 />
                 <View style={styles.graph}>
-                    <Chart data={this.dataToChart(this.state.segments)}/>
+                    <EditProgramLineChart data={this.dataToChart(this.state.segments)}/>
                 </View>
 
                 <View style={styles.table}>
@@ -79,7 +88,7 @@ class EditProgramScreen extends React.Component {
                             lastModificationDate: (new Date()).toISOString()
                         };
 
-                        if (this.props.selectedProgram === "") {
+                        if (this.props.selectedProgram === NO_PROG_SELECTED) {
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
                                     if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
@@ -117,26 +126,30 @@ class EditProgramScreen extends React.Component {
         }
         let segments = [...this.state.segments];
         for (let i = 0; i < segments.length; i++) {
-            for (let key in segments[i]) {
-                if (segments[i][key] === "") {
-                    delete segments[i][key];
-                    continue;
-                }
-                if (Number.isNaN(Number.parseFloat(segments[i][key]))) {
-                    Alert.alert("Erreur", "Les segments comportent des erreurs de syntaxe.", [{text: 'Ok', onPress: () => {}}]);
-                    return false;
-                }
-                if (Number.parseFloat(segments[i][key]) !== segments[i][key]) {
-                    segments[i][key] = Number.parseFloat(segments[i][key]);
-                }
-            }
-            if (Object.keys(segments[i]).length < 2) {
-                Alert.alert("Erreur", "Le segment " + (i+1) + " est incomplet.", [{text: 'Ok', onPress: () => {}}]);
-                return false;
-            }
+            this.checkSegmentIntegrity(segments[i], i);
         }
         this.setState({segments: segments});
         return true;
+    }
+
+    checkSegmentIntegrity(segment, i) {
+        for (let key in segment) {
+            if (segment[key] === "") {
+                delete segment[key];
+                continue;
+            }
+            if (Number.isNaN(Number.parseFloat(segment[key]))) {
+                Alert.alert("Erreur", "Les segments comportent des erreurs de syntaxe.", [{text: 'Ok', onPress: () => {}}]);
+                return false;
+            }
+            if (Number.parseFloat(segment[key]) !== segment[key]) {
+                segment[key] = Number.parseFloat(segment[key]);
+            }
+        }
+        if (Object.keys(segment).length < 2) {
+            Alert.alert("Erreur", "Le segment " + (i+1) + " est incomplet.", [{text: 'Ok', onPress: () => {}}]);
+            return false;
+        }
     }
 
     addBackListener() {
@@ -157,24 +170,83 @@ class EditProgramScreen extends React.Component {
     };
 
     dataToChart(segments) {
-        let chartData = [{time: 0, temperature: 0}];
+        let chartData = [{time: TIME_ORIGIN, temperature: TEMP_ORIGIN}];
         let temp = 0;
         let time = 0;
+        let segDuration;
+        let segTemp;
+        let segSlope;
+        let lastTemp;
+        let lastTime;
+        let timeWithSlope;
+        let tempWithSlope;
         for (const i in segments) {
-            if (segments[i].hasOwnProperty("duration")) {
-                time = segments[i].duration + time;
-            } else {
-                time = (segments[i].targetTemperature / segments[i].slope) + time;
+            //set segment vars
+            segDuration = parseFloat(segments[i][DURATION]);
+            segTemp = parseFloat(segments[i][TARGET_TEMPERATURE]);
+            segSlope = parseFloat(segments[i][SLOPE]);
+            lastTemp = chartData[chartData.length-1].temperature;
+            lastTime = chartData[chartData.length-1].time;
+            timeWithSlope = getDurationFromTempAndSlope(segTemp, lastTemp, segSlope);
+            tempWithSlope = getTempFromDurationAndSlope(segDuration, segSlope);
+
+            //check properties
+            for (let key in segments[i]) {
+                if (segments[i][key] === "") {
+                    delete segments[i][key];
+                }
             }
-            if (segments[i].hasOwnProperty("targetTemperature")) {
-                temp = segments[i].targetTemperature;
-            } else {
-                temp = (segments[i].duration * segments[i].slope) + temp;
+            if ((segments[i].length < 2) || (segSlope === 0 && lastTemp !== segTemp)) {
+                continue;
             }
-            console.log("VALS", time, temp);
-            chartData[parseInt(i)+1] = {time: time, temperature: temp};
+
+            //compute time
+            if (this.hasProperty(segments[i],[DURATION])) {
+                time += segDuration;
+            } else {
+                time += timeWithSlope;
+            }
+
+            //compute temperature
+            if (this.hasProperty(segments[i],[TARGET_TEMPERATURE])) {
+                temp = segTemp;
+            } else {
+                temp += tempWithSlope;
+            }
+
+            //add plateau if necessary
+            if (this.hasProperty(segments[i], TABLE_KEYS)) {
+                //horizontal segment
+                if (timeWithSlope < segDuration) {
+                    chartData[chartData.length] = {
+                        time: timeWithSlope + lastTime,
+                        temperature: temp
+                    };
+                }
+                //vertical segment
+                else if (timeWithSlope > segDuration) {
+                    chartData[chartData.length] = {
+                        time: time,
+                        temperature: tempWithSlope + lastTemp
+                    };
+                }
+            }
+
+            //create point
+            if (!Number.isNaN(time) && !Number.isNaN(temp)) {
+                chartData[chartData.length] = {time: time, temperature: temp};
+            }
         }
         return chartData;
+    }
+
+    hasProperty(object, properties) {
+        for (let i in properties) {
+            if (!object.hasOwnProperty(properties[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

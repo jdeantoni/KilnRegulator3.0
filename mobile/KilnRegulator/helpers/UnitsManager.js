@@ -32,3 +32,48 @@ export function unitToDev(segments) {
 
     return segments;
 }
+
+export function computeTimeFromSegments(segments) {
+    let timeInSeconds = 0;
+    for (let i in segments) {
+        if (segments[i].hasOwnProperty("duration")) {
+            timeInSeconds += segments[i]["duration"];
+        } else if (segments[i].hasOwnProperty("targetTemperature") && segments[i].hasOwnProperty("slope")) {
+            const lastTemp = (i === "0") ? 0 : segments[parseInt(i)-1]["targetTemperature"];
+            timeInSeconds += Math.abs(segments[i]["targetTemperature"] - lastTemp) / segments[i]["slope"];
+        }
+    }
+
+    const hours = Math.floor(timeInSeconds / 3600);
+    let minutes = Math.floor((timeInSeconds - (hours * 3600)) / 60);
+    if (minutes < 10) { minutes = "0" + minutes }
+
+    return hours + "h" + minutes + "min";
+}
+
+export function hoursToHoursAndMinutes(hours) {
+    let realHours = Math.trunc(hours);
+    let minutes = Math.floor((hours - realHours) * 60);
+    if (minutes === 60 || minutes === 0) {
+        if (minutes === 60) {
+            realHours++;
+        }
+        return realHours + "h";
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    return realHours + "h" + minutes + "m";
+}
+
+export function isoDateToUser(date) {
+    return date.split("T")[0];
+}
+
+export function getDurationFromTempAndSlope(targetTemperature, lastTemperature, slope) {
+    return Math.abs(targetTemperature - lastTemperature) / Math.abs(slope);
+}
+
+export function getTempFromDurationAndSlope(duration, slope) {
+    return parseFloat(duration) * Math.abs(slope);
+}

@@ -1,8 +1,9 @@
 import React from "react";
 import {StyleSheet, View} from "react-native";
-import {VictoryChart, VictoryLine, VictoryTheme} from "victory-native";
+import {VictoryChart, VictoryLine, VictoryTheme, VictoryAxis} from "victory-native";
+import {hoursToHoursAndMinutes} from "../helpers/UnitsManager";
 
-export default class Chart extends React.Component {
+export default class EditProgramLineChart extends React.Component {
     constructor(props) {
         super(props);
 
@@ -13,10 +14,18 @@ export default class Chart extends React.Component {
 
     render() {
         if (this.state.dimensions === undefined) return <View style={styles.container} onLayout={this.onLayout}/>;
+        if (this.props.data.length <= 1) return <View/>;
 
         return (
             <View style={styles.container}>
                 <VictoryChart theme={VictoryTheme.material} height={270} width={this.state.width}>
+                    <VictoryAxis
+                        tickFormat={(t) => hoursToHoursAndMinutes(t)}
+                    />
+                    <VictoryAxis
+                        dependentAxis
+                        tickFormat={(T) => T + "°C"}
+                    />
                     <VictoryLine
                         style={{
                             data: { stroke: "#c43a31" },
