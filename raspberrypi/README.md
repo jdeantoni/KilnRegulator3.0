@@ -1,5 +1,7 @@
 # KilnRegulator Server on RaspberryPi
 
+Arduino code will be automatically built and deployed on the Arduino when running through `docker-compose`.
+
 ## Dependencies
 
 ```
