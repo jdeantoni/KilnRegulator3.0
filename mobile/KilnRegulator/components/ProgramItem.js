@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { connect } from "react-redux";
+import {computeTimeFromSegments, isoDateToUser} from "../helpers/UnitsManager";
 
 class ProgramItem extends React.Component {
     render() {
@@ -14,29 +15,12 @@ class ProgramItem extends React.Component {
                     </View>
                     <View style={styles.description_container}>
                         <Text style={styles.description_text}>{program.segments.length} segment{this.writeS(program.segments.length)}</Text>
-                        <Text style={styles.description_text}>{this.computeTime(program.segments)}</Text>
-                        <Text style={styles.description_text}>Dernière modification le {program.lastModificationDate.split("T")[0]}</Text>
+                        <Text style={styles.description_text}>{computeTimeFromSegments(program.segments)}</Text>
+                        <Text style={styles.description_text}>Dernière modification le {isoDateToUser(program.lastModificationDate)}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
         )
-    }
-
-    computeTime(segments) {
-        let timeInSeconds = 0;
-        segments.forEach((segment) => {
-            if (segment.hasOwnProperty("duration")) {
-                timeInSeconds += segment["duration"];
-            } else if (segment.hasOwnProperty("targetTemperature") && segment.hasOwnProperty("slope")) {
-                timeInSeconds += segment["targetTemperature"] / segment["slope"];
-            }
-        });
-
-        const hours = Math.floor(timeInSeconds / 3600);
-        let minutes = Math.floor((timeInSeconds - (hours * 3600)) / 60);
-        if (minutes < 10) { minutes = "0" + minutes }
-
-        return hours + "h" + minutes + "min";
     }
 
     toggleOnPress() {

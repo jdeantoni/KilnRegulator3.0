@@ -1,0 +1,11 @@
+const TIME_ORIGIN = 0;
+const TEMP_ORIGIN = 0;
+const NO_PROG_SELECTED = "";
+const DURATION = "duration";
+const SLOPE = "slope";
+const TARGET_TEMPERATURE = "targetTemperature";
+const TABLE_KEYS = [DURATION, SLOPE, TARGET_TEMPERATURE];
+
+export {
+    TIME_ORIGIN, TEMP_ORIGIN, NO_PROG_SELECTED, DURATION, SLOPE, TARGET_TEMPERATURE, TABLE_KEYS
+}
