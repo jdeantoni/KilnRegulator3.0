@@ -131,14 +131,6 @@ class ArduinoKilnRegulator {
   setSetpoint(setpoint) {
     this.arduino.write(["setpoint", setpoint]);
   }
-
-  findStateName(state) {
-    return StateElement[state];
-  }
-
-  findElementStateName(state) {
-    return KilnState[state];
-  }
 }
 
 module.exports = ArduinoKilnRegulator;

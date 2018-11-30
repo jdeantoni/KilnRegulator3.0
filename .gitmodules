@@ -19,3 +19,6 @@
 [submodule "arduino/src/Arduino-Makefile"]
 	path = arduino/src/Arduino-Makefile
 	url = https://github.com/sudar/Arduino-Makefile.git
+[submodule "arduino/src/Adafruit_MAX31856"]
+	path = arduino/src/Adafruit_MAX31856
+	url = https://github.com/adafruit/Adafruit_MAX31856.git
