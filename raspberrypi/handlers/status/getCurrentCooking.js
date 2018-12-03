@@ -5,6 +5,7 @@
  *
  */
 exports.handler = function getCurrentCooking(req, res, next) {
+  const cookingRepository = require('../../services/cookingrepository');
   const arduino = require('../../services/arduinorepository').first();
   if (!arduino) {
     res.status(503);
@@ -12,12 +13,20 @@ exports.handler = function getCurrentCooking(req, res, next) {
     return;
   }
 
-  if (!arduino.cooking.startDate) {
+  if (!arduino.cooking.uuid) {
     res.status(400);
     res.send({error: "Cooking not started"});
     return;
   }
 
-  res.send(arduino.cooking);
-  next()
+  cookingRepository.get(arduino.cooking.uuid, function(err, cooking) {
+    if (err) {
+      res.status(500);
+      res.send({error: err});
+      console.error(err);
+    } else {
+      res.send(cooking);
+    }
+    next()
+  });
 }
