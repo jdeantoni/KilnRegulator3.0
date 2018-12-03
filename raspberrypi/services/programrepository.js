@@ -41,7 +41,11 @@ class ProgramRepository {
   get(uuid, c) {
     const pr = this;
     mongoose.model('program').findOne({uuid: uuid}, function(err, program) {
-      c(err, pr.parseMongoProgram(program));
+      if (err || !program) {
+        c(err,  null);
+      } else {
+        c(err, pr.parseMongoProgram(program));
+      }
     });
   }
 
@@ -54,8 +58,10 @@ class ProgramRepository {
     mongoose.model('program').findOne({uuid: uuid}, function(err, program) {
       if (!err) {
         program.remove();
+        c(err, pr.parseMongoProgram(program));
+      } else {
+        c(err, null);
       }
-      c(err, pr.parseMongoProgram(program));
     });
   }
 
@@ -64,10 +70,14 @@ class ProgramRepository {
     mongoose.model('program').find({})
       .sort({name: 'ascending'})
       .exec(function(err, programs) {
-        programs = programs.map(function(program) {
-          return pr.parseMongoProgram(program);
-        });
-        c(err, programs);
+        if (err) {
+          c(err, null);
+        } else {
+          programs = programs.map(function(program) {
+            return pr.parseMongoProgram(program);
+          });
+          c(err, programs);
+        }
       });
   }
 }
