@@ -1,6 +1,9 @@
+const uuidv1 = require('uuid/v1');
+
 const ArduinoMessagePack = require('./arduinomessagepack');
 const ElementState = require('../model/elementState')
 const KilnState = require('../model/kilnState')
+const cookingRepository = require('./cookingrepository');
 
 const eh = require('./errorhandler');
 
@@ -76,9 +79,16 @@ class ArduinoKilnRegulator {
     // upadte current cooking
     if (this.cooking.startDate) { // cooking started
       const startDate = Math.floor(Date.parse(this.cooking.startDate) / 1000);
-      const timestamp = data.timestamp - startDate; // timestamp from start of program in seconds
-      //cookingRepository.addSample(currentCooking, timestamp, this.temperature); // should do something in database
-      this.cooking.samples.push({timestamp: timestamp, temperature: data.temperature});
+      let timestamp = data.timestamp - startDate; // timestamp from start of program in seconds
+
+      if (timestamp < 0 && this.cooking.offset === undefined) { // arduino not exactly synced… add offset.
+        this.cooking.offset = timestamp;
+      }
+      if (this.cooking.offset) {
+        timestamp -= this.cooking.offset;
+      }
+
+      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: data.temperature});
     }
   }
 
@@ -142,9 +152,11 @@ class ArduinoKilnRegulator {
     this.arduino.write(["start", program.segments.length]);
     this.arduino.emitter.once('ack-start', function(msg) {
       console.log('Started!');
+      akn.cooking.uuid = uuidv1();
       akn.cooking.startDate = (new Date()).toISOString();
       akn.cooking.programId = program.uuid;
-      akn.cooking.samples = [];
+
+      cookingRepository.add(akn.cooking);
     });
   }
 
