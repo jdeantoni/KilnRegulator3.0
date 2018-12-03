@@ -5,6 +5,18 @@
  *
  */
 exports.handler = function getCurrentCooking(req, res, next) {
-  res.send("");
+  const arduino = require('../../services/arduinorepository').first();
+  if (!arduino) {
+    res.status(503);
+    res.send({errored: true});
+    return;
+  }
+
+  if (!arduino.cooking.startDate) {
+    res.status(400);
+    res.send({error: "Cooking not started"});
+  }
+
+  res.send(arduino.cooking);
   next()
 }
