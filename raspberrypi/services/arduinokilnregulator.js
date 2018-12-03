@@ -14,6 +14,8 @@ class ArduinoKilnRegulator {
     this.elementState = "";
     this.currentSegment = -1;
 
+    this.cooking = {};
+
     this.errored = false;
 
     eh.on('error', function(msg, timestamp) {
@@ -70,6 +72,14 @@ class ArduinoKilnRegulator {
     this.elementState = this.findElementStateName(data.elementState);
     this.currentSegment = data.currentSegment;
     this.temperature = data.temperature;
+
+    // upadte current cooking
+    if (this.cooking.startDate) { // cooking started
+      const startDate = Math.floor(Date.parse(this.cooking.startDate) / 1000);
+      const timestamp = data.timestamp - startDate; // timestamp from start of program in seconds
+      //cookingRepository.addSample(currentCooking, timestamp, this.temperature); // should do something in database
+      this.cooking.samples.push({timestamp: timestamp, temperature: data.temperature});
+    }
   }
 
   findStateName(state) {
@@ -105,9 +115,13 @@ class ArduinoKilnRegulator {
 
   stop() {
     this.arduino.write(["stop"]);
+    this.arduino.emitter.once('ack-stop', function(msg) {
+      console.log('Stopped!');
+    });
   }
 
   start(program) {
+    const akn = this;
     const arduino = this.arduino;
     const segments = program.segments;
     for (const i in segments) {
@@ -126,6 +140,12 @@ class ArduinoKilnRegulator {
     }
 
     this.arduino.write(["start", program.segments.length]);
+    this.arduino.emitter.once('ack-start', function(msg) {
+      console.log('Started!');
+      akn.cooking.startDate = (new Date()).toISOString();
+      akn.cooking.programId = program.uuid;
+      akn.cooking.samples = [];
+    });
   }
 
   setSetpoint(setpoint) {
