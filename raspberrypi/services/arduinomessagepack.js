@@ -52,7 +52,11 @@ class ArduinoMessagePack extends Arduino {
     if (e === 'data') {
       const arduino = this;
       this.serialPort.on('data', function (data) {
-        arduino.decoder.write(data);
+        try {
+          arduino.decoder.write(data);
+        } catch(e) {
+          console.log(e);
+        }
       });
       this.decoder.on('data', function(msg, error) {
         if (msg && !error && msg.hasOwnProperty('ack')) {
@@ -63,17 +67,19 @@ class ArduinoMessagePack extends Arduino {
             c(null, 'Arduino: Message id not found in backlog');
             return;
           }
+          const origMsg = arduino.msgBacklog[msg.id];
 
-          this.bufferFill -= arduino.msgBacklog[msg.id].length; // decrease buffer filling since Arduino cleared it from its receive buffer
+          this.bufferFill -= origMsg.length; // decrease buffer filling since Arduino cleared it from its receive buffer
 
-          const expectedCrc = arduino.msgBacklog[msg.id].crc;
+          const expectedCrc = origMsg.crc;
           const actualCrc = msg.crc;
           if (expectedCrc != actualCrc) {
-            c(null, 'Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, arduino.msgBacklog[msg.id].msg);
+            c(null, 'Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, origMsg.msg);
             arduino.deleteFromBacklog(msg.id);
             return;
           }
           arduino.deleteFromBacklog(msg.id);
+          arduino.emitter.emit('ack-' + origMsg.msg[0], origMsg);
         }
         c(msg, error);
       });
