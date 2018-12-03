@@ -15,6 +15,7 @@ exports.handler = function getCurrentCooking(req, res, next) {
   if (!arduino.cooking.startDate) {
     res.status(400);
     res.send({error: "Cooking not started"});
+    return;
   }
 
   res.send(arduino.cooking);
