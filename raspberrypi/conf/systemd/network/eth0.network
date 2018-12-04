@@ -3,4 +3,6 @@ Name=eth0
 
 [Network]
 Bridge=br0
-
+# Workaround for https://github.com/systemd/systemd/issues/5043
+IPv6AcceptRA=no
+LinkLocalAddressing=no
