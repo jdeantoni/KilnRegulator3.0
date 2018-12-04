@@ -7,12 +7,14 @@
 #include <msgpack.hpp>
 #include <util/crc16.h>
 
+#include <Time.h>
+#include <IEEE754tools.h>
+
 #include "KilnRegulator.h"
 #include "Segment.h"
 #include "Program.h"
 #include "StreamCRC.h"
-#include "Time.h"
-#include "IEEE754tools.h"
+#include "Timer.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -23,6 +25,8 @@ KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 StreamCRC streamCRC(Serial);
 
 Program program;
+
+Timer samplingTimer{5000}; // 500ms sampling rate, more or less…
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -264,14 +268,21 @@ void setup() {
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
+
+	samplingTimer.start(millis());
 }
 
 void loop() {
 	if (Serial.available()) {
 		receiveMessage(streamCRC, kilnRegulator);
 	}
-	kilnRegulator.updateState();
-	sendState(streamCRC, kilnRegulator);
+
+	samplingTimer.update(millis());
+	if (samplingTimer.expired()) {
+		kilnRegulator.updateState();
+		sendState(streamCRC, kilnRegulator);
+		samplingTimer.start(millis());
+	}
 
 	if (lastTimesyncRequest > 0 && lastTimesyncRequest + timeout < millis()) { // timed out
 		strcpy(key, "timesync");
@@ -283,5 +294,5 @@ void loop() {
 		}
 	}
 
-	delay(500);
+	delay(100);
 }
