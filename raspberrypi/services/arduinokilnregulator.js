@@ -16,6 +16,7 @@ class ArduinoKilnRegulator {
     this.state = "";
     this.elementState = "";
     this.currentSegment = -1;
+    this.timestamp = 0; // timestamp from beginning of cooking
 
     this.cooking = {};
 
@@ -87,6 +88,8 @@ class ArduinoKilnRegulator {
       if (this.cooking.offset) {
         timestamp -= this.cooking.offset;
       }
+
+      this.timestamp = timestamp;
 
       cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: data.temperature});
     }
