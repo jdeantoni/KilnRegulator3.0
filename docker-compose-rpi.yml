@@ -25,7 +25,9 @@ services:
       - /dev:/dev
     privileged: true
   mongo:
-    image: andresvidal/rpi3-mongodb3
+    build:
+      context: rpi3-mongodb3
+      dockerfile: Dockerfile
     volumes:
       - /srv/KilnRegulator:/data/db
     ports:

@@ -22,3 +22,6 @@
 [submodule "arduino/src/Adafruit_MAX31856"]
 	path = arduino/src/Adafruit_MAX31856
 	url = https://github.com/adafruit/Adafruit_MAX31856.git
+[submodule "rpi3-mongodb3"]
+	path = rpi3-mongodb3
+	url = https://github.com/piernov/rpi3-mongodb3.git
