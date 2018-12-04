@@ -32,9 +32,16 @@ sudo usermod -G docker -a pi
 #Watchdog
 sudo apt install watchdog
 echo -e "# activating the hardware watchdog\ndtparam=watchdog=on" |sudo tee -a /boot/config.txt
-echo -e "# rpi watchdog max timeout\nwatchdog-timeout=15" | sudo tee /etc/watchdog.conf
+cat <<EOF | sudo tee -a /etc/watchdog.conf
+# rpi watchdog device
+watchdog-device = /dev/watchdog
+# rpi watchdog max timeout
+watchdog-timeout=15
 # some parameters to trigger watchdog on resource exhausted
-echo -e "max-load-1 = 24\nmin-memory = 8" | sudo tee /etc/watchdog.conf
+max-load-1 = 24
+min-memory = 8
+EOF
+
 
 # We don't need no swapfile
 sudo systemctl disable dphys-swapfile.service
