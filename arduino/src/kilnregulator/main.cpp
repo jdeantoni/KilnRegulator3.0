@@ -15,6 +15,8 @@
 #include "Program.h"
 #include "StreamCRC.h"
 #include "Timer.h"
+#include "Time.h"
+#include "WatchDog.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -27,6 +29,8 @@ StreamCRC streamCRC(Serial);
 Program program;
 
 Timer samplingTimer{5000}; // 500ms sampling rate, more or less…
+
+WatchDog watchdog;
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -265,6 +269,8 @@ void setup() {
 	pinMode(13, OUTPUT);
 	digitalWrite(13, LOW);
 
+	watchdog.init();
+
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
@@ -294,5 +300,6 @@ void loop() {
 		}
 	}
 
+	watchdog.update();
 	delay(100);
 }
