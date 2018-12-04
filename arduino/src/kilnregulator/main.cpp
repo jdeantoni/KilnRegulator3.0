@@ -12,6 +12,7 @@
 #include "Program.h"
 #include "StreamCRC.h"
 #include "Time.h"
+#include "WatchDog.h"
 #include "IEEE754tools.h"
 
 #define MAX_KEY_LENGTH 31
@@ -23,6 +24,8 @@ KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 StreamCRC streamCRC(Serial);
 
 Program program;
+
+WatchDog watchdog;
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -261,6 +264,8 @@ void setup() {
 	pinMode(13, OUTPUT);
 	digitalWrite(13, LOW);
 
+	watchdog.init();
+
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
@@ -283,5 +288,7 @@ void loop() {
 		}
 	}
 
-	delay(500);
+	watchdog.update();
+
+	delay(1000);
 }
