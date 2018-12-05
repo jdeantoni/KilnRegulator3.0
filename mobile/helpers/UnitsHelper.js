@@ -1,13 +1,11 @@
-import {TARGET_TEMPERATURE} from "./Constants";
-
-const DURATION = "duration";
-const SLOPE = "slope";
-const ID = "_id";
+import {DURATION, ID, SLOPE, TARGET_TEMPERATURE} from "./Constants";
 
 export function unitToUser(segments) {
+    if (segments == null) return null;
+
     let newSegments = JSON.parse(JSON.stringify(segments));
 
-    for (let i = 0; i < segments.length; i++) {
+    for (let i in segments) {
         if (segments[i].hasOwnProperty(DURATION)) {
             newSegments[i][DURATION] = segments[i][DURATION] / 3600;
         }
@@ -20,7 +18,7 @@ export function unitToUser(segments) {
 }
 
 export function unitToDev(segments) {
-    for (let i = 0; i < segments.length; i++) {
+    for (let i in segments) {
         if (segments[i].hasOwnProperty(DURATION)) {
             segments[i][DURATION] *= 3600;
         }
@@ -35,41 +33,58 @@ export function unitToDev(segments) {
     return segments;
 }
 
-export function computeTimeFromSegments(segments) {
+export function estimateTimeInSecondsForAllSegments(segments) {
     let timeInSeconds = 0;
     for (let i in segments) {
-        if (segments[i].hasOwnProperty(DURATION)) {
-            timeInSeconds += segments[i][DURATION];
-        } else if (segments[i].hasOwnProperty(TARGET_TEMPERATURE) && segments[i].hasOwnProperty(SLOPE)) {
-            const lastTemp = (i === "0") ? 0 : segments[parseInt(i)-1][TARGET_TEMPERATURE];
-            timeInSeconds += Math.abs(segments[i][TARGET_TEMPERATURE] - lastTemp) / segments[i][SLOPE];
-        }
+        timeInSeconds += estimateTimeInSecondsForSegment(segments, parseInt(i));
+    }
+    return timeInSeconds;
+}
+
+export function estimateTimeInSecondsForSegment(segments, segmentNumber) {
+    const segment = segments[segmentNumber];
+    if (segment.hasOwnProperty(DURATION)) {
+        return segment[DURATION];
+    } else if (segment.hasOwnProperty(TARGET_TEMPERATURE) && segment.hasOwnProperty(SLOPE)) {
+        const lastTemp = (segmentNumber === 0) ? 0 : segments[segmentNumber-1][TARGET_TEMPERATURE];
+        return Math.abs(segment[TARGET_TEMPERATURE] - lastTemp) / segment[SLOPE];
+    }
+}
+
+export function secondsToUser(timeInSeconds) {
+    if (timeInSeconds <= 0) {
+        return "0s";
     }
 
     const hours = Math.floor(timeInSeconds / 3600);
     let minutes = Math.floor((timeInSeconds - (hours * 3600)) / 60);
-    if (minutes < 10) { minutes = "0" + minutes }
 
-    return hours + "h" + minutes + "min";
+    if (hours === 0) {
+        return minutes + "min";
+    } else {
+        if (minutes < 10) { minutes = "0" + minutes }
+        return hours + "h" + minutes;
+    }
 }
 
 export function hoursToHoursAndMinutes(hours) {
     let realHours = Math.trunc(hours);
     let minutes = Math.floor((hours - realHours) * 60);
+
     if (minutes === 60 || minutes === 0) {
-        if (minutes === 60) {
-            realHours++;
-        }
+        if (minutes === 60) realHours++;
         return realHours + "h";
     }
     if (minutes < 10) {
         minutes = "0" + minutes;
     }
-    return realHours + "h" + minutes + "m";
+
+    return realHours + "h" + minutes;
 }
 
-export function isoDateToUser(date) {
-    return date.split("T")[0];
+export function isoDateToUser(isoDate) {
+    const date = new Date(isoDate);
+    return date.getDay() + "/" + date.getMonth() + "/" + date.getFullYear();
 }
 
 export function getDurationFromTempAndSlope(targetTemperature, lastTemperature, slope) {

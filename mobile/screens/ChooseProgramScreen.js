@@ -6,6 +6,7 @@ import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
 import { connect } from "react-redux";
+import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Constants";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -39,7 +40,7 @@ class ChooseProgramScreen extends React.Component {
                         <Button title={this.buttonNameEditProgram()} onPress={() => this.props.navigation.navigate("EditProgram")}/>
                     </View>
                     <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === ""}/>
+                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === NO_PROG_SELECTED}/>
                     </View>
                 </View>
             </View>
@@ -64,7 +65,9 @@ class ChooseProgramScreen extends React.Component {
                         this.actionAPI.startCooking({uuid: this.props.selectedProgram})
                             .then((response) => {
                                 if (response.ok) {
-                                    this.props.navigation.navigate("TrackingCooking");
+                                    this.props.navigation.navigate("TrackingCooking", {
+                                        program: this.props.selectedProgram
+                                    });
                                 }
                                 else throw new Error("HTTP response status not code 200 as expected.");
                             })
@@ -81,8 +84,8 @@ class ChooseProgramScreen extends React.Component {
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
                 {text: 'Oui', onPress: () => {
-                    if (this.props.selectedProgram !== "") {
-                        this.props.dispatch({ type: "SELECT_PROGRAM", value: this.props.selectedProgram });
+                    if (this.props.selectedProgram !== NO_PROG_SELECTED) {
+                        this.props.dispatch({ type: SELECT_PROGRAM, value: this.props.selectedProgram });
                     }
                     this.props.navigation.navigate("FindKiln");
                 }},
@@ -91,7 +94,7 @@ class ChooseProgramScreen extends React.Component {
     };
 
     buttonNameEditProgram() {
-        return (this.props.selectedProgram === "") ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
+        return (this.props.selectedProgram === NO_PROG_SELECTED) ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
     }
 
     getPrograms() {
@@ -103,7 +106,7 @@ class ChooseProgramScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
-                const action = { type: "UPDATE_PROGRAMS", value: response };
+                const action = { type: UPDATE_PROGRAMS, value: response };
                 this.props.dispatch(action);
 
                 const ids = [];
