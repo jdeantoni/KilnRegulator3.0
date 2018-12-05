@@ -16,9 +16,9 @@ public:
 
 	void updateState();
 	double getTemperature() const;
-	int getState() const;
-	int getElementState() const;
-	int getCurrentSegment() const;
+	uint8_t getState() const;
+	uint8_t getElementState() const;
+	int8_t getCurrentSegment() const;
 
 	int start(const Program &program);
 	int stop();
@@ -27,9 +27,9 @@ public:
 	double setpoint = -1.0;
 private:
 	double temperature = 0.0;
-	int state = KilnState::READY;
-	int elementState = ElementState::STALE;
-	int currentSegment = -1;
+	uint8_t state = KilnState::READY;
+	uint8_t elementState = ElementState::STALE;
+	int8_t currentSegment = -1;
 
 	unsigned long windowSize = 5000;
 	unsigned long windowStartTime = 0;

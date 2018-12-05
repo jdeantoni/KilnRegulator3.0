@@ -78,15 +78,15 @@ double KilnRegulator::getTemperature() const {
 	return temperature;
 }
 
-int KilnRegulator::getState() const {
+uint8_t KilnRegulator::getState() const {
 	return state;
 }
 
-int KilnRegulator::getElementState() const {
+uint8_t KilnRegulator::getElementState() const {
 	return elementState;
 }
 
-int KilnRegulator::getCurrentSegment() const {
+int8_t KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
 }
 
