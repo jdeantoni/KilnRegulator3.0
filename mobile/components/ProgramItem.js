@@ -1,7 +1,11 @@
 import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { connect } from "react-redux";
-import {computeTimeFromSegments, isoDateToUser} from "../helpers/UnitsManager";
+import {
+    estimateTimeInSecondsForAllSegments,
+    isoDateToUser,
+    secondsToUser
+} from "../helpers/UnitsHelper";
 
 class ProgramItem extends React.Component {
     render() {
@@ -15,7 +19,7 @@ class ProgramItem extends React.Component {
                     </View>
                     <View style={styles.description_container}>
                         <Text style={styles.description_text}>{program.segments.length} segment{this.writeS(program.segments.length)}</Text>
-                        <Text style={styles.description_text}>{computeTimeFromSegments(program.segments)}</Text>
+                        <Text style={styles.description_text}>Durée : {secondsToUser(estimateTimeInSecondsForAllSegments(program.segments))}</Text>
                         <Text style={styles.description_text}>Dernière modification le {isoDateToUser(program.lastModificationDate)}</Text>
                     </View>
                 </View>
