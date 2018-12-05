@@ -3,7 +3,7 @@
 ## Dependencies
 
 ```
-npm install
+npm install expo
 ```
 
 ## Run
