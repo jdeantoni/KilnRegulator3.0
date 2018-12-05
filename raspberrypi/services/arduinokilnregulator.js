@@ -101,7 +101,7 @@ class ArduinoKilnRegulator {
       status.timestamp = timestamp;
 
       // save new segment in database
-      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: data.temperature});
+      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
     }
 
     this.status = status;
