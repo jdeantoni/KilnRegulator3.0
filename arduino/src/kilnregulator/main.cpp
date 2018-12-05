@@ -221,9 +221,9 @@ readerror:
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	size_t mapSize = 8;
 
-	int state =  kilnRegulator.getState();
-	int elementState =  kilnRegulator.getElementState();
-	int segment = kilnRegulator.getCurrentSegment();
+	uint8_t state =  kilnRegulator.getState();
+	uint8_t elementState =  kilnRegulator.getElementState();
+	int8_t segment = kilnRegulator.getCurrentSegment();
 	double temperature = kilnRegulator.getTemperature();
 
 	msgpack::writeMapSize(stream, mapSize);
@@ -231,25 +231,25 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	msgpack::writeString(stream, "command");
 	msgpack::writeString(stream, "status");
 
-	msgpack::writeString(stream, "state");
-	msgpack::writeInt16(stream, state);
+	msgpack::writeString5(stream, "s", 1); //"state"
+	msgpack::writeIntU8(stream, state);
 
-	msgpack::writeString(stream, "elementState");
-	msgpack::writeInt16(stream, elementState);
+	msgpack::writeString5(stream, "eS", 2); //"elementState"
+	msgpack::writeIntU8(stream, elementState);
 
-	msgpack::writeString(stream, "currentSegment");
-	msgpack::writeInt16(stream, segment);
+	msgpack::writeString5(stream, "cS", 2); //"currentSegment"
+	msgpack::writeInt8(stream, segment);
 
-	msgpack::writeString(stream, "temperature");
+	msgpack::writeString5(stream, "t", 1); //"temperature"
 	msgpack::writeFloat32(stream, temperature);
 
-	msgpack::writeString(stream, "output");
+	msgpack::writeString5(stream, "o", 1); //"output"
 	msgpack::writeFloat32(stream, kilnRegulator.output);
 
-	msgpack::writeString(stream, "setPoint");
+	msgpack::writeString5(stream, "sP", 2); //"setPoint"
 	msgpack::writeFloat32(stream, kilnRegulator.setpoint);
 
-	msgpack::writeString(stream, "timestamp");
+	msgpack::writeString5(stream, "ts", 2); //"timestamp"
 	msgpack::writeIntU32(stream, now());
 }
 
