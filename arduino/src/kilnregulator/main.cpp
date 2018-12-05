@@ -220,6 +220,8 @@ readerror:
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	size_t mapSize = 8;
 
+	uint32_t timestamp = now(); // get it first because it may send a time syncronisation request
+
 	uint8_t state =  kilnRegulator.getState();
 	uint8_t elementState =  kilnRegulator.getElementState();
 	int8_t segment = kilnRegulator.getCurrentSegment();
@@ -249,7 +251,7 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	msgpack::writeFloat32(stream, kilnRegulator.setpoint);
 
 	msgpack::writeString5(stream, "ts", 2); //"timestamp"
-	msgpack::writeIntU32(stream, now());
+	msgpack::writeIntU32(stream, timestamp);
 }
 
 
