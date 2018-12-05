@@ -59,12 +59,14 @@ void KilnRegulator::regulate() {
 	if (now - windowStartTime > windowSize) { //time to shift the Relay Window
 		windowStartTime += windowSize;
 	}
-	if (windowSize * output / 255  > now - windowStartTime) {
-		digitalWrite(outputPin, HIGH);
-		digitalWrite(13, HIGH);
-	} else {
-		digitalWrite(outputPin, LOW);
-		digitalWrite(13, LOW);
+	if (windowSize * output / 255  > now - windowStartTime) { // heat
+		elementState = ElementState::HEATING;
+		digitalWrite(outputPin, HIGH); //heating elment on
+		digitalWrite(13, HIGH); //led on
+	} else { // let cool down
+		elementState = ElementState::STALE;
+		digitalWrite(outputPin, LOW); //heating element on
+		digitalWrite(13, LOW); //led off
 	}
 }
 
