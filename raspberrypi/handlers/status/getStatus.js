@@ -15,11 +15,11 @@ exports.handler = function getStatus(req, res, next) {
 
   res.send({
     errored: arduino.errored,
-    state: arduino.state,
-    elementState: arduino.elementState,
+    state: arduino.status.state,
+    elementState: arduino.status.elementState,
     sample: {
-      timestamp: arduino.timestamp,
-      temperature: arduino.temperature
+      timestamp: arduino.status.timestamp,
+      temperature: arduino.status.temperature
     }
   });
   next()
