@@ -185,7 +185,6 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		errCode = msgpack::readInt(stream, timestamp);
 		if (errCode) { // not error code but success
 			setTime(timestamp);
-			errCode = timestamp;
 			lastTimesyncRequest = 0;
 			timeoutCounter = 0;
 		} else {
