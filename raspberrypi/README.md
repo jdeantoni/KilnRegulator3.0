@@ -2,7 +2,8 @@
 
 Arduino code will be automatically built and deployed on the Arduino when running through `docker-compose`.
 
-## Dependencies
+## Dependencies (to be installed on the Raspberry or the development environment accordingly)
+This README considers that the Raspbian OS is already installed on the Raspberry (see https://www.raspberrypi.org/downloads/raspbian/). 
 
 ```
 docker
@@ -10,8 +11,9 @@ docker-compose
 ```
 
 ## Prepare
+The arduino is connected through usb serial to the raspberry and the rasberry connected to the development computer (e.g., by using ethernet). Then, in the later, you can either connect to the raspberry through ssh or directly launch commands on the raspberry. But First, on the raspberry
 
-Edit `raspberrypi/conf/udev/rules.d/arduino.rules` replacing the `idVendor` and `idProduct` by those of your Arduino device.
+Edit `raspberrypi/conf/udev/rules.d/arduino.rules` replacing the `idVendor` and `idProduct` by those of your Arduino device (that can be found in dmesg for instance).
 
 ```
 sudo cp raspberrypi/conf/udev/rules.d/arduino.rules /etc/udev/rules.d
