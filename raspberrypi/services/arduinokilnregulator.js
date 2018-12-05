@@ -17,6 +17,8 @@ class ArduinoKilnRegulator {
       state: "",
       elementState: "",
       currentSegment: -1,
+      output: 0,
+      setPoint: 0,
       timestamp: 0
     };
 

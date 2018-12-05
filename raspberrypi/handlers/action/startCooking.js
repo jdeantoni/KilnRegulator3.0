@@ -13,7 +13,7 @@ exports.handler = function startCooking(req, res, next) {
     return;
   }
 
-	programRepository.exists(req.body.uuid, function(err, exists) {
+  programRepository.exists(req.body.uuid, function(err, exists) {
     if (err) {
       res.status(500);
       res.send({error: err});
