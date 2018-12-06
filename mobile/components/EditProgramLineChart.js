@@ -30,7 +30,8 @@ export default class EditProgramLineChart extends React.Component {
             <View style={styles.container}>
                 <VictoryChart
                     theme={VictoryTheme.material}
-                    height={270} width={this.state.width}
+                    width={this.state.width}
+                    padding={{ left: 60, top: 60, right: 20, bottom: 70 }}
                     containerComponent={<VictoryCursorContainer
                         cursorDimension="x"
                         cursorLabel={cursor => { return {

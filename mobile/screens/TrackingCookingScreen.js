@@ -185,7 +185,7 @@ class TrackingCookingScreen extends React.Component {
     }
 
     findProgram(programId) {
-        for (const i in this.props.programs) {
+        for (let i in this.props.programs) {
             if (this.props.programs[i].uuid === programId) {
                 return this.props.programs[i];
             }
@@ -237,14 +237,12 @@ class TrackingCookingScreen extends React.Component {
     }
 
     findPointsOfSegments(elapsedTime) {
-        let timeInSeconds = 0;
         let lastPoint;
         let nextPoint = {time: TIME_ORIGIN, temp: TEMP_ORIGIN};
         for (let i in this.state.theoreticData) {
-            timeInSeconds += this.state.theoreticData[i].time;
             lastPoint = nextPoint;
             nextPoint = this.state.theoreticData[i];
-            if (timeInSeconds > elapsedTime) {
+            if (this.state.theoreticData[i].time > elapsedTime) {
                 break;
             }
         }
