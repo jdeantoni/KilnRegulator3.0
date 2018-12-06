@@ -1,0 +1,27 @@
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -107,6 +107,16 @@
+             abiFilters "armeabi-v7a", "x86"
+         }
+     }
++    signingConfigs {
++        release {
++            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
++                storeFile file(MYAPP_RELEASE_STORE_FILE)
++                storePassword MYAPP_RELEASE_STORE_PASSWORD
++                keyAlias MYAPP_RELEASE_KEY_ALIAS
++                keyPassword MYAPP_RELEASE_KEY_PASSWORD
++            }
++        }
++    }
+     splits {
+         abi {
+             reset()
+@@ -119,6 +129,7 @@
+         release {
+             minifyEnabled enableProguardInReleaseBuilds
+             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
++            signingConfig signingConfigs.release
+         }
+     }
+     // applicationVariants are e.g. debug, release
