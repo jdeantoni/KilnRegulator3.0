@@ -18,15 +18,16 @@
 
 | Project               | License       | Note                                                  | Project page                                                                  |
 | --------------------- | ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
-|NodeJS			| X11		| OK							| https://nodejs.org/								|
-|Express		| MIT		| OK							| https://expressjs.com/							|
-|Mongoose		| MIT		| OK							| https://mongoosejs.com/							|
-|MongoDB		| AGPLv3/SSPL	| OK but all the source code must be redistributed	| https://www.mongodb.com/							|
-|Swagger Routes		| MIT		| OK 							| https://github.com/mikestead/swagger-routes					|
-|Swagger UI Express	| MIT		| OK							| https://github.com/scottie1984/swagger-ui-express				|
-|msgpack5		| MIT		| OK							| https://github.com/mcollina/msgpack5						|
-|SerialPort		| MIT		| OK							| https://github.com/node-serialport/node-serialport				|
-|yaml.js		| MIT		| OK							| https://github.com/jeremyfa/yaml.js						|
-|crc			| MIT		| OK							| https://github.com/alexgorbatchev/node-crc					|
-|uuid			| MIT		| OK							| https://github.com/kelektiv/node-uuid						|
-|Docker CE		| Apache	| OK							| https://www.docker.com/							|
+| Raspbian Lite		| GPL		| OK, we only run unmodified OS				| https://www.raspbian.org/							|
+| NodeJS		| X11		| OK							| https://nodejs.org/								|
+| Express		| MIT		| OK							| https://expressjs.com/							|
+| Mongoose		| MIT		| OK							| https://mongoosejs.com/							|
+| MongoDB		| AGPLv3/SSPL	| OK but all the source code must be redistributed	| https://www.mongodb.com/							|
+| Swagger Routes	| MIT		| OK 							| https://github.com/mikestead/swagger-routes					|
+| Swagger UI Express	| MIT		| OK							| https://github.com/scottie1984/swagger-ui-express				|
+| msgpack5		| MIT		| OK							| https://github.com/mcollina/msgpack5						|
+| SerialPort		| MIT		| OK							| https://github.com/node-serialport/node-serialport				|
+| yaml.js		| MIT		| OK							| https://github.com/jeremyfa/yaml.js						|
+| crc			| MIT		| OK							| https://github.com/alexgorbatchev/node-crc					|
+| uuid			| MIT		| OK							| https://github.com/kelektiv/node-uuid						|
+| Docker CE		| Apache	| OK							| https://www.docker.com/							|
