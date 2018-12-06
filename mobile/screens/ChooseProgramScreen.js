@@ -10,7 +10,7 @@ import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Cons
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-        title: 'ChooseProgramScreen',
+        title: 'Choix du programme',
         headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
     });
 

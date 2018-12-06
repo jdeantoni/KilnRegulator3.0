@@ -14,7 +14,7 @@ import segmentsToChart from "../helpers/ChartHelper";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
-        title: 'EditProgramScreen',
+        title: 'Édition d\'un programme',
         headerLeft: displayArrow(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
     });
 

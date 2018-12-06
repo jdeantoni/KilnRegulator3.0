@@ -60,7 +60,15 @@ export default class TrackingLineChart extends React.Component {
                             x={"time"}
                             y={"temperature"}
                         />
-                        {this.lineForRealData()}
+                        <VictoryLine
+                            style={{
+                                data: { stroke: "green" },
+                                parent: { border: "1px solid #ccc"},
+                            }}
+                            data={(this.props.realData.length <= 1) ? [{timestamp: 0, temperature: 0}] : this.props.realData}
+                            x={"timestamp"}
+                            y={"temperature"}
+                        />
                     </VictoryGroup>
                     {this.displayPoint()}
                 </VictoryChart>
@@ -68,27 +76,13 @@ export default class TrackingLineChart extends React.Component {
         );
     }
 
-    lineForRealData() {
-        return (this.props.realData.length <= 1) ?
-            null :
-            (
-                <VictoryLine
-                    style={{
-                        data: { stroke: "green" },
-                        parent: { border: "1px solid #ccc"},
-                    }}
-                    data={this.props.realData}
-                    x={"timestamp"}
-                    y={"temperature"}
-                />
-            );
-    }
-
     handleCursorChange(value) {
         if (value == null) return;
+        const y = this.getTemperatureFromTimeInSegments(value);
+        if (y == null) return;
 
         this.setState({
-            activePoint: {x: value, y: this.getTemperatureFromTimeInSegments(value)}
+            activePoint: {x: value, y: y}
         });
     }
 
@@ -111,8 +105,11 @@ export default class TrackingLineChart extends React.Component {
         for (i = 1; i < this.props.theoreticData.length; i++) {
             if (time < this.props.theoreticData[i].time) break;
         }
-
-        return Math.round(this.coeff[i].a * time + this.coeff[i].b);
+        try {
+            return Math.round(this.coeff[i].a * time + this.coeff[i].b);
+        } catch {
+            return null;
+        }
     }
 
     findCoefficients() {

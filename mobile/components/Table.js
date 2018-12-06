@@ -72,8 +72,8 @@ export default class Table extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                {this.renderHeader()}
                 <ScrollView style={styles.container}>
-                    {this.renderHeader()}
                     {this.renderRows()}
                     <Button title={"Ajouter un segment"} onPress={() => this.addSegment()}/>
                 </ScrollView>
@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     },
     header_row: {
         height: 50,
-        flex: 1,
         flexDirection: 'row',
         backgroundColor: "#B71C1C",
         borderBottomWidth: 2,
