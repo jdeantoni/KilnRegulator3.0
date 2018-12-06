@@ -1,5 +1,5 @@
 import React from "react";
-import {StyleSheet, View} from "react-native";
+import {Image, StyleSheet, View} from "react-native";
 import {
     VictoryChart,
     VictoryLine,
@@ -12,6 +12,7 @@ import {
 } from "victory-native";
 import {secondsToUser} from "../helpers/UnitsHelper";
 import {TEMP_ORIGIN, TIME_ORIGIN} from "../helpers/Constants";
+import images from "../helpers/ImageLoader";
 
 export default class TrackingLineChart extends React.Component {
     constructor(props) {
@@ -24,15 +25,21 @@ export default class TrackingLineChart extends React.Component {
     }
 
     render() {
-        if (this.state.dimensions === undefined) return <View style={styles.container} onLayout={this.onLayout}/>;
-        if (this.props.theoreticData == null || this.props.theoreticData.length <= 1) return <View/>;
+        if (this.state.dimensions === undefined || this.props.theoreticData == null || this.props.theoreticData.length <= 1) {
+            return (
+                <View style={styles.loading} onLayout={this.onLayout}>
+                    <Image source={images.loading} style={{width: 50, height: 50}}/>
+                </View>
+            );
+        }
         if (this.coeff == null) this.findCoefficients();
 
         return (
             <View style={styles.container}>
                 <VictoryChart
                     theme={VictoryTheme.material}
-                    height={270} width={this.state.width}
+                    width={this.state.width}
+                    padding={{ left: 60, top: 60, right: 20, bottom: 70 }}
                     containerComponent={<VictoryCursorContainer
                         cursorDimension="x"
                         cursorLabel={cursor => { return {
@@ -137,7 +144,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5fcff"
+    },
+    loading: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: "center"
     }
 });
 
