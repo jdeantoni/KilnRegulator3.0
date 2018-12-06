@@ -31,3 +31,19 @@
 | crc			| MIT		| OK							| https://github.com/alexgorbatchev/node-crc					|
 | uuid			| MIT		| OK							| https://github.com/kelektiv/node-uuid						|
 | Docker CE		| Apache	| OK							| https://www.docker.com/							|
+
+
+# Mobile
+
+| Project               | License       | Note                                                  | Project page                                                                  |
+| --------------------- | ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
+|Expo			| MIT		| OK							| https://expo.io/								|
+|React		| MIT		| OK							| https://reactjs.org/							|
+|React Native		| MIT		| OK							| https://facebook.github.io/react-native/							|
+|React Navigation		| BSD-2-Clause	| OK 	| https://reactnavigation.org/							|
+|Redux		| MIT		| OK 							| https://redux.js.org/					|
+|React Redux	| MIT		| OK							| https://redux.js.org/				|
+|querystring		| MIT		| OK							| https://github.com/Gozala/querystring						|
+|SuperAgent		| MIT		| OK							| https://github.com/visionmedia/superagent				|
+|uuid			| MIT		| OK							| https://github.com/kelektiv/node-uuid						|
+|Victory Native		| MIT	| OK							| https://formidable.com/open-source/victory/docs/							|
