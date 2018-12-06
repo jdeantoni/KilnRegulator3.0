@@ -4,6 +4,7 @@
 
 | Project 		| License	| Note 							| Project page 									|
 | --------------------- | ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Arduino framework	| LGPL		| OK, see Arduino's FAQ					| https://www.arduino.cc/							|
 | Adafruit_MAX31856	| BSD		| No license text… Assume 2-clause			| https://github.com/adafruit/Adafruit_MAX31856 				|
 | IEEE754tools		| MIT		| OK							| https://github.com/RobTillaart/Arduino/tree/master/libraries/IEEE754tools 	|
 | Arduino-Makefile	| LGPL		| OK, only build tools					| https://github.com/sudar/Arduino-Makefile 					|
