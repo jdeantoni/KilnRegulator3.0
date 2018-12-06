@@ -5,7 +5,8 @@
 Install Expo, React Native and the project dependencies:
 
 ```
-npm install expo-cli --global
+sudo npm install expo-cli --global
+sudo npm install react-native-cli --global
 npm install
 ```
 
