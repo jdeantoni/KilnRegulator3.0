@@ -36,3 +36,39 @@ $env:REACT_NATIVE_PACKAGER_HOSTNAME = “<IP>”
 - If the QR code doesn't appear, reload Expo.
 - If the bundle can't be constructed, add a dummy line in the code, the build may start.
 - Check there is an unique instance of the app on your phone.
+
+## Deploy
+
+### Prepare
+
+#### Eject
+
+```
+./eject.sh
+```
+
+#### Generate signing key
+
+```
+keytool -genkey -v -keystore android/app/my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+```
+
+#### Add signing configuration
+
+```
+patch -p1 -i android-sign.patch
+```
+
+### Build & deploy
+
+#### Generate signed apk
+
+```
+./android/gradlew -p android assembleRelease
+```
+
+#### Install signed apk
+
+```
+adb install ./android/app/build/outputs/apk/release/app-release.apk
+```
