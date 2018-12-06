@@ -89,14 +89,14 @@ export default class EditProgramLineChart extends React.Component {
         let lastPoint = {time: TIME_ORIGIN, temperature: TEMP_ORIGIN};
         let nextPoint;
 
-        for (let i in this.state.data) {
-            if (this.state.props[i].time < time) {
-                lastPoint = this.state.props[i];
-            } else if (this.state.props[i].time > time) {
-                nextPoint = this.state.props[i];
+        for (let i in this.props.data) {
+            if (this.props.data[i].time < time) {
+                lastPoint = this.props.data[i];
+            } else if (this.props.data[i].time > time) {
+                nextPoint = this.props.data[i];
                 break;
             } else {
-                return this.state.props[i].temperature;
+                return this.props.data[i].temperature;
             }
         }
 

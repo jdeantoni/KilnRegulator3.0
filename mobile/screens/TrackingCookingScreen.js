@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, Alert, BackHandler} from 'react-native';
+import {View, Text, StyleSheet, Button, Alert, BackHandler, Image} from 'react-native';
 import { displayArrow } from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI, StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
@@ -12,11 +12,14 @@ import {
     estimateTimeInSecondsForSegment,
     secondsToUser
 } from "../helpers/UnitsHelper";
-import {UPDATE_PROGRAMS} from "../helpers/Constants";
+import {COOLING, HEATING, STALE, UPDATE_PROGRAMS} from "../helpers/Constants";
+import TrackingImageItem from "../components/TrackingImageItem";
+import images from "../helpers/ImageLoader";
+import TrackingTextItem from "../components/TrackingTextItem";
 
 class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-        title: 'TrackingCookingScreen',
+        title: 'Suivi de cuisson',
         headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
     });
 
@@ -33,19 +36,22 @@ class TrackingCookingScreen extends React.Component {
         this.state = {
             temperature: 0.0,
             realData: [],
-            theoreticData: null
+            theoreticData: null,
+            elementState: STALE
         };
     }
 
     render() {
         if (!this.currentProgram) {
             return (
-                <View style={styles.main_container}>
+                <View style={styles.loading}>
                     <NavigationEvents
                         onWillFocus={() => this.onWillFocus()}
                         onWillBlur={() => this.onWillBlur()}
                     />
-                    <Text>Chargement...</Text>
+                    <Image
+                        source={images.loading}
+                        style={{width: 50, height: 50}}/>
                 </View>
             );
         }
@@ -62,16 +68,23 @@ class TrackingCookingScreen extends React.Component {
                         theoreticData={segmentsToChart(this.state.theoreticData)}
                         realData={this.state.realData}/>
                 </View>
+                <View style={styles.program_name}>
+                    <Text style={{fontSize: 14}}>Programme en cours : {this.currentProgram.name}</Text>
+                </View>
                 <View style={styles.major_data_container}>
-                    <Text>Température actuelle : {currentTemperature}°C</Text>
-                    <Text>Temps restant estimé : {remainingTime}</Text>
-                    <Text>Programme en cours : {this.currentProgram.name}</Text>
+                    <TrackingImageItem text={currentTemperature + "°C"} img={this.thermometerImage()} subText={"Température actuelle"}/>
+                    <View style={styles.divider}/>
+                    <TrackingImageItem text={remainingTime} img={images.time} subText={"Temps restant"}/>
                 </View>
                 <View style={styles.minor_data_container}>
-                    <Text>Temps écoulé : {elapsedTime}</Text>
-                    <Text>Température prévue : {expectedTemperature}°C</Text>
-                    <Text>Prochain segment : {expectedTimeRemaining}</Text>
-                    <Button title={"Stop"} onPress={() => this.stopCooking()}/>
+                    <TrackingTextItem text={expectedTemperature + "°C"} subText={"Température prévue"}/>
+                    <View style={styles.divider}/>
+                    <TrackingTextItem text={elapsedTime} subText={"Temps écoulé"}/>
+                    <View style={styles.divider}/>
+                    <TrackingTextItem text={expectedTimeRemaining} subText={"Prochain segment"}/>
+                </View>
+                <View>
+                    <Button title={"Arrêt"} onPress={() => this.stopCooking()}/>
                 </View>
             </View>
         );
@@ -104,18 +117,13 @@ class TrackingCookingScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
-                if (response.state === "stopped") {
-                    this.setState({
-                        temperature: response.sample.temperature
-                    })
-                } else {
-                    this.setState({
-                        temperature: response.sample.temperature,
-                        realData: (this.state.realData === []) ?
-                            [{temperature: response.sample.temperature, timestamp: response.sample.timestamp}] :
-                            this.state.realData.concat({temperature: response.sample.temperature, timestamp: response.sample.timestamp})
-                    })
-                }
+                this.setState({
+                    temperature: response.sample.temperature,
+                    elementState: response.elementState,
+                    realData: (this.state.realData === []) ?
+                        [{temperature: response.sample.temperature, timestamp: response.sample.timestamp}] :
+                        this.state.realData.concat({temperature: response.sample.temperature, timestamp: response.sample.timestamp})
+                })
             })
             .catch((error) => {
                 console.log(error);
@@ -215,16 +223,15 @@ class TrackingCookingScreen extends React.Component {
 
     infoToDisplay() {
         const elapsedTime = this.computeElapsedTime();
-        const nextTheoreticPoint = this.findNextTheoreticPoint(elapsedTime);
+        const {timeToNextPoint, segmentNumber, deltaTime} = this.findNextTheoreticPoint(elapsedTime);
 
         return {
             currentTemperature: Math.round(this.state.temperature),
             remainingTime: secondsToUser(this.estimatedTime - elapsedTime),
             elapsedTime: secondsToUser(elapsedTime),
-            expectedTemperature: nextTheoreticPoint.targetTemperature,
-            expectedTimeRemaining: secondsToUser(nextTheoreticPoint.duration - elapsedTime)
+            expectedTemperature: this.computeTemperatureFromTime(segmentNumber, deltaTime, elapsedTime, timeToNextPoint),
+            expectedTimeRemaining: secondsToUser(timeToNextPoint - elapsedTime)
         };
-
     }
 
     computeElapsedTime() {
@@ -234,13 +241,44 @@ class TrackingCookingScreen extends React.Component {
     findNextTheoreticPoint(elapsedTime) {
         let timeInSeconds = 0;
         let i;
+        let deltaTime;
         for (i in this.currentProgram.segments) {
-            timeInSeconds += estimateTimeInSecondsForSegment(this.currentProgram.segments, parseInt(i));
+            deltaTime = estimateTimeInSecondsForSegment(this.currentProgram.segments, parseInt(i));
+            timeInSeconds += deltaTime;
             if (timeInSeconds > elapsedTime) {
                 break;
             }
         }
-        return this.currentProgram.segments[parseInt(i)];
+        return {
+            timeToNextPoint: timeInSeconds,
+            segmentNumber: parseInt(i),
+            deltaTime: deltaTime
+        };
+    }
+
+    computeTemperatureFromTime(nextSegmentId, deltaTime, elapsedTime, timeToNextPoint) {
+        const seg1 = this.currentProgram.segments[nextSegmentId-1];
+        const seg2 = this.currentProgram.segments[nextSegmentId];
+
+        if (this.estimatedTime <= elapsedTime) {
+            return seg2.targetTemperature;
+        }
+
+        const a = (seg2.targetTemperature - seg1.targetTemperature) / deltaTime;
+        const b = seg2.targetTemperature - a * timeToNextPoint;
+
+        return Math.round(a * elapsedTime + b);
+    }
+
+    thermometerImage() {
+        switch (this.state.elementState) {
+            case COOLING:
+                return images.cooling;
+            case HEATING:
+                return images.heating;
+            default:
+                return images.stale;
+        }
     }
 }
 
@@ -255,14 +293,16 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     chart_container: {
-        flex: 5,
+        flex: 11,
     },
     major_data_container: {
-        flex: 3,
-        backgroundColor: "lightblue"
+        flex: 5,
+        flexDirection: 'row',
+        backgroundColor: "lightblue",
     },
     minor_data_container: {
-        flex: 2,
+        flex: 4,
+        flexDirection: 'row',
         backgroundColor: "lightgrey"
     },
     loading: {
@@ -270,6 +310,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "center"
     },
+    program_name: {
+        backgroundColor: 'pink',
+        justifyContent: "center",
+        alignItems: 'center',
+        paddingVertical: 3
+    },
+    divider: {
+        borderLeftColor: 'black',
+        borderLeftWidth: 2,
+        marginVertical: 15
+    }
 });
 
 const mapStateToProps = (state) => {

@@ -7,7 +7,7 @@ import {NavigationEvents} from "react-navigation";
 
 export default class FindKilnScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-        title: 'FindKilnScreen',
+        title: 'KilnRegulator3.0',
         headerLeft: <View/>,
     });
 
@@ -31,7 +31,7 @@ export default class FindKilnScreen extends React.Component {
                                value={this.state.ip}/>
                 </View>
                 <View style={styles.container}>
-                    <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>
+                    <Button title={"Se connecter au four"} onPress={() => this.kilnSelected()}/>
                 </View>
             </View>
         );
