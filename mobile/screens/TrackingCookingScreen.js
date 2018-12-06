@@ -7,12 +7,8 @@ import {NavigationEvents} from "react-navigation";
 import TrackingLineChart from "../components/TrackingLineChart";
 import connect from "react-redux/es/connect/connect";
 import segmentsToChart from "../helpers/ChartHelper";
-import {
-    estimateTimeInSecondsForAllSegments,
-    estimateTimeInSecondsForSegment,
-    secondsToUser
-} from "../helpers/UnitsHelper";
-import {COOLING, HEATING, STALE, UPDATE_PROGRAMS} from "../helpers/Constants";
+import {estimateTimeInSecondsForAllSegments, secondsToUser} from "../helpers/UnitsHelper";
+import {COOLING, HEATING, STALE, TEMP_ORIGIN, TIME_ORIGIN, UPDATE_PROGRAMS} from "../helpers/Constants";
 import TrackingImageItem from "../components/TrackingImageItem";
 import images from "../helpers/ImageLoader";
 import TrackingTextItem from "../components/TrackingTextItem";
@@ -65,11 +61,13 @@ class TrackingCookingScreen extends React.Component {
                 />
                 <View style={styles.chart_container}>
                     <TrackingLineChart
-                        theoreticData={segmentsToChart(this.state.theoreticData)}
+                        theoreticData={this.state.theoreticData}
                         realData={this.state.realData}/>
                 </View>
                 <View style={styles.program_name}>
-                    <Text style={{fontSize: 14}}>Programme en cours : {this.currentProgram.name}</Text>
+                    <Text style={{fontSize: 14}}>Programme en cours :
+                        <Text style={{fontWeight: "bold", fontSize: 14}}> {this.currentProgram.name}</Text>
+                    </Text>
                 </View>
                 <View style={styles.major_data_container}>
                     <TrackingImageItem text={currentTemperature + "°C"} img={this.thermometerImage()} subText={"Température actuelle"}/>
@@ -145,7 +143,7 @@ class TrackingCookingScreen extends React.Component {
                 this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
 
                 this.setState({
-                    theoreticData: this.currentProgram.segments,
+                    theoreticData: segmentsToChart(this.currentProgram.segments),
                     realData: response.samples
                 });
             })
@@ -161,7 +159,7 @@ class TrackingCookingScreen extends React.Component {
         this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
 
         this.setState({
-            theoreticData: this.currentProgram.segments,
+            theoreticData: segmentsToChart(this.currentProgram.segments),
             realData: (!Array.isArray(this.state.realData) || this.state.realData === []) ? [] : [...this.state.realData]
         });
     }
@@ -223,14 +221,14 @@ class TrackingCookingScreen extends React.Component {
 
     infoToDisplay() {
         const elapsedTime = this.computeElapsedTime();
-        const {timeToNextPoint, segmentNumber, deltaTime} = this.findNextTheoreticPoint(elapsedTime);
+        const {lastPoint, nextPoint} = this.findPointsOfSegments(elapsedTime);
 
         return {
             currentTemperature: Math.round(this.state.temperature),
             remainingTime: secondsToUser(this.estimatedTime - elapsedTime),
             elapsedTime: secondsToUser(elapsedTime),
-            expectedTemperature: this.computeTemperatureFromTime(segmentNumber, deltaTime, elapsedTime, timeToNextPoint),
-            expectedTimeRemaining: secondsToUser(timeToNextPoint - elapsedTime)
+            expectedTemperature: this.computeTemperatureFromSegmentAndTime(lastPoint, nextPoint, elapsedTime),
+            expectedTimeRemaining: secondsToUser(nextPoint.time - elapsedTime)
         };
     }
 
@@ -238,34 +236,24 @@ class TrackingCookingScreen extends React.Component {
         return (new Date() - this.startDate) / 1000;
     }
 
-    findNextTheoreticPoint(elapsedTime) {
+    findPointsOfSegments(elapsedTime) {
         let timeInSeconds = 0;
-        let i;
-        let deltaTime;
-        for (i in this.currentProgram.segments) {
-            deltaTime = estimateTimeInSecondsForSegment(this.currentProgram.segments, parseInt(i));
-            timeInSeconds += deltaTime;
+        let lastPoint;
+        let nextPoint = {time: TIME_ORIGIN, temp: TEMP_ORIGIN};
+        for (let i in this.state.theoreticData) {
+            timeInSeconds += this.state.theoreticData[i].time;
+            lastPoint = nextPoint;
+            nextPoint = this.state.theoreticData[i];
             if (timeInSeconds > elapsedTime) {
                 break;
             }
         }
-        return {
-            timeToNextPoint: timeInSeconds,
-            segmentNumber: parseInt(i),
-            deltaTime: deltaTime
-        };
+        return {lastPoint: lastPoint, nextPoint: nextPoint};
     }
 
-    computeTemperatureFromTime(nextSegmentId, deltaTime, elapsedTime, timeToNextPoint) {
-        const seg1 = this.currentProgram.segments[nextSegmentId-1];
-        const seg2 = this.currentProgram.segments[nextSegmentId];
-
-        if (this.estimatedTime <= elapsedTime) {
-            return seg2.targetTemperature;
-        }
-
-        const a = (seg2.targetTemperature - seg1.targetTemperature) / deltaTime;
-        const b = seg2.targetTemperature - a * timeToNextPoint;
+    computeTemperatureFromSegmentAndTime(lastPoint, nextPoint, elapsedTime) {
+        const a = (nextPoint.temperature - lastPoint.temperature) / (nextPoint.time - lastPoint.time);
+        const b = lastPoint.temperature - a * lastPoint.time;
 
         return Math.round(a * elapsedTime + b);
     }
