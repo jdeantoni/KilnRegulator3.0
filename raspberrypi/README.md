@@ -3,7 +3,7 @@
 Arduino code will be automatically built and deployed on the Arduino when running through `docker-compose`.
 
 ## Dependencies (to be installed on the Raspberry or the development environment accordingly)
-This README considers that the Raspbian OS is already installed on the Raspberry (see https://www.raspberrypi.org/downloads/raspbian/). 
+This README considers that the Raspbian OS is already installed on the Raspberry (see https://www.raspberrypi.org/downloads/raspbian/).
 
 ```
 docker
@@ -17,6 +17,11 @@ Edit `raspberrypi/conf/udev/rules.d/arduino.rules` replacing the `idVendor` and 
 
 ```
 sudo cp raspberrypi/conf/udev/rules.d/arduino.rules /etc/udev/rules.d
+```
+
+On Raspberry Pi:
+```
+git submodule update --init rpi3-mongodb3
 ```
 
 ## Build
