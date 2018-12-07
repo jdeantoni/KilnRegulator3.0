@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Button, Alert, BackHandler, Image} from 'react-native';
+import {View, Text, StyleSheet, Button, Alert, BackHandler, Image, TouchableOpacity} from 'react-native';
 import { displayArrow } from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI, StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
@@ -17,6 +17,11 @@ class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'Suivi de cuisson',
         headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
+        headerRight: (
+            <TouchableOpacity style={{paddingRight: 16}} onPress={() => {console.log(navigation)}}>
+                <Image source={(navigation.getParam("errored")) ? images.warning : images.bell}
+                       style={{height: 28, width: 28}}/>
+            </TouchableOpacity>)
     });
 
     constructor(props) {
@@ -128,6 +133,9 @@ class TrackingCookingScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
+                if (response.errored) {
+                    this.props.navigation.setParams({errored: response.errored});
+                }
                 if (response.state === "running" || response.state === "stopped") {
                     this.setState({
                         temperature: response.sample.temperature,

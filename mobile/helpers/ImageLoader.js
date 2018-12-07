@@ -6,7 +6,9 @@ const images = {
     cooling: require('../assets/cooling.png'),
     stale: require('../assets/stale.png'),
     time: require('../assets/time.png'),
-    loading: require('../assets/loading.gif')
+    loading: require('../assets/loading.gif'),
+    warning: require('../assets/warning.png'),
+    bell: require('../assets/bell.png')
 };
 
 export default images;
