@@ -87,7 +87,7 @@ class ArduinoKilnRegulator {
     }
 
     // update current cooking
-    if (status.state == "running") { // cooking running
+    if (status.state != "ready" && this.cooking.startDate) { // cooking started, collect samples even in stopped state
       const startDate = Math.floor(Date.parse(this.cooking.startDate) / 1000);
       let timestamp = status.timestamp - startDate; // timestamp from start of program in seconds
 
