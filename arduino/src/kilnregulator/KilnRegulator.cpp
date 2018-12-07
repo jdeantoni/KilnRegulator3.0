@@ -59,12 +59,14 @@ void KilnRegulator::regulate() {
 	if (now - windowStartTime > windowSize) { //time to shift the Relay Window
 		windowStartTime += windowSize;
 	}
-	if (windowSize * output / 255  > now - windowStartTime) {
-		digitalWrite(outputPin, HIGH);
-		digitalWrite(13, HIGH);
-	} else {
-		digitalWrite(outputPin, LOW);
-		digitalWrite(13, LOW);
+	if (windowSize * output / 255  > now - windowStartTime) { // heat
+		elementState = ElementState::HEATING;
+		digitalWrite(outputPin, HIGH); //heating elment on
+		digitalWrite(13, HIGH); //led on
+	} else { // let cool down
+		elementState = ElementState::STALE;
+		digitalWrite(outputPin, LOW); //heating element on
+		digitalWrite(13, LOW); //led off
 	}
 }
 
@@ -78,15 +80,15 @@ double KilnRegulator::getTemperature() const {
 	return temperature;
 }
 
-int KilnRegulator::getState() const {
+uint8_t KilnRegulator::getState() const {
 	return state;
 }
 
-int KilnRegulator::getElementState() const {
+uint8_t KilnRegulator::getElementState() const {
 	return elementState;
 }
 
-int KilnRegulator::getCurrentSegment() const {
+int8_t KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
 }
 
