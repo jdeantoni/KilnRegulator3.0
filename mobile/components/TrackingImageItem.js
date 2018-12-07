@@ -24,10 +24,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5
     },
     title: {
-        fontSize: 34
+        fontSize: 34,
+        textAlign: 'center'
     },
     description: {
-        fontSize: 12
+        fontSize: 12,
+        textAlign: 'center'
     },
     image: {
         flex: 1,

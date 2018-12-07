@@ -20,9 +20,11 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     title: {
-        fontSize: 32
+        fontSize: 32,
+        textAlign: 'center'
     },
     description: {
-        fontSize: 12
+        fontSize: 12,
+        textAlign: 'center'
     }
 });

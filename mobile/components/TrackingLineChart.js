@@ -67,15 +67,7 @@ export default class TrackingLineChart extends React.Component {
                             x={"time"}
                             y={"temperature"}
                         />
-                        <VictoryLine
-                            style={{
-                                data: { stroke: "green" },
-                                parent: { border: "1px solid #ccc"},
-                            }}
-                            data={(this.props.realData.length <= 1) ? [{timestamp: 0, temperature: 0}] : this.props.realData}
-                            x={"timestamp"}
-                            y={"temperature"}
-                        />
+                        {this.displayRealData()}
                     </VictoryGroup>
                     {this.displayPoint()}
                 </VictoryChart>
@@ -91,6 +83,23 @@ export default class TrackingLineChart extends React.Component {
         this.setState({
             activePoint: {x: value, y: y}
         });
+    }
+
+    displayRealData() {
+        if (this.props.realData == null || this.props.realData.length <= 1) {
+            return null;
+        }
+        return (
+            <VictoryLine
+                style={{
+                    data: { stroke: "green" },
+                    parent: { border: "1px solid #ccc"},
+                }}
+                data={this.props.realData}
+                x={"timestamp"}
+                y={"temperature"}
+            />
+        );
     }
 
     displayPoint() {
