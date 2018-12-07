@@ -33,7 +33,8 @@ class TrackingCookingScreen extends React.Component {
             temperature: 0.0,
             realData: [],
             theoreticData: null,
-            elementState: STALE
+            elementState: STALE,
+            isStopped: false
         };
     }
 
@@ -70,9 +71,13 @@ class TrackingCookingScreen extends React.Component {
                     </Text>
                 </View>
                 <View style={styles.major_data_container}>
-                    <TrackingImageItem text={currentTemperature + "°C"} img={this.thermometerImage()} subText={"Température actuelle"}/>
+                    <View style={styles.data_container}>
+                        <TrackingImageItem text={currentTemperature + "°C"} img={this.thermometerImage()} subText={"Température actuelle"}/>
+                    </View>
                     <View style={styles.divider}/>
-                    <TrackingImageItem text={remainingTime} img={images.time} subText={"Temps restant"}/>
+                    <View style={styles.data_container}>
+                        {this.displayRemainingTime(remainingTime)}
+                    </View>
                 </View>
                 <View style={styles.minor_data_container}>
                     <TrackingTextItem text={expectedTemperature + "°C"} subText={"Température prévue"}/>
@@ -82,11 +87,19 @@ class TrackingCookingScreen extends React.Component {
                     <TrackingTextItem text={expectedTimeRemaining} subText={"Prochain segment"}/>
                 </View>
                 <View>
-                    <Button title={"Arrêt"} onPress={() => this.stopCooking()}/>
+                    <Button title={this.state.isStopped ? "Retour aux programmes" : "Arrêt"} onPress={() => this.stopButton()}/>
                 </View>
             </View>
         );
     }
+
+
+    displayRemainingTime(remainingTime) {
+        return (this.state.isStopped) ?
+            <View style={styles.terminated_container}><Text style={styles.terminated_text}>Programme terminé</Text></View> :
+            <TrackingImageItem text={remainingTime} img={images.time} subText={"Temps restant"}/>
+    }
+
 
     onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
@@ -115,13 +128,19 @@ class TrackingCookingScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
-                this.setState({
-                    temperature: response.sample.temperature,
-                    elementState: response.elementState,
-                    realData: (this.state.realData === []) ?
-                        [{temperature: response.sample.temperature, timestamp: response.sample.timestamp}] :
-                        this.state.realData.concat({temperature: response.sample.temperature, timestamp: response.sample.timestamp})
-                })
+                if (response.state === "running" || response.state === "stopped") {
+                    this.setState({
+                        temperature: response.sample.temperature,
+                        elementState: response.elementState,
+                        isStopped: (response.state === "stopped"),
+                        realData: (this.state.realData === []) ?
+                            [{temperature: response.sample.temperature, timestamp: response.sample.timestamp}] :
+                            this.state.realData.concat({temperature: response.sample.temperature, timestamp: response.sample.timestamp})
+                    });
+                } else {
+                    this.setState({ temperature: response.sample.temperature });
+                }
+
             })
             .catch((error) => {
                 console.log(error);
@@ -164,24 +183,41 @@ class TrackingCookingScreen extends React.Component {
         });
     }
 
-    stopCooking() {
-        Alert.alert("Arrêt de la cuisson", "Êtes-vous sûr de vouloir arrêter le processus de cuisson ?",
-            [
-                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () =>
-                        this.actionApi.stopCooking()
-                            .then((response) => {
-                                if (response.ok) {
-                                    this.props.navigation.navigate("ChooseProgram")
-                                }
-                                else throw new Error("HTTP response status not code 200 as expected.");
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                                alert("Connexion réseau échouée")
-                            })
-                },
-            ]);
+    stopButton() {
+        if (this.state.isStopped) {
+            this.actionApi.resetCooking()
+                .then((response) => {
+                    if (response.ok) {
+                        this.setState({
+                            realData: [],
+                            theoreticData: null,
+                            elementState: STALE,
+                            isStopped: false
+                        });
+                        this.props.navigation.navigate("ChooseProgram")
+                    }
+                    else throw new Error("HTTP response status not code 200 as expected.");
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("Connexion réseau échouée")
+                });
+        } else {
+            Alert.alert("Arrêt de la cuisson", "Êtes-vous sûr de vouloir arrêter le processus de cuisson ?",
+                [
+                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                    {text: 'Oui', onPress: () =>
+                            this.actionApi.stopCooking()
+                                .then((response) => {
+                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    alert("Connexion réseau échouée")
+                                })
+                    },
+                ]);
+        }
     }
 
     findProgram(programId) {
@@ -250,6 +286,9 @@ class TrackingCookingScreen extends React.Component {
     }
 
     computeTemperatureFromSegmentAndTime(lastPoint, nextPoint, elapsedTime) {
+        if (elapsedTime > nextPoint.time) {
+            return nextPoint.temperature;
+        }
         const a = (nextPoint.temperature - lastPoint.temperature) / (nextPoint.time - lastPoint.time);
         const b = lastPoint.temperature - a * lastPoint.time;
 
@@ -306,6 +345,18 @@ const styles = StyleSheet.create({
         borderLeftColor: 'black',
         borderLeftWidth: 2,
         marginVertical: 15
+    },
+    data_container: {
+        flex: 1
+    },
+    terminated_text: {
+        textAlign: 'center',
+        fontSize: 28
+    },
+    terminated_container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: 'center'
     }
 });
 
