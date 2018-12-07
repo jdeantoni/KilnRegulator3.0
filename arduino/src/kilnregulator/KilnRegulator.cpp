@@ -94,7 +94,7 @@ int8_t KilnRegulator::getCurrentSegment() const {
 
 int KilnRegulator::start(const Program &program) {
 
-	if (state == KilnState::RUNNING) {
+	if (state != KilnState::READY) {
 		return ErrorCode::INVALID_STATE;
 	}
 	/*if (setpoint < 0) {
@@ -125,6 +125,15 @@ int KilnRegulator::stop() {
 
 	state = KilnState::STOPPED;
 	windowStartTime = 0;
+	return 0;
+}
+
+int KilnRegulator::reset() {
+	if (state != KilnState::STOPPED) {
+		return ErrorCode::INVALID_STATE;
+	}
+
+	state = KilnState::READY;
 	return 0;
 }
 

@@ -22,6 +22,7 @@ public:
 
 	int start(const Program &program);
 	int stop();
+	int reset();
 	int setSetpoint(double);
 	double output = 0.0;
 	double setpoint = -1.0;

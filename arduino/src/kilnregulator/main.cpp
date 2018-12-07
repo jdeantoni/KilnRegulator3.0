@@ -174,6 +174,9 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	} else if (!strncmp(key, "stop", keyLength+1)) {
 		errCode = kilnRegulator.stop();
 		//stop cooking
+	} else if (!strncmp(key, "reset", keyLength+1)) {
+		errCode = kilnRegulator.reset();
+		//reset cooking
 	} else if (!strncmp(key, "timesync", keyLength+1)) {
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;

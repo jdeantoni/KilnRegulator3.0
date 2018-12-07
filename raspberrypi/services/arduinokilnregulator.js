@@ -176,6 +176,15 @@ class ArduinoKilnRegulator {
     });
   }
 
+  reset() {
+    const akn = this;
+    this.arduino.write(["reset"]);
+    this.arduino.emitter.once('ack-reset', function(msg) {
+      console.log('Reset!');
+      akn.cooking = {};
+    });
+  }
+
   setSetpoint(setpoint) {
     this.arduino.write(["setpoint", setpoint]);
   }
