@@ -92,6 +92,10 @@ int8_t KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
 }
 
+unsigned long KilnRegulator::getStartDate() const {
+	return currentSegment;
+}
+
 int KilnRegulator::start(const Program &program) {
 
 	if (state != KilnState::READY) {

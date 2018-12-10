@@ -17,6 +17,7 @@
 #include "Timer.h"
 #include "Time.h"
 #include "WatchDog.h"
+#include "LCDMonitor.h"
 
 #define MAX_KEY_LENGTH 31
 
@@ -31,6 +32,8 @@ Program program;
 Timer samplingTimer{5000}; // 500ms sampling rate, more or less…
 
 WatchDog watchdog;
+
+LCDMonitor lcdMonitor(/*cs*/10, /*dc*/8, /*rst*/9);
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -275,6 +278,8 @@ void setup() {
 
 	watchdog.init();
 
+	lcdMonitor.init();
+
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
@@ -303,6 +308,8 @@ void loop() {
 			// 3 timesync requests timed out, raspberry most likely not answering, do something…
 		}
 	}
+
+	lcdMonitor.draw(kilnRegulator);
 
 	watchdog.update();
 	delay(100);

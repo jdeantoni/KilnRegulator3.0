@@ -19,6 +19,7 @@ public:
 	uint8_t getState() const;
 	uint8_t getElementState() const;
 	int8_t getCurrentSegment() const;
+	unsigned long getStartDate() const;
 
 	int start(const Program &program);
 	int stop();
