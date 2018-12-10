@@ -1,18 +1,19 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native'
 import { connect } from "react-redux";
 import {
     estimateTimeInSecondsForAllSegments,
     isoDateToUser,
     secondsToUser
 } from "../helpers/UnitsHelper";
+import images from "../helpers/ImageLoader";
 
 class ProgramItem extends React.Component {
     render() {
         const program = this.props.programs[this.props.id.item];
 
         return (
-            <TouchableOpacity style={[styles.main_container, this.isSelected()]} onPress={() => {this.toggleOnPress()}}>
+            <TouchableOpacity style={[styles.main_container, this.colorIfSelected()]} onPress={() => {this.toggleOnPress()}}>
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
                         <Text style={styles.title_text}>{program.name}</Text>
@@ -23,6 +24,7 @@ class ProgramItem extends React.Component {
                         <Text style={styles.description_text}>Dernière modification le {isoDateToUser(program.lastModificationDate)}</Text>
                     </View>
                 </View>
+                {this.displayGarbage()}
             </TouchableOpacity>
         )
     }
@@ -32,20 +34,26 @@ class ProgramItem extends React.Component {
         this.props.dispatch(action);
     }
 
-    isSelected() {
+    colorIfSelected() {
         if (this.props.selectedProgram === this.props.id.item) {
             return {
                 backgroundColor: "lightgreen"
             }
-        } else {
-            return {
-                backgroundColor: "white"
-            };
         }
     }
 
     writeS(nbSegments) {
         return (nbSegments > 1) ? "s" : "";
+    }
+
+    displayGarbage() {
+        if (this.props.selectedProgram === this.props.id.item) {
+            return (
+                <View style={styles.right_container}>
+                    <Image source={images.garbage} style={styles.garbage}/>
+                </View>
+            );
+        }
     }
 }
 
@@ -58,10 +66,16 @@ const styles = StyleSheet.create({
         fontSize: 40
     },
     content_container: {
-        margin: 5
+        margin: 5,
+        flex: 4
     },
     header_container: {
         flex: 2,
+    },
+    right_container: {
+        justifyContent: 'center',
+        alignItems: "center",
+        flex: 1
     },
     title_text: {
         fontWeight: 'bold',
@@ -76,6 +90,10 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         color: '#666666',
         flex: 1
+    },
+    garbage: {
+        height: 25,
+        width: 25
     }
 });
 
