@@ -87,6 +87,13 @@ export function isoDateToUser(isoDate) {
     return date.getDay() + "/" + date.getMonth() + "/" + date.getFullYear();
 }
 
+export function completeIsoDateToUser(isoDate) {
+    const date = new Date(isoDate);
+    let minutes = date.getMinutes();
+    if (minutes < 10) minutes = "0" + minutes;
+    return date.getDay() + "/" + date.getMonth() + "/" + date.getFullYear() + " à " + date.getHours() + "h" + minutes;
+}
+
 export function getDurationFromTempAndSlope(targetTemperature, lastTemperature, slope) {
     return Math.abs(targetTemperature - lastTemperature) / Math.abs(slope);
 }
