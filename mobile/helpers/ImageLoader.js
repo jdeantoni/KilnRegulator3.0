@@ -13,7 +13,8 @@ const images = {
     error: require('../assets/error.png'),
     fatal: require('../assets/fatal.png'),
     panic: require('../assets/panic.png'),
-    garbage: require('../assets/garbage.png')
+    garbage: require('../assets/garbage.png'),
+    settings: require('../assets/settings.png')
 };
 
 export default images;

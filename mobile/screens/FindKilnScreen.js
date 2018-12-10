@@ -75,7 +75,7 @@ export default class FindKilnScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 }

@@ -87,6 +87,45 @@
     }
 
     /**
+     * Callback function to receive the result of the resetCooking operation.
+     * @callback module:api/ActionApi~resetCookingCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Reset cooking
+     * @param {module:api/ActionApi~resetCookingCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.resetCooking = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var collectionQueryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = [];
+      var accepts = [];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/action/reset', 'POST',
+        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the startCooking operation.
      * @callback module:api/ActionApi~startCookingCallback
      * @param {String} error Error message, if any.
