@@ -18,8 +18,8 @@ class TrackingCookingScreen extends React.Component {
         title: 'Suivi de cuisson',
         headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
         headerRight: (
-            <TouchableOpacity style={{paddingRight: 16}} onPress={() => {console.log(navigation)}}>
-                <Image source={(navigation.getParam("errored")) ? images.warning : images.bell}
+            <TouchableOpacity style={{paddingRight: 16}} onPress={() => {navigation.navigate("Errors")}}>
+                <Image source={(navigation.getParam("errored")) ? images.error_notif : images.bell}
                        style={{height: 28, width: 28}}/>
             </TouchableOpacity>)
     });
@@ -105,11 +105,10 @@ class TrackingCookingScreen extends React.Component {
             <TrackingImageItem text={remainingTime} img={images.time} subText={"Temps restant"}/>
     }
 
-
     onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 
-        if (this.props.navigation.state.params !== undefined) {
+        if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty("program")) {
             this.getCurrentCookingFromProps();
         } else if (this.currentProgram !== null) {
             this.getCurrentCooking();

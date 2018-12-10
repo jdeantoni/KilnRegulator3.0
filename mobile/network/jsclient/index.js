@@ -16,12 +16,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Body', 'model/Cooking', 'model/Debug', 'model/Error', 'model/Program', 'model/Sample', 'model/Segment', 'model/Status', 'api/ActionApi', 'api/DebugApi', 'api/ErrorsApi', 'api/ProgramsApi', 'api/StatusApi'], factory);
+    define(['ApiClient', 'model/Body', 'model/Body1', 'model/Cooking', 'model/Debug', 'model/Error', 'model/Program', 'model/Sample', 'model/Segment', 'model/Status', 'api/ActionApi', 'api/CookingsApi', 'api/DebugApi', 'api/ErrorsApi', 'api/ProgramsApi', 'api/StatusApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/Body'), require('./model/Cooking'), require('./model/Debug'), require('./model/Error'), require('./model/Program'), require('./model/Sample'), require('./model/Segment'), require('./model/Status'), require('./api/ActionApi'), require('./api/DebugApi'), require('./api/ErrorsApi'), require('./api/ProgramsApi'), require('./api/StatusApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/Body'), require('./model/Body1'), require('./model/Cooking'), require('./model/Debug'), require('./model/Error'), require('./model/Program'), require('./model/Sample'), require('./model/Segment'), require('./model/Status'), require('./api/ActionApi'), require('./api/CookingsApi'), require('./api/DebugApi'), require('./api/ErrorsApi'), require('./api/ProgramsApi'), require('./api/StatusApi'));
   }
-}(function(ApiClient, Body, Cooking, Debug, Error, Program, Sample, Segment, Status, ActionApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi) {
+}(function(ApiClient, Body, Body1, Cooking, Debug, Error, Program, Sample, Segment, Status, ActionApi, CookingsApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi) {
   'use strict';
 
   /**
@@ -67,6 +67,11 @@
      */
     Body: Body,
     /**
+     * The Body1 model constructor.
+     * @property {module:model/Body1}
+     */
+    Body1: Body1,
+    /**
      * The Cooking model constructor.
      * @property {module:model/Cooking}
      */
@@ -106,6 +111,11 @@
      * @property {module:api/ActionApi}
      */
     ActionApi: ActionApi,
+    /**
+     * The CookingsApi service constructor.
+     * @property {module:api/CookingsApi}
+     */
+    CookingsApi: CookingsApi,
     /**
      * The DebugApi service constructor.
      * @property {module:api/DebugApi}

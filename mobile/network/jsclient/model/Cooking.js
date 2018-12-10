@@ -51,6 +51,7 @@
 
 
 
+
   };
 
   /**
@@ -64,6 +65,9 @@
     if (data) {
       obj = obj || new exports();
 
+      if (data.hasOwnProperty('uuid')) {
+        obj['uuid'] = ApiClient.convertToType(data['uuid'], 'String');
+      }
       if (data.hasOwnProperty('programId')) {
         obj['programId'] = ApiClient.convertToType(data['programId'], 'String');
       }
@@ -80,6 +84,11 @@
     return obj;
   }
 
+  /**
+   * UUID of this cooking
+   * @member {String} uuid
+   */
+  exports.prototype['uuid'] = undefined;
   /**
    * Program UUID used for this cooking
    * @member {String} programId

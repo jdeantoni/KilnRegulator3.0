@@ -68,6 +68,7 @@
         throw new Error("Missing the required parameter 'body' when calling addProgram");
       }
 
+
       var pathParams = {
       };
       var queryParams = {
@@ -117,6 +118,7 @@
       if (body === undefined || body === null) {
         throw new Error("Missing the required parameter 'body' when calling editProgram");
       }
+
 
       var pathParams = {
         'uuid': uuid

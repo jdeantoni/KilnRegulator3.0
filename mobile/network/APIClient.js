@@ -1,4 +1,4 @@
-import { ActionApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi, ApiClient } from './jsclient';
+import { ActionApi, CookingsApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi, ApiClient } from './jsclient';
 
 class APIClient extends ApiClient {
     constructor(address) {
@@ -21,6 +21,12 @@ class APIClient extends ApiClient {
 }
 
 class ActionAPI extends ActionApi {
+    constructor(address) {
+        super(new APIClient(address));
+    }
+}
+
+class CookingsAPI extends CookingsApi {
     constructor(address) {
         super(new APIClient(address));
     }
@@ -53,6 +59,7 @@ class StatusAPI extends StatusApi {
 export {
     ActionAPI,
     DebugAPI,
+    CookingsAPI,
     ErrorsAPI,
     ProgramsAPI,
     StatusAPI
