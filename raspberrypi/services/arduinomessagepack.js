@@ -8,8 +8,14 @@ class ArduinoMessagePack extends Arduino {
   constructor(dev, baudRate) {
     super(dev, baudRate);
     this.emitter = new events.EventEmitter();
-    this.encoder = msgpack.encoder();
     this.decoder = msgpack.decoder();
+
+    //handle decoder error from msgpack5
+    this.decoder.on('error', function(err) {
+      this.emitter.emit('error', err);
+    });
+
+
     this.msgId = 0;
     this.msgBacklog = {};
 
