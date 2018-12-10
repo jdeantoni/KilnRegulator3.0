@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, Button, Alert, BackHandler, Image, TouchableOpacity} from 'react-native';
-import { displayArrow } from "../helpers/NavigationHelper";
+import { displayArrowWithMessage } from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI, StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
@@ -16,7 +16,7 @@ import TrackingTextItem from "../components/TrackingTextItem";
 class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'Suivi de cuisson',
-        headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
+        headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
         headerRight: (
             <TouchableOpacity style={{paddingRight: 16}} onPress={() => {navigation.navigate("Errors")}}>
                 <Image source={(navigation.getParam("errored")) ? images.error_notif : images.bell}
@@ -151,7 +151,7 @@ class TrackingCookingScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 
@@ -175,7 +175,7 @@ class TrackingCookingScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 
@@ -192,6 +192,7 @@ class TrackingCookingScreen extends React.Component {
 
     stopButton() {
         if (this.state.isStopped) {
+            console.log("API", this.actionApi);
             this.actionApi.resetCooking()
                 .then((response) => {
                     if (response.ok) {
@@ -207,7 +208,7 @@ class TrackingCookingScreen extends React.Component {
                 })
                 .catch((error) => {
                     console.log(error);
-                    alert("Connexion réseau échouée")
+                    Alert.alert("Erreur", "Connexion réseau échouée");
                 });
         } else {
             Alert.alert("Arrêt de la cuisson", "Êtes-vous sûr de vouloir arrêter le processus de cuisson ?",
@@ -220,7 +221,7 @@ class TrackingCookingScreen extends React.Component {
                                 })
                                 .catch((error) => {
                                     console.log(error);
-                                    alert("Connexion réseau échouée")
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
                                 })
                     },
                 ]);
@@ -258,7 +259,7 @@ class TrackingCookingScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 

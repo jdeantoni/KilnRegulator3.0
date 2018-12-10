@@ -2,7 +2,7 @@ import React from "react";
 import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
 import Table from "../components/Table";
 import connect from "react-redux/es/connect/connect";
-import {displayArrow} from "../helpers/NavigationHelper";
+import {displayArrowWithMessage} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
@@ -15,7 +15,7 @@ import segmentsToChart from "../helpers/ChartHelper";
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Édition d\'un programme',
-        headerLeft: displayArrow(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
+        headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
     });
 
     constructor(props) {
@@ -88,7 +88,7 @@ class EditProgramScreen extends React.Component {
                                 })
                                 .catch((error) => {
                                     console.log(error);
-                                    alert("Connexion réseau échouée")
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
                         } else {
                             this.programApi.editProgram(this.props.selectedProgram, newProgram)
@@ -97,7 +97,7 @@ class EditProgramScreen extends React.Component {
                                 })
                                 .catch((error) => {
                                     console.log(error);
-                                    alert("Connexion réseau échouée")
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
                         }
                         this.props.dispatch({ type: SELECT_PROGRAM, value: newProgram.uuid });

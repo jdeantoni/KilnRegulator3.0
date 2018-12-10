@@ -1,17 +1,23 @@
 import React from 'react';
-import {View, StyleSheet, Button, Alert, BackHandler} from 'react-native';
-import { displayArrow } from "../helpers/NavigationHelper";
+import {View, StyleSheet, Button, Alert, BackHandler, TouchableOpacity, Image} from 'react-native';
+import { displayArrowWithMessage } from "../helpers/NavigationHelper";
 import ProgramList from "../components/ProgramList";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
 import { connect } from "react-redux";
 import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Constants";
+import images from "../helpers/ImageLoader";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'Choix du programme',
-        headerLeft: displayArrow(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
+        headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
+        headerRight: (
+            <TouchableOpacity style={{paddingRight: 16}} onPress={() => {navigation.navigate("Settings")}}>
+                <Image source={images.settings}
+                       style={{height: 28, width: 28}}/>
+            </TouchableOpacity>)
     });
 
     constructor(props) {
@@ -73,7 +79,7 @@ class ChooseProgramScreen extends React.Component {
                             })
                             .catch((error) => {
                                 console.log(error);
-                                alert("Connexion réseau échouée")
+                                Alert.alert("Erreur", "Connexion réseau échouée");
                             })
                 },
             ]);
@@ -117,7 +123,7 @@ class ChooseProgramScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 }

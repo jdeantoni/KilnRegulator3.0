@@ -1,18 +1,15 @@
 import React from 'react';
-import {View, StyleSheet, Button, TouchableOpacity, Image, FlatList, Text} from 'react-native';
+import {View, StyleSheet, Button, FlatList, Text, Alert} from 'react-native';
 import {NavigationEvents} from "react-navigation";
-import Images from "../helpers/ImageLoader";
 import {ErrorsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import ErrorItem from "../components/ErrorItem";
+import {displayArrow} from "../helpers/NavigationHelper";
 
 export default class ErrorsScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Erreurs',
-        headerLeft: (
-            <TouchableOpacity style={{paddingLeft: 16}} onPress={() => navigation.navigate("TrackingCooking")}>
-                <Image source={Images.arrow} style={{height: 24, width: 24}}/>
-            </TouchableOpacity>),
+        headerLeft: displayArrow(navigation, "TrackingCooking"),
     });
 
     constructor(props) {
@@ -79,7 +76,7 @@ export default class ErrorsScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 
@@ -93,7 +90,7 @@ export default class ErrorsScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 }
