@@ -14,7 +14,9 @@ const images = {
     fatal: require('../assets/fatal.png'),
     panic: require('../assets/panic.png'),
     garbage: require('../assets/garbage.png'),
-    settings: require('../assets/settings.png')
+    settings: require('../assets/settings.png'),
+    import: require('../assets/import.png'),
+    export: require('../assets/export.png'),
 };
 
 export default images;

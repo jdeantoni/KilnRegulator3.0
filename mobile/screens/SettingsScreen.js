@@ -4,12 +4,21 @@ import {displayArrow} from "../helpers/NavigationHelper";
 import connect from "react-redux/es/connect/connect";
 import SettingsList from 'react-native-settings-list';
 import images from "../helpers/ImageLoader";
+import {ADD_PROGRAM} from "../helpers/Constants";
+import {ProgramsAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 class SettingsScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Réglages',
         headerLeft: displayArrow(navigation, "ChooseProgram")
     });
+
+    constructor(props) {
+        super(props);
+
+        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+    }
 
     render() {
         return (
@@ -25,7 +34,7 @@ class SettingsScreen extends React.Component {
                     <SettingsList.Item
                         icon={
                             <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.settings}/>
+                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.import}/>
                             </View>
                         }
                         hasNavArrow={false}
@@ -37,7 +46,7 @@ class SettingsScreen extends React.Component {
                     <SettingsList.Item
                         icon={
                             <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.settings}/>
+                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.export}/>
                             </View>
                         }
                         hasNavArrow={false}
@@ -81,8 +90,30 @@ class SettingsScreen extends React.Component {
 
     fetchingData = async () => {
         try {
-            const programs = await AsyncStorage.getItem('PROGRAMS');
-            //save programs
+            const programs = JSON.parse(await AsyncStorage.getItem('PROGRAMS'));
+
+            let found;
+            for (let i in programs) {
+                found = false;
+                for (let j in this.props.programs) {
+                    found = programs[i].uuid === this.props.programs[j].uuid;
+                    if (found) break;
+                }
+                if (!found) {
+                    this.programApi.addProgram(programs[i])
+                        .then((response) => {
+                            if (response.ok) {
+                                this.props.dispatch({ type: ADD_PROGRAM, value: programs[i] });
+                            }
+                            else throw new Error("HTTP response status not code 200 as expected.");
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            Alert.alert("Erreur", "Connexion réseau échouée");
+                        });
+                }
+            }
+
             return programs !== null;
         } catch (error) {
             console.log(error);

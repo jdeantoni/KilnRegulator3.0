@@ -11,6 +11,7 @@ import images from "../helpers/ImageLoader";
 class ProgramItem extends React.Component {
     render() {
         const program = this.props.programs[this.props.id.item];
+        if (!program) return <View/>;
 
         return (
             <TouchableOpacity style={[styles.main_container, this.colorIfSelected()]} onPress={() => {this.toggleOnPress()}}>
