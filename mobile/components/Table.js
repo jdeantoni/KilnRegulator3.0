@@ -1,6 +1,7 @@
 import React from "react";
 import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert} from "react-native";
 import images from "../helpers/ImageLoader";
+import {SLOPE} from "../helpers/Constants";
 
 export default class Table extends React.Component {
     constructor(props) {
@@ -97,9 +98,14 @@ export default class Table extends React.Component {
     }
 
     changeValueInData(rowId, headerKey, value) {
-        if (Number.isNaN(Number.parseFloat(value)) && value !== "") {
-            return false;
+        if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
+            (value !== "-" && value !== "." && Number.isNaN(Number.parseFloat(value)) && value !== "")) {
+            return false
         }
+        if (headerKey !== SLOPE && value[0] === "-") {
+            value = Math.abs(value);
+        }
+
         let array = [...this.state.data];
         array[rowId][headerKey] = value;
         this.setState({data: array});

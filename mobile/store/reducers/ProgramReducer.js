@@ -2,7 +2,7 @@ import {ADD_PROGRAM, DELETE_PROGRAM, NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PR
 
 const initialState = {
     selectedProgram: NO_PROG_SELECTED,
-    programs: {}
+    programs: []
 };
 
 function togglePrograms(state = initialState, action) {
@@ -20,19 +20,23 @@ function togglePrograms(state = initialState, action) {
                 ...state,
                 selectedProgram: action.value.uuid
             };
-            nextState.programs[action.value.uuid] = action.value;
+            nextState.programs.push(action.value);
             return nextState;
 
         case DELETE_PROGRAM:
             nextState = { ...state };
-            delete nextState.programs[action.value];
+            for (let i in nextState.programs) {
+                if (nextState.programs[i].uuid === action.value) {
+                    delete nextState.programs[i];
+                }
+            }
             return nextState;
 
         case UPDATE_PROGRAMS:
-            nextState = { ...state };
-            for (let i = 0; i < action.value.length; i++) {
-                nextState.programs[action.value[i].uuid] = action.value[i];
-            }
+            nextState = {
+                ...state,
+                programs: action.value
+            };
             return nextState;
 
         default:

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native'
+import {StyleSheet, View, Text, TouchableOpacity, Image, Alert} from 'react-native'
 import { connect } from "react-redux";
 import {
     estimateTimeInSecondsForAllSegments,
@@ -7,36 +7,45 @@ import {
     secondsToUser
 } from "../helpers/UnitsHelper";
 import images from "../helpers/ImageLoader";
+import uuidv4 from "uuid/v4";
+import {ADD_PROGRAM, SELECT_PROGRAM} from "../helpers/Constants";
+import {ProgramsAPI} from "../network/APIClient";
+import NetworkRoute from "../network/NetworkRoute";
 
 class ProgramItem extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+    }
     render() {
-        const program = this.props.programs[this.props.id.item];
-        if (!program) return <View/>;
+        if (!this.props.program) return <View/>;
+        this.program = this.props.program;
 
         return (
             <TouchableOpacity style={[styles.main_container, this.colorIfSelected()]} onPress={() => {this.toggleOnPress()}}>
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
-                        <Text style={styles.title_text}>{program.name}</Text>
+                        <Text style={styles.title_text}>{this.program.name}</Text>
                     </View>
                     <View style={styles.description_container}>
-                        <Text style={styles.description_text}>{program.segments.length} segment{this.writeS(program.segments.length)}</Text>
-                        <Text style={styles.description_text}>Durée : {secondsToUser(estimateTimeInSecondsForAllSegments(program.segments))}</Text>
-                        <Text style={styles.description_text}>Dernière modification le {isoDateToUser(program.lastModificationDate)}</Text>
+                        <Text style={styles.description_text}>{this.program.segments.length} segment{this.writeS(this.program.segments.length)}</Text>
+                        <Text style={styles.description_text}>Durée : {secondsToUser(estimateTimeInSecondsForAllSegments(this.program.segments))}</Text>
+                        <Text style={styles.description_text}>Dernière modification le {isoDateToUser(this.program.lastModificationDate)}</Text>
                     </View>
                 </View>
-                {this.displayGarbage()}
+                {this.displayIcons()}
             </TouchableOpacity>
         )
     }
 
     toggleOnPress() {
-        const action = { type: "SELECT_PROGRAM", value: this.props.id.item };
+        const action = { type: SELECT_PROGRAM, value: this.program.uuid };
         this.props.dispatch(action);
     }
 
     colorIfSelected() {
-        if (this.props.selectedProgram === this.props.id.item) {
+        if (this.props.selectedProgram === this.program.uuid) {
             return {
                 backgroundColor: "lightgreen"
             }
@@ -47,14 +56,45 @@ class ProgramItem extends React.Component {
         return (nbSegments > 1) ? "s" : "";
     }
 
-    displayGarbage() {
-        if (this.props.selectedProgram === this.props.id.item) {
+    displayIcons() {
+        if (this.props.selectedProgram === this.program.uuid) {
             return (
                 <View style={styles.right_container}>
-                    <Image source={images.garbage} style={styles.garbage}/>
+                    <TouchableOpacity onPress={() => {
+                        this.props.navigation.navigate("EditProgram", { program: this.program })
+                    }}>
+                        <Image source={images.edit} style={styles.icon}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.duplicateProgram()}>
+                        <Image source={images.duplicate} style={styles.icon}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <Image source={images.garbage} style={styles.icon}/>
+                    </TouchableOpacity>
                 </View>
             );
         }
+    }
+
+    duplicateProgram() {
+        const newProgram = {
+            uuid: uuidv4(),
+            name: this.program.name,
+            segments: this.program.segments,
+            lastModificationDate: (new Date()).toISOString()
+        };
+
+        this.programApi.addProgram(newProgram)
+            .then((response) => {
+                if (response.ok) {
+                    this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                }
+                else throw new Error("HTTP response status not code 200 as expected.");
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("Erreur", "Connexion réseau échouée");
+            });
     }
 }
 
@@ -68,7 +108,7 @@ const styles = StyleSheet.create({
     },
     content_container: {
         margin: 5,
-        flex: 4
+        flex: 3
     },
     header_container: {
         flex: 2,
@@ -76,7 +116,9 @@ const styles = StyleSheet.create({
     right_container: {
         justifyContent: 'center',
         alignItems: "center",
-        flex: 1
+        marginRight: 5,
+        flex: 1,
+        flexDirection: 'row'
     },
     title_text: {
         fontWeight: 'bold',
@@ -92,9 +134,10 @@ const styles = StyleSheet.create({
         color: '#666666',
         flex: 1
     },
-    garbage: {
+    icon: {
         height: 25,
-        width: 25
+        width: 25,
+        marginHorizontal: 5
     }
 });
 
