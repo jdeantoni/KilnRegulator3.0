@@ -1,7 +1,17 @@
 # KilnRegulator Server on RaspberryPi
 
 ## Setup
+
 Raspbian Lite
+
+### Auto
+
+```
+cd scripts
+./install.sh
+```
+
+### Manual
 
 ```
 sudo apt install hostapd
