@@ -30,7 +30,7 @@ class TrackingCookingScreen extends React.Component {
         this.statusApi = new StatusAPI(NetworkRoute.getInstance().getAddress());
         this.actionApi = new ActionAPI(NetworkRoute.getInstance().getAddress());
 
-        if (Object.keys(this.props.programs).length === 0 && this.props.programs.constructor === Object) {
+        if (this.props.programs === undefined || this.props.programs.length === 0) {
             this.getPrograms(new ProgramsAPI(NetworkRoute.getInstance().getAddress()));
         }
 
@@ -181,7 +181,12 @@ class TrackingCookingScreen extends React.Component {
 
     getCurrentCookingFromProps() {
         this.startDate = new Date();
-        this.currentProgram = this.props.programs[this.props.navigation.state.params.program];
+        for (let i in this.props.programs) {
+            if (this.props.programs[i].uuid === this.props.navigation.state.params.program) {
+                this.currentProgram = this.props.programs[i];
+                break;
+            }
+        }
         this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
 
         this.setState({
@@ -192,7 +197,6 @@ class TrackingCookingScreen extends React.Component {
 
     stopButton() {
         if (this.state.isStopped) {
-            console.log("API", this.actionApi);
             this.actionApi.resetCooking()
                 .then((response) => {
                     if (response.ok) {

@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, StyleSheet, Button, Alert, BackHandler, TouchableOpacity, Image} from 'react-native';
+import {View, StyleSheet, Button, Alert, BackHandler, TouchableOpacity, Image, FlatList} from 'react-native';
 import { displayArrowWithMessage } from "../helpers/NavigationHelper";
-import ProgramList from "../components/ProgramList";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
 import { connect } from "react-redux";
 import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Constants";
 import images from "../helpers/ImageLoader";
+import ProgramItem from "../components/ProgramItem";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -25,10 +25,6 @@ class ChooseProgramScreen extends React.Component {
 
         this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
         this.programsAPI = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
-
-        this.state = {
-            ids: [],
-        };
     }
 
     render() {
@@ -39,14 +35,23 @@ class ChooseProgramScreen extends React.Component {
                     onWillBlur={() => this.onWillBlur()}
                 />
                 <View style={{flex: 6}}>
-                    <ProgramList ids={this.state.ids}/>
+                    <FlatList
+                        data={this.props.programs}
+                        keyExtractor={(item) => {return item.uuid}}
+                        renderItem={({item}) => <ProgramItem program={item} navigation={this.props.navigation}/>}
+                    />
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
-                        <Button title={this.buttonNameEditProgram()} onPress={() => this.props.navigation.navigate("EditProgram")}/>
-                    </View>
-                    <View style={styles.button}>
-                        <Button title={"Lancer la cuisson"} onPress={() => this.launchCooking()} disabled={this.props.selectedProgram === NO_PROG_SELECTED}/>
+                        <Button
+                            title={(this.props.selectedProgram === NO_PROG_SELECTED) ? "Créer un nouveau programme" : "Lancer la cuisson"}
+                            onPress={() => {
+                                if (this.props.selectedProgram === NO_PROG_SELECTED) {
+                                    this.props.navigation.navigate("EditProgram")
+                                } else {
+                                    this.launchCooking();
+                                }}
+                            }/>
                     </View>
                 </View>
             </View>
@@ -99,10 +104,6 @@ class ChooseProgramScreen extends React.Component {
         return true;
     };
 
-    buttonNameEditProgram() {
-        return (this.props.selectedProgram === NO_PROG_SELECTED) ? "Créer un nouveau programme" : "Modifier le programme sélectionné";
-    }
-
     getPrograms() {
         this.programsAPI.getPrograms()
             .then((response) => {
@@ -112,14 +113,7 @@ class ChooseProgramScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
-                const action = { type: UPDATE_PROGRAMS, value: response };
-                this.props.dispatch(action);
-
-                const ids = [];
-                for (let id in response) {
-                    ids.push(response[id].uuid);
-                }
-                this.setState({ids: ids});
+                this.props.dispatch({ type: UPDATE_PROGRAMS, value: response });
             })
             .catch((error) => {
                 console.log(error);

@@ -1,7 +1,6 @@
 import React from "react";
 import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
 import Table from "../components/Table";
-import connect from "react-redux/es/connect/connect";
 import {displayArrowWithMessage} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
@@ -9,8 +8,9 @@ import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import EditProgramLineChart from "../components/EditProgramLineChart";
 import {unitToDev, unitToUser} from "../helpers/UnitsHelper";
-import {ADD_PROGRAM, DELETE_PROGRAM, NO_PROG_SELECTED} from "../helpers/Constants";
+import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
 import segmentsToChart from "../helpers/ChartHelper";
+import connect from "react-redux/es/connect/connect";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -23,9 +23,14 @@ class EditProgramScreen extends React.Component {
 
         this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
 
+        try {
+            this.initProgram = this.props.navigation.state.params.program;
+        } catch {
+            this.initProgram = undefined;
+        }
         this.state = {
-            programName: (this.props.selectedProgram !== NO_PROG_SELECTED) ? this.props.programs[this.props.selectedProgram].name : "",
-            segments: (this.props.selectedProgram !== NO_PROG_SELECTED) ? unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
+            programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
+            segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments)
         };
     }
 
@@ -81,7 +86,7 @@ class EditProgramScreen extends React.Component {
                             lastModificationDate: (new Date()).toISOString()
                         };
 
-                        if (this.props.selectedProgram === NO_PROG_SELECTED) {
+                        if (this.initProgram === undefined) {
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
                                     if (response.ok) {
@@ -96,10 +101,10 @@ class EditProgramScreen extends React.Component {
                                 });
                         }
                         else {
-                            this.programApi.editProgram(this.props.selectedProgram, newProgram)
+                            this.programApi.editProgram(this.initProgram.uuid, newProgram)
                                 .then((response) => {
                                     if (response.ok) {
-                                        this.props.dispatch({ type: DELETE_PROGRAM, value: this.props.selectedProgram });
+                                        this.props.dispatch({ type: DELETE_PROGRAM, value: this.initProgram.uuid });
                                         this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
                                         this.props.navigation.navigate("ChooseProgram");
                                     }
@@ -125,8 +130,10 @@ class EditProgramScreen extends React.Component {
             return false;
         }
         let segments = [...this.state.segments];
+        let isCorrect;
         for (let i = 0; i < segments.length; i++) {
-            this.checkSegmentIntegrity(segments[i], i);
+            isCorrect = this.checkSegmentIntegrity(segments[i], i);
+            if (!isCorrect) return false;
         }
         this.setState({segments: segments});
         return true;
@@ -134,7 +141,7 @@ class EditProgramScreen extends React.Component {
 
     checkSegmentIntegrity(segment, i) {
         for (let key in segment) {
-            if (segment[key] === "") {
+            if (segment[key] === "" || segment[key] === "-" || segment[key] === ".") {
                 delete segment[key];
                 continue;
             }
@@ -150,6 +157,7 @@ class EditProgramScreen extends React.Component {
             Alert.alert("Erreur", "Le segment " + (i+1) + " est incomplet.", [{text: 'Ok', onPress: () => {}}]);
             return false;
         }
+        return true;
     }
 
     addBackListener() {
@@ -202,10 +210,4 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapStateToProps = (state) => {
-    return {
-        selectedProgram: state.selectedProgram,
-        programs: state.programs
-    };
-};
-export default connect(mapStateToProps)(EditProgramScreen);
+export default connect()(EditProgramScreen);

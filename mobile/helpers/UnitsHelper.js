@@ -99,5 +99,5 @@ export function getDurationFromTempAndSlope(targetTemperature, lastTemperature, 
 }
 
 export function getTempFromDurationAndSlope(duration, slope) {
-    return parseFloat(duration) * Math.abs(slope);
+    return parseFloat(duration) * slope;
 }

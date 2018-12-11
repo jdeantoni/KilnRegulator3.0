@@ -17,6 +17,8 @@ const images = {
     settings: require('../assets/settings.png'),
     import: require('../assets/import.png'),
     export: require('../assets/export.png'),
+    edit: require('../assets/edit.png'),
+    duplicate: require('../assets/duplicate.png'),
 };
 
 export default images;
