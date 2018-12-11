@@ -5,15 +5,30 @@ Raspbian Lite
 
 ```
 sudo apt install hostapd
-sudo systemctl enable systemd-networkd
-sudo systemctl enable systemd-networkd-wait-online
 sudo systemctl disable NetworkManager-wait-online.service
+sudo systemctl enable systemd-networkd.service
 sudo systemctl enable systemd-resolved.service
-sudo systemctl enable hostapd
-sudo systemctl enable avahi-daemon
+sudo systemctl enable avahi-daemon.service
 
+
+# Network configuration
+## DNS using systemd-resolved
 sudo rm /etc/resolv.conf
 sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+## WiFi access point
+sudo cp hostapd/hostapd.conf /etc/hostapd/
+sudo cp systemd/system/hostapd.service /etc/systemd/system/
+sudo systemctl enable hostapd
+sudo cp systemd/network/wlan0.network /etc/systemd/network/
+## Ethernet
+sudo cp systemd/network/eth0.network /etc/systemd/network/
+## Bridge
+sudo cp systemd/network/br0.netdev /etc/systemd/network/
+sudo cp systemd/network/br0.network /etc/systemd/network/
+## Wait for network configuration to be up, ignoring wlan0 interface (configured later in the boot process by hostapd)
+sudo mkdir /etc/systemd/system/systemd-networkd-wait-online.service.d
+sudo cp systemd/system/systemd-networkd-wait-online.service.d/override.conf /etc/systemd/system/systemd-networkd-wait-online.service.d/
+sudo systemctl enable systemd-networkd-wait-online.service
 
 # SSH avahi service
 sudo cp  /usr/share/doc/avahi-daemon/examples/ssh.service /etc/avahi/services
@@ -47,3 +62,14 @@ EOF
 sudo systemctl disable dphys-swapfile.service
 sudo rm -f /var/swap
 ```
+
+Reboot Raspberry Pi.
+
+## Default settings
+
+| Parameter           | Default value    | Configuration file                 |
+| ------------------- | ---------------- | ---------------------------------- |
+| SSID                | KilnRegulator    | /etc/hostapd/hostapd.conf          |
+| Passphrase          | KilnRegulator3.0 | /etc/hostapd/hostapd.conf          |
+| WiFi IP Address     | 192.168.1.1      | /etc/systemd/network/wlan0.network |
+| Ethernet IP Address | DHCP configured  | /etc/systemd/network/br0.network   |
