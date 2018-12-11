@@ -9,7 +9,7 @@ import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import EditProgramLineChart from "../components/EditProgramLineChart";
 import {unitToDev, unitToUser} from "../helpers/UnitsHelper";
-import {NO_PROG_SELECTED, SELECT_PROGRAM} from "../helpers/Constants";
+import {ADD_PROGRAM, DELETE_PROGRAM, NO_PROG_SELECTED} from "../helpers/Constants";
 import segmentsToChart from "../helpers/ChartHelper";
 
 class EditProgramScreen extends React.Component {
@@ -84,25 +84,32 @@ class EditProgramScreen extends React.Component {
                         if (this.props.selectedProgram === NO_PROG_SELECTED) {
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
-                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                    Alert.alert("Erreur", "Connexion réseau échouée");
-                                });
-                        } else {
-                            this.programApi.editProgram(this.props.selectedProgram, newProgram)
-                                .then((response) => {
-                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
+                                    if (response.ok) {
+                                        this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                                        this.props.navigation.navigate("ChooseProgram");
+                                    }
+                                    else throw new Error("HTTP response status not code 200 as expected.");
                                 })
                                 .catch((error) => {
                                     console.log(error);
                                     Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
                         }
-                        this.props.dispatch({ type: SELECT_PROGRAM, value: newProgram.uuid });
-
-                        this.props.navigation.navigate("ChooseProgram");
+                        else {
+                            this.programApi.editProgram(this.props.selectedProgram, newProgram)
+                                .then((response) => {
+                                    if (response.ok) {
+                                        this.props.dispatch({ type: DELETE_PROGRAM, value: this.props.selectedProgram });
+                                        this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                                        this.props.navigation.navigate("ChooseProgram");
+                                    }
+                                    else throw new Error("HTTP response status not code 200 as expected.");
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
+                                });
+                        }
                     }
                 },
             ]);
