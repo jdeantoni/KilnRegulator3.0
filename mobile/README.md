@@ -42,6 +42,11 @@ $env:REACT_NATIVE_PACKAGER_HOSTNAME = “<IP>”
 
 ### Prepare
 
+Make sure the `ANDROID_HOME` environment variable is set to the Android SDK path, eg. `~/Android/Sdk`:
+```
+export ANDROID_HOME="$HOME/Android/Sdk"
+```
+
 #### Eject
 
 ```
