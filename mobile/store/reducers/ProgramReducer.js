@@ -24,7 +24,8 @@ function togglePrograms(state = initialState, action) {
 
         case ADD_PROGRAM:
             nextState = {
-                programs: state.programs.concat(action.value),
+                programs: (state.programs === undefined || state.programs == null || state.programs.length === 0) ?
+                                [action.value] : state.programs.concat(action.value),
                 selectedProgram: action.value.uuid
             };
             return nextState;

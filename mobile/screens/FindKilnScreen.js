@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
+import {View, StyleSheet, Button, BackHandler, Alert, TextInput, KeyboardAvoidingView} from 'react-native';
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
@@ -22,7 +22,7 @@ class FindKilnScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.main_container}>
+            <KeyboardAvoidingView style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.onWillFocus()}
                     onWillBlur={() => this.onWillBlur()}
@@ -38,7 +38,7 @@ class FindKilnScreen extends React.Component {
                 <View style={styles.container}>
                     <Button title={"Mode hors ligne"} onPress={() => this.offlineModeSelected()}/>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
 
