@@ -2,6 +2,7 @@ import React from "react";
 import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert} from "react-native";
 import images from "../helpers/ImageLoader";
 import {SLOPE} from "../helpers/Constants";
+import colors from "../styles/colors";
 
 export default class Table extends React.Component {
     constructor(props) {
@@ -76,7 +77,10 @@ export default class Table extends React.Component {
                 {this.renderHeader()}
                 <ScrollView style={styles.container}>
                     {this.renderRows()}
-                    <Button title={"Ajouter un segment"} onPress={() => this.addSegment()}/>
+                    <Button title={"Ajouter un segment"}
+                            onPress={() => this.addSegment()}
+                            color={colors.PRIMARY_COLOR}
+                            style={{marginHorizontal: 20}}/>
                 </ScrollView>
             </View>
         )
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     header_row: {
         height: 50,
         flexDirection: 'row',
-        backgroundColor: "#B71C1C",
+        backgroundColor: colors.PRIMARY_DARK_COLOR,
         borderBottomWidth: 2,
     },
     minus: {

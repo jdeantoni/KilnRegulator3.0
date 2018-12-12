@@ -12,6 +12,7 @@ import {COOLING, HEATING, STALE, TEMP_ORIGIN, TIME_ORIGIN, UPDATE_PROGRAMS} from
 import TrackingImageItem from "../components/TrackingImageItem";
 import images from "../helpers/ImageLoader";
 import TrackingTextItem from "../components/TrackingTextItem";
+import colors from "../styles/colors";
 
 class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -21,7 +22,9 @@ class TrackingCookingScreen extends React.Component {
             <TouchableOpacity style={{paddingRight: 16}} onPress={() => {navigation.navigate("Errors")}}>
                 <Image source={(navigation.getParam("errored")) ? images.error_notif : images.bell}
                        style={{height: 28, width: 28}}/>
-            </TouchableOpacity>)
+            </TouchableOpacity>),
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
@@ -51,9 +54,7 @@ class TrackingCookingScreen extends React.Component {
                         onWillFocus={() => this.onWillFocus()}
                         onWillBlur={() => this.onWillBlur()}
                     />
-                    <Image
-                        source={images.loading}
-                        style={{width: 50, height: 50}}/>
+                    <Image source={images.loading} style={{width: 100, height: 100}}/>
                 </View>
             );
         }
@@ -70,9 +71,9 @@ class TrackingCookingScreen extends React.Component {
                         theoreticData={this.state.theoreticData}
                         realData={this.state.realData}/>
                 </View>
-                <View style={styles.program_name}>
-                    <Text style={{fontSize: 14}}>Programme en cours :
-                        <Text style={{fontWeight: "bold", fontSize: 14}}> {this.currentProgram.name}</Text>
+                <View style={styles.program_name_container}>
+                    <Text style={styles.program_name}>Programme en cours :
+                        <Text style={styles.program_name && {fontWeight: "bold"}}> {this.currentProgram.name}</Text>
                     </Text>
                 </View>
                 <View style={styles.major_data_container}>
@@ -91,8 +92,11 @@ class TrackingCookingScreen extends React.Component {
                     <View style={styles.divider}/>
                     <TrackingTextItem text={expectedTimeRemaining} subText={"Prochain segment"}/>
                 </View>
-                <View>
-                    <Button title={this.state.isStopped ? "Retour aux programmes" : "Arrêt"} onPress={() => this.stopButton()}/>
+                <View style={styles.button}>
+                    <Button
+                        title={this.state.isStopped ? "Retour aux programmes" : "Arrêt"}
+                        onPress={() => this.stopButton()}
+                        color={colors.PRIMARY_COLOR}/>
                 </View>
             </View>
         );
@@ -331,27 +335,32 @@ const styles = StyleSheet.create({
     },
     chart_container: {
         flex: 11,
+        backgroundColor: colors.LIGHT_GREY
     },
     major_data_container: {
         flex: 5,
         flexDirection: 'row',
-        backgroundColor: "lightblue",
+        backgroundColor: colors.SECONDARY_LIGHT_COLOR,
     },
     minor_data_container: {
         flex: 4,
         flexDirection: 'row',
-        backgroundColor: "lightgrey"
+        backgroundColor: colors.LIGHT_GREY
     },
     loading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: "center"
     },
-    program_name: {
-        backgroundColor: 'pink',
+    program_name_container: {
+        backgroundColor: colors.PRIMARY_COLOR,
         justifyContent: "center",
         alignItems: 'center',
         paddingVertical: 3
+    },
+    program_name: {
+        color: "white",
+        fontSize: 14
     },
     divider: {
         borderLeftColor: 'black',
@@ -369,6 +378,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: 'center'
+    },
+    button: {
+        backgroundColor: colors.LIGHT_GREY,
+        paddingHorizontal: 10,
+        paddingBottom: 5
     }
 });
 

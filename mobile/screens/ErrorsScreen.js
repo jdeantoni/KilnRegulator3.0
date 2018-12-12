@@ -5,11 +5,14 @@ import {ErrorsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import ErrorItem from "../components/ErrorItem";
 import {displayArrow} from "../helpers/NavigationHelper";
+import colors from "../styles/colors";
 
 export default class ErrorsScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Erreurs',
         headerLeft: displayArrow(navigation, "TrackingCooking"),
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
