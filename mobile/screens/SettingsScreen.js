@@ -1,6 +1,6 @@
 import React from "react";
 import {StyleSheet, View, AsyncStorage, Alert, Image} from "react-native";
-import {displayArrow} from "../helpers/NavigationHelper";
+import {displayArrow, offlineMode} from "../helpers/NavigationHelper";
 import connect from "react-redux/es/connect/connect";
 import SettingsList from 'react-native-settings-list';
 import images from "../helpers/ImageLoader";
@@ -34,25 +34,25 @@ class SettingsScreen extends React.Component {
                     <SettingsList.Item
                         icon={
                             <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.import}/>
+                                <Image style={{alignSelf:'center', height:22, width:22}} source={images.import}/>
                             </View>
                         }
                         hasNavArrow={false}
                         itemWidth={70}
                         titleStyle={{color:'black', fontSize: 16}}
-                        title='Importer'
+                        title={this.firstItemTitle()}
                         onPress={() => {this.import()}}
                     />
                     <SettingsList.Item
                         icon={
                             <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center',height:22, width:22}} source={images.export}/>
+                                <Image style={{alignSelf:'center', height:22, width:22}} source={images.export}/>
                             </View>
                         }
                         hasNavArrow={false}
                         itemWidth={70}
                         titleStyle={{color:'black', fontSize: 16}}
-                        title='Exporter'
+                        title={this.secondItemTitle()}
                         onPress={() => {this.export()}}
                     />
                     <SettingsList.Header headerStyle={{marginTop:-5}}/>
@@ -61,6 +61,13 @@ class SettingsScreen extends React.Component {
         );
     }
 
+    firstItemTitle() {
+        return (offlineMode) ? 'Écraser les modifications par les données du téléphone' : 'Envoyer les programmes du téléphone au four'
+    }
+
+    secondItemTitle() {
+        return (offlineMode) ? 'Sauvegarder les modifications sur le téléphone' : 'Sauvegarder les programmes du four sur le téléphone'
+    }
 
     import() {
         if (this.fetchingData()) {
@@ -100,6 +107,10 @@ class SettingsScreen extends React.Component {
                     if (found) break;
                 }
                 if (!found) {
+                    if (offlineMode) {
+                        this.props.dispatch({ type: ADD_PROGRAM, value: programs[i] });
+                        continue;
+                    }
                     this.programApi.addProgram(programs[i])
                         .then((response) => {
                             if (response.ok) {

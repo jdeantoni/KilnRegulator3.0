@@ -1,4 +1,11 @@
-import {ADD_PROGRAM, DELETE_PROGRAM, NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../../helpers/Constants";
+import {
+    ADD_PROGRAM,
+    CLEAN_PROGRAMS,
+    DELETE_PROGRAM,
+    NO_PROG_SELECTED,
+    SELECT_PROGRAM,
+    UPDATE_PROGRAMS
+} from "../../helpers/Constants";
 
 const initialState = {
     selectedProgram: NO_PROG_SELECTED,
@@ -17,19 +24,23 @@ function togglePrograms(state = initialState, action) {
 
         case ADD_PROGRAM:
             nextState = {
-                ...state,
+                programs: state.programs.concat(action.value),
                 selectedProgram: action.value.uuid
             };
-            nextState.programs.push(action.value);
             return nextState;
 
         case DELETE_PROGRAM:
-            nextState = { ...state };
-            for (let i in nextState.programs) {
-                if (nextState.programs[i].uuid === action.value) {
-                    delete nextState.programs[i];
+            let newArray = state.programs.slice();
+            for (let i in newArray) {
+                if (newArray[parseInt(i)].uuid === action.value) {
+                    newArray.splice(parseInt(i), 1);
+                    break;
                 }
             }
+            nextState = {
+                ...state,
+                programs: newArray
+            };
             return nextState;
 
         case UPDATE_PROGRAMS:
@@ -38,6 +49,9 @@ function togglePrograms(state = initialState, action) {
                 programs: action.value
             };
             return nextState;
+
+        case CLEAN_PROGRAMS:
+            return initialState;
 
         default:
             return state;

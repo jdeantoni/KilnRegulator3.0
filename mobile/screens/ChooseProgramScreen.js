@@ -1,6 +1,16 @@
 import React from 'react';
-import {View, StyleSheet, Button, Alert, BackHandler, TouchableOpacity, Image, FlatList} from 'react-native';
-import { displayArrowWithMessage } from "../helpers/NavigationHelper";
+import {
+    View,
+    StyleSheet,
+    Button,
+    Alert,
+    BackHandler,
+    TouchableOpacity,
+    Image,
+    FlatList,
+    AsyncStorage
+} from 'react-native';
+import {displayArrowWithMessage, offlineMode} from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
@@ -23,8 +33,12 @@ class ChooseProgramScreen extends React.Component {
     constructor(props) {
         super(props);
 
-        this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
-        this.programsAPI = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        if (offlineMode) {
+            this.fetchingData();
+        } else {
+            this.actionAPI = new ActionAPI(NetworkRoute.getInstance().getAddress());
+            this.programsAPI = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        }
     }
 
     render() {
@@ -44,14 +58,8 @@ class ChooseProgramScreen extends React.Component {
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
                         <Button
-                            title={(this.props.selectedProgram === NO_PROG_SELECTED) ? "Créer un nouveau programme" : "Lancer la cuisson"}
-                            onPress={() => {
-                                if (this.props.selectedProgram === NO_PROG_SELECTED) {
-                                    this.props.navigation.navigate("EditProgram")
-                                } else {
-                                    this.launchCooking();
-                                }}
-                            }/>
+                            title={this.buttonName()}
+                            onPress={() => this.buttonAction()}/>
                     </View>
                 </View>
             </View>
@@ -59,13 +67,27 @@ class ChooseProgramScreen extends React.Component {
     }
 
     onWillFocus() {
-        this.getPrograms();
+        if (!offlineMode) {
+            this.getPrograms();
+        }
 
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
     onWillBlur() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+    }
+
+    buttonName() {
+        return (this.props.selectedProgram === NO_PROG_SELECTED || offlineMode) ? "Créer un nouveau programme" : "Lancer la cuisson";
+    }
+
+    buttonAction() {
+        if (this.props.selectedProgram === NO_PROG_SELECTED || offlineMode) {
+            this.props.navigation.navigate("EditProgram");
+        } else {
+            this.launchCooking();
+        }
     }
 
     launchCooking() {
@@ -90,20 +112,6 @@ class ChooseProgramScreen extends React.Component {
             ]);
     }
 
-    handleBackPress = () => {
-        Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
-            [
-                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () => {
-                    if (this.props.selectedProgram !== NO_PROG_SELECTED) {
-                        this.props.dispatch({ type: SELECT_PROGRAM, value: this.props.selectedProgram });
-                    }
-                    this.props.navigation.navigate("FindKiln");
-                }},
-            ]);
-        return true;
-    };
-
     getPrograms() {
         this.programsAPI.getPrograms()
             .then((response) => {
@@ -120,6 +128,54 @@ class ChooseProgramScreen extends React.Component {
                 Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
+
+    fetchingData = async () => {
+        try {
+            const programs = JSON.parse(await AsyncStorage.getItem('PROGRAMS'));
+            this.props.dispatch({ type: UPDATE_PROGRAMS, value: programs });
+            return programs !== null;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    };
+
+    persistingData = async () => {
+        try {
+            await AsyncStorage.setItem("PROGRAMS", JSON.stringify(this.props.programs));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    };
+
+    handleBackPress = () => {
+        if (offlineMode) {
+            Alert.alert("Retour", "Voulez-vous quitter la page en sauvegardant les modifications sur le téléphone ?",
+                [
+                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                    {text: 'Quitter sans sauvegarder', onPress: () => {this.props.navigation.navigate("FindKiln");}},
+                    {text: 'Quitter et sauvegarder', onPress: () => {
+                            this.persistingData();
+                            this.props.navigation.navigate("FindKiln");
+                        }}
+                ]);
+        } else {
+            Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
+                [
+                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                    {text: 'Oui', onPress: () => {
+                            if (this.props.selectedProgram !== NO_PROG_SELECTED) {
+                                this.props.dispatch({ type: SELECT_PROGRAM, value: this.props.selectedProgram });
+                            }
+                            this.props.navigation.navigate("FindKiln");
+                        }},
+                ]);
+        }
+
+        return true;
+    };
 }
 
 const styles = StyleSheet.create({

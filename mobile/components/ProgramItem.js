@@ -8,16 +8,20 @@ import {
 } from "../helpers/UnitsHelper";
 import images from "../helpers/ImageLoader";
 import uuidv4 from "uuid/v4";
-import {ADD_PROGRAM, SELECT_PROGRAM} from "../helpers/Constants";
+import {ADD_PROGRAM, DELETE_PROGRAM, SELECT_PROGRAM} from "../helpers/Constants";
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import {offlineMode} from "../helpers/NavigationHelper";
 
 class ProgramItem extends React.Component {
     constructor(props) {
         super(props);
 
-        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        if (!offlineMode) {
+            this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        }
     }
+
     render() {
         if (!this.props.program) return <View/>;
         this.program = this.props.program;
@@ -61,14 +65,14 @@ class ProgramItem extends React.Component {
             return (
                 <View style={styles.right_container}>
                     <TouchableOpacity onPress={() => {
-                        this.props.navigation.navigate("EditProgram", { program: this.program })
+                        this.props.navigation.navigate("EditProgram", { program: this.program, offline: this.props.offline })
                     }}>
                         <Image source={images.edit} style={styles.icon}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.duplicateProgram()}>
                         <Image source={images.duplicate} style={styles.icon}/>
                     </TouchableOpacity>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.eraseProgram()}>
                         <Image source={images.garbage} style={styles.icon}/>
                     </TouchableOpacity>
                 </View>
@@ -84,17 +88,25 @@ class ProgramItem extends React.Component {
             lastModificationDate: (new Date()).toISOString()
         };
 
-        this.programApi.addProgram(newProgram)
-            .then((response) => {
-                if (response.ok) {
-                    this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
-                }
-                else throw new Error("HTTP response status not code 200 as expected.");
-            })
-            .catch((error) => {
-                console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
-            });
+        if (offlineMode) {
+            this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+        } else {
+            this.programApi.addProgram(newProgram)
+                .then((response) => {
+                    if (response.ok) {
+                        this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                    }
+                    else throw new Error("HTTP response status not code 200 as expected.");
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("Erreur", "Connexion réseau échouée");
+                });
+        }
+    }
+
+    eraseProgram() {
+        this.props.dispatch({ type: DELETE_PROGRAM, value: this.program.uuid });
     }
 }
 

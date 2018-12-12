@@ -1,16 +1,6 @@
-import {Platform, Image, TouchableOpacity, Alert} from "react-native";
+import {Image, TouchableOpacity, Alert} from "react-native";
 import Images from "./ImageLoader";
 import React from "react";
-
-export default function displayHamburger(navigation) {
-    if (Platform.OS === 'android') {
-        return (
-            <TouchableOpacity style={{paddingLeft: 16}} onPress={() => navigation.openDrawer()}>
-                <Image source={Images.hamburger} style={{height: 24, width: 24}}/>
-            </TouchableOpacity>
-        );
-    }
-}
 
 export function displayArrowWithMessage(navigation, message, target) {
     return (
@@ -34,4 +24,10 @@ export function displayArrow(navigation, target) {
             <Image source={Images.arrow} style={{height: 24, width: 24}}/>
         </TouchableOpacity>
     );
+}
+
+export let offlineMode = false;
+
+export function setOfflineMode(bool) {
+    offlineMode = bool;
 }
