@@ -11,6 +11,7 @@ import {
 } from "victory-native";
 import {hoursToHoursAndMinutes} from "../helpers/UnitsHelper";
 import {TEMP_ORIGIN, TIME_ORIGIN} from "../helpers/Constants";
+import colors from "../styles/colors";
 
 export default class EditProgramLineChart extends React.Component {
     constructor(props) {
@@ -51,7 +52,7 @@ export default class EditProgramLineChart extends React.Component {
                     />
                     <VictoryLine
                         style={{
-                            data: { stroke: "#c43a31" },
+                            data: { stroke: colors.PRIMARY_COLOR },
                             parent: { border: "1px solid #ccc"},
                         }}
                         data={this.props.data}
@@ -113,7 +114,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5fcff"
     }
 });
 

@@ -1,16 +1,19 @@
 import React from 'react';
-import {View, StyleSheet, Button, BackHandler, Alert, TextInput, KeyboardAvoidingView} from 'react-native';
+import {View, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
 import {setOfflineMode} from "../helpers/NavigationHelper";
 import connect from "react-redux/es/connect/connect";
 import {CLEAN_PROGRAMS} from "../helpers/Constants";
+import colors from "../styles/colors";
 
 class FindKilnScreen extends React.Component {
     static navigationOptions = () => ({
         title: 'KilnRegulator3.0',
         headerLeft: <View/>,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
@@ -22,7 +25,7 @@ class FindKilnScreen extends React.Component {
 
     render() {
         return (
-            <KeyboardAvoidingView style={styles.main_container} behavior="padding">
+            <View style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.onWillFocus()}
                     onWillBlur={() => this.onWillBlur()}
@@ -33,12 +36,17 @@ class FindKilnScreen extends React.Component {
                                value={this.state.ip}/>
                 </View>
                 <View style={styles.container}>
-                    <Button title={"Se connecter au four"} onPress={() => this.kilnSelected()}/>
+                    <Button title={"Se connecter au four"}
+                            onPress={() => this.kilnSelected()}
+                            color={colors.PRIMARY_COLOR}/>
+
                 </View>
                 <View style={styles.container}>
-                    <Button title={"Mode hors ligne"} onPress={() => this.offlineModeSelected()}/>
+                    <Button title={"Mode hors ligne"}
+                            onPress={() => this.offlineModeSelected()}
+                            color={colors.PRIMARY_COLOR}/>
                 </View>
-            </KeyboardAvoidingView>
+            </View>
         );
     }
 
@@ -96,7 +104,7 @@ class FindKilnScreen extends React.Component {
 const styles = StyleSheet.create({
     main_container: {
         flex: 1,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         justifyContent: 'center',
         alignItems: "center"
     },

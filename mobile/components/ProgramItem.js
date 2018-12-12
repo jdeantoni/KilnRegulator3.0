@@ -12,6 +12,7 @@ import {ADD_PROGRAM, DELETE_PROGRAM, SELECT_PROGRAM} from "../helpers/Constants"
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {offlineMode} from "../helpers/NavigationHelper";
+import colors from "../styles/colors";
 
 class ProgramItem extends React.Component {
     constructor(props) {
@@ -51,7 +52,7 @@ class ProgramItem extends React.Component {
     colorIfSelected() {
         if (this.props.selectedProgram === this.program.uuid) {
             return {
-                backgroundColor: "lightgreen"
+                backgroundColor: colors.SECONDARY_LIGHT_COLOR
             }
         }
     }
@@ -134,6 +135,7 @@ const styles = StyleSheet.create({
     },
     title_text: {
         fontWeight: 'bold',
+        color: colors.PRIMARY_DARK_COLOR,
         fontSize: 20,
         flexWrap: 'wrap',
         paddingRight: 5

@@ -7,11 +7,14 @@ import images from "../helpers/ImageLoader";
 import {ADD_PROGRAM} from "../helpers/Constants";
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
+import colors from "../styles/colors";
 
 class SettingsScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Réglages',
-        headerLeft: displayArrow(navigation, "ChooseProgram")
+        headerLeft: displayArrow(navigation, "ChooseProgram"),
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
@@ -22,19 +25,19 @@ class SettingsScreen extends React.Component {
 
     render() {
         return (
-            <View style={{backgroundColor:'#f6f6f6',flex:1}}>
+            <View style={styles.main_container}>
                 <SettingsList borderColor='#d6d5d9' defaultItemSize={50}>
                     <SettingsList.Item
                         hasNavArrow={false}
                         title='Gestion des programmes'
-                        titleStyle={{color:'#009688', marginBottom:10, fontWeight:'500'}}
+                        titleStyle={{color: colors.PRIMARY_DARK_COLOR, marginBottom: 10, fontWeight: '500'}}
                         itemWidth={50}
                         borderHide={'Both'}
                     />
                     <SettingsList.Item
                         icon={
-                            <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center', height:22, width:22}} source={images.import}/>
+                            <View style={styles.image_container}>
+                                <Image style={styles.image} source={images.import}/>
                             </View>
                         }
                         hasNavArrow={false}
@@ -45,8 +48,8 @@ class SettingsScreen extends React.Component {
                     />
                     <SettingsList.Item
                         icon={
-                            <View style={styles.imageStyle}>
-                                <Image style={{alignSelf:'center', height:22, width:22}} source={images.export}/>
+                            <View style={styles.image_container}>
+                                <Image style={styles.image} source={images.export}/>
                             </View>
                         }
                         hasNavArrow={false}
@@ -135,18 +138,21 @@ class SettingsScreen extends React.Component {
 
 const styles = StyleSheet.create({
     main_container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: "stretch",
-        flexDirection: 'column',
+        backgroundColor: colors.LIGHT_GREY,
+        flex: 1
     },
-    imageStyle:{
-        marginLeft:15,
-        marginRight:20,
+    image_container: {
+        marginLeft: 15,
+        marginRight: 20,
+        alignSelf: 'center',
+        width: 20,
+        height: 24,
+        justifyContent: 'center'
+    },
+    image: {
         alignSelf:'center',
-        width:20,
-        height:24,
-        justifyContent:'center'
+        height:22,
+        width:22
     }
 });
 

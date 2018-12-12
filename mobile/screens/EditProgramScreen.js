@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
+import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View} from "react-native";
 import Table from "../components/Table";
 import {displayArrowWithMessage, offlineMode} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
@@ -11,11 +11,14 @@ import {unitToDev, unitToUser} from "../helpers/UnitsHelper";
 import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
 import segmentsToChart from "../helpers/ChartHelper";
 import connect from "react-redux/es/connect/connect";
+import colors from "../styles/colors";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Édition d\'un programme',
         headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
@@ -38,7 +41,7 @@ class EditProgramScreen extends React.Component {
 
     render() {
         return (
-            <KeyboardAvoidingView style={styles.main_container} behavior="padding">
+            <View style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
@@ -65,9 +68,10 @@ class EditProgramScreen extends React.Component {
 
                     <Button
                         title={"Sauvegarder le programme"}
-                        onPress={() => this.saveProgram()}/>
+                        onPress={() => this.saveProgram()}
+                        color={colors.PRIMARY_COLOR}/>
                 </View>
-            </KeyboardAvoidingView>
+            </View>
         );
     }
 
@@ -190,7 +194,7 @@ class EditProgramScreen extends React.Component {
 const styles = StyleSheet.create({
     main_container: {
         flex: 1,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         justifyContent: 'center',
         alignItems: "stretch",
 
@@ -203,7 +207,7 @@ const styles = StyleSheet.create({
         flex: 4,
     },
     bottom: {
-        backgroundColor: "#dddddd",
+        backgroundColor: colors.SECONDARY_LIGHT_COLOR,
         padding: 10
     },
     name_input: {
@@ -213,7 +217,7 @@ const styles = StyleSheet.create({
         paddingBottom: 3
     },
     text_input: {
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         flex: 1,
         padding: 3
     }

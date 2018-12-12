@@ -10,7 +10,7 @@ import {
     FlatList,
     AsyncStorage
 } from 'react-native';
-import {displayArrowWithMessage, offlineMode} from "../helpers/NavigationHelper";
+import {displaySimpleArrow, offlineMode} from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import { NavigationEvents } from 'react-navigation';
@@ -18,17 +18,30 @@ import { connect } from "react-redux";
 import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Constants";
 import images from "../helpers/ImageLoader";
 import ProgramItem from "../components/ProgramItem";
+import colors from "../styles/colors";
 
 class ChooseProgramScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'Choix du programme',
-        headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de vouloir vous déconnecter du four ?", "FindKiln"),
+        headerLeft: (navigation.state.params === undefined || navigation.state.params.headerLeft === undefined) ?
+            displaySimpleArrow() : navigation.state.params.headerLeft,
         headerRight: (
             <TouchableOpacity style={{paddingRight: 16}} onPress={() => {navigation.navigate("Settings")}}>
-                <Image source={images.settings}
-                       style={{height: 28, width: 28}}/>
-            </TouchableOpacity>)
+                <Image source={images.settings} style={{height: 28, width: 28}}/>
+            </TouchableOpacity>),
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
+
+    componentWillMount(){
+        this.props.navigation.setParams({
+            headerLeft: (
+                <TouchableOpacity style={{paddingLeft: 16}} onPress={() => this.handleBackPress()}>
+                    <Image source={images.arrow} style={{height: 24, width: 24}}/>
+                </TouchableOpacity>
+            )
+        })
+    }
 
     constructor(props) {
         super(props);
@@ -59,7 +72,8 @@ class ChooseProgramScreen extends React.Component {
                     <View style={styles.button}>
                         <Button
                             title={this.buttonName()}
-                            onPress={() => this.buttonAction()}/>
+                            onPress={() => this.buttonAction()}
+                            color={colors.PRIMARY_COLOR}/>
                     </View>
                 </View>
             </View>
@@ -184,6 +198,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "stretch",
         flexDirection: 'column',
+        backgroundColor: colors.LIGHT_GREY
     },
     buttons: {
         alignItems: "stretch",

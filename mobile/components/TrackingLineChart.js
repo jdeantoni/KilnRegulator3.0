@@ -13,6 +13,7 @@ import {
 import {secondsToUser} from "../helpers/UnitsHelper";
 import {TEMP_ORIGIN, TIME_ORIGIN} from "../helpers/Constants";
 import images from "../helpers/ImageLoader";
+import colors from "../styles/colors";
 
 export default class TrackingLineChart extends React.Component {
     constructor(props) {
@@ -28,7 +29,7 @@ export default class TrackingLineChart extends React.Component {
         if (this.state.dimensions === undefined || this.props.theoreticData == null || this.props.theoreticData.length <= 1) {
             return (
                 <View style={styles.loading} onLayout={this.onLayout}>
-                    <Image source={images.loading} style={{width: 50, height: 50}}/>
+                    <Image source={images.loading} style={{width: 100, height: 100}}/>
                 </View>
             );
         }
@@ -60,7 +61,7 @@ export default class TrackingLineChart extends React.Component {
                     <VictoryGroup>
                         <VictoryLine
                             style={{
-                                data: { stroke: "#c43a31" },
+                                data: { stroke: colors.PRIMARY_COLOR },
                                 parent: { border: "1px solid #ccc"},
                             }}
                             data={this.props.theoreticData}

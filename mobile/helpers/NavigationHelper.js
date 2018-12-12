@@ -1,4 +1,4 @@
-import {Image, TouchableOpacity, Alert} from "react-native";
+import {Image, TouchableOpacity, Alert, View} from "react-native";
 import Images from "./ImageLoader";
 import React from "react";
 
@@ -23,6 +23,14 @@ export function displayArrow(navigation, target) {
         <TouchableOpacity style={{paddingLeft: 16}} onPress={() => navigation.navigate(target)}>
             <Image source={Images.arrow} style={{height: 24, width: 24}}/>
         </TouchableOpacity>
+    );
+}
+
+export function displaySimpleArrow() {
+    return (
+        <View style={{paddingLeft: 16}}>
+            <Image source={Images.arrow} style={{height: 24, width: 24}}/>
+        </View>
     );
 }
 
