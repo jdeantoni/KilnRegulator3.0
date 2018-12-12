@@ -1,12 +1,14 @@
 import React from 'react';
 import {View, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
-import displayHamburger from "../helpers/NavigationHelper";
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
+import {setOfflineMode} from "../helpers/NavigationHelper";
+import connect from "react-redux/es/connect/connect";
+import {CLEAN_PROGRAMS} from "../helpers/Constants";
 
-export default class FindKilnScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => ({
+class FindKilnScreen extends React.Component {
+    static navigationOptions = () => ({
         title: 'KilnRegulator3.0',
         headerLeft: <View/>,
     });
@@ -33,11 +35,16 @@ export default class FindKilnScreen extends React.Component {
                 <View style={styles.container}>
                     <Button title={"Se connecter au four"} onPress={() => this.kilnSelected()}/>
                 </View>
+                <View style={styles.container}>
+                    <Button title={"Mode hors ligne"} onPress={() => this.offlineModeSelected()}/>
+                </View>
             </View>
         );
     }
 
     onWillFocus() {
+        this.props.dispatch({ type: CLEAN_PROGRAMS });
+
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
@@ -66,6 +73,7 @@ export default class FindKilnScreen extends React.Component {
             })
             .then((response) => {
                 NetworkRoute.getInstance().setAddress(this.state.ip);
+                setOfflineMode(false);
                 if (response.state === "ready") {
                     this.props.navigation.navigate("ChooseProgram");
                 }
@@ -77,6 +85,11 @@ export default class FindKilnScreen extends React.Component {
                 console.log(error);
                 Alert.alert("Erreur", "Connexion réseau échouée");
             });
+    }
+
+    offlineModeSelected() {
+        setOfflineMode(true);
+        this.props.navigation.navigate("ChooseProgram")
     }
 }
 
@@ -91,3 +104,5 @@ const styles = StyleSheet.create({
         padding: 10
     }
 });
+
+export default connect()(FindKilnScreen);

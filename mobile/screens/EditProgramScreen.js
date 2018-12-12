@@ -1,7 +1,7 @@
 import React from "react";
 import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
 import Table from "../components/Table";
-import {displayArrowWithMessage} from "../helpers/NavigationHelper";
+import {displayArrowWithMessage, offlineMode} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
@@ -21,7 +21,9 @@ class EditProgramScreen extends React.Component {
     constructor(props) {
         super(props);
 
-        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        if (!offlineMode) {
+            this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        }
 
         try {
             this.initProgram = this.props.navigation.state.params.program;
@@ -86,7 +88,14 @@ class EditProgramScreen extends React.Component {
                             lastModificationDate: (new Date()).toISOString()
                         };
 
-                        if (this.initProgram === undefined) {
+                        if (offlineMode) {
+                            if (this.initProgram !== undefined) {
+                                this.props.dispatch({ type: DELETE_PROGRAM, value: this.initProgram.uuid });
+                            }
+                            this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                            this.props.navigation.navigate("ChooseProgram");
+                        }
+                        else if (this.initProgram === undefined) {
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
                                     if (response.ok) {
