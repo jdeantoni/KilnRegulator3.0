@@ -2,6 +2,8 @@
 
 ## Overall architecture
 
+![Croquis](https://raw.githubusercontent.com/jdeantoni/KilnRegulator3.0/master/doc/Overall_architecture.svg?sanitize=true)
+
 ## API
 
 REST API between the Raspberry Pi NodeJS server and the mobile React-Native app is defined using Swagger in the `doc/swagger.yaml` file.
