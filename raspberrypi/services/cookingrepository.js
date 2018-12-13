@@ -78,7 +78,7 @@ class CookingRepository {
     const pr = this;
     mongoose.model('cooking').find({})
       .select('-samples')
-      .sort({name: 'ascending'})
+      .sort('-startDate')
       .exec(function(err, cookings) {
         if (err) {
           c(err, null);
