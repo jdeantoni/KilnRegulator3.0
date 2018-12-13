@@ -30,7 +30,7 @@ class EditProgramScreen extends React.Component {
 
         try {
             this.initProgram = this.props.navigation.state.params.program;
-        } catch {
+        } catch (e) {
             this.initProgram = undefined;
         }
         this.state = {
