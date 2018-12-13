@@ -1,22 +1,18 @@
 {
   "name": "empty-project-template",
-  "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "eject": "expo eject"
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios"
   },
   "dependencies": {
-    "expo": "^31.0.2",
     "jest-serializer": "^23.0.1",
     "querystring": "^0.2.0",
     "react": "16.6.3",
     "react-native": "0.57.7",
     "react-native-gesture-handler": "^1.0.10",
     "react-native-settings-list": "^1.8.0",
-    "react-native-svg": "^8.0.8",
     "react-navigation": "^3.0.5",
     "react-redux": "^5.1.1",
     "redux": "^4.0.1",
