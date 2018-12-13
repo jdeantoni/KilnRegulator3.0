@@ -11,7 +11,7 @@ host: "127.0.0.1:3000"
 basePath: "/"
 tags:
 - name: "status"
-- name: "cooking"
+- name: "cookings"
 - name: "programs"
 - name: "action"
 - name: "debug"
@@ -49,6 +49,47 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Cooking"
+
+  /cookings:
+    get:
+      tags:
+      - "cookings"
+      summary: "Get all cookings uuid/programId/date (without samples)"
+      operationId: "getCookings"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "all cookings"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Cooking"
+  /cookings/{uuid}:
+    get:
+      tags:
+      - "cookings"
+      summary: "get the cooking with the given uuid (including all samples)"
+      operationId: "getCooking"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "uuid"
+        type: "string"
+        required: true
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Cooking"
 
   /programs:
     get:
@@ -149,7 +190,6 @@ paths:
           description: "invalid operation, ex. not running"
         500:
           description: "could not stop cooking"
-
   /action/emergencystop:
     post:
       tags:
@@ -163,6 +203,19 @@ paths:
           description: "invalid operation, ex. not running"
         500:
           description: "could not stop cooking"
+  /action/reset:
+    post:
+      tags:
+      - "action"
+      summary: "Reset cooking"
+      operationId: "resetCooking"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "invalid operation, ex. not stopped"
+        500:
+          description: "could not reset cooking"
 
   /errors:
     get:
@@ -323,6 +376,10 @@ definitions:
   Cooking:
     type: "object"
     properties:
+      uuid:
+        type: "string"
+        description: "UUID of this cooking"
+        format: "uuid"
       programId:
         type: "string"
         description: "Program UUID used for this cooking"
