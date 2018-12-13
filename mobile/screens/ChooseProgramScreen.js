@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     Image,
     FlatList,
-    AsyncStorage
+    AsyncStorage,
+    Text
 } from 'react-native';
 import {displaySimpleArrow, offlineMode} from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
@@ -62,11 +63,7 @@ class ChooseProgramScreen extends React.Component {
                     onWillBlur={() => this.onWillBlur()}
                 />
                 <View style={{flex: 6}}>
-                    <FlatList
-                        data={this.props.programs}
-                        keyExtractor={(item) => {return item.uuid}}
-                        renderItem={({item}) => <ProgramItem program={item} navigation={this.props.navigation}/>}
-                    />
+                    {this.displayList()}
                 </View>
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
@@ -91,6 +88,25 @@ class ChooseProgramScreen extends React.Component {
     onWillBlur() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     }
+
+    displayList() {
+        if (this.props.programs === undefined || this.props.programs == null || this.props.programs.length < 1) {
+            return (
+                <View style={styles.no_program}>
+                    <Text style={styles.no_program_text}>Aucun programme</Text>
+                </View>
+            );
+        } else {
+            return (
+                <FlatList
+                    data={this.props.programs}
+                    keyExtractor={(item) => {return item.uuid}}
+                    renderItem={({item}) => <ProgramItem program={item} navigation={this.props.navigation}/>}
+                />
+            );
+        }
+    }
+
 
     buttonName() {
         return (this.props.selectedProgram === NO_PROG_SELECTED || offlineMode) ? "Créer un nouveau programme" : "Lancer la cuisson";
@@ -199,6 +215,15 @@ const styles = StyleSheet.create({
         alignItems: "stretch",
         flexDirection: 'column',
         backgroundColor: colors.LIGHT_GREY
+    },
+    no_program: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: "center",
+    },
+    no_program_text: {
+        fontStyle: 'italic',
+        color: '#666666'
     },
     buttons: {
         alignItems: "stretch",

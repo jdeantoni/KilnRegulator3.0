@@ -34,7 +34,7 @@ export default class ErrorsScreen extends React.Component {
                         onWillFocus={() => this.onWillFocus()}
                         onWillBlur={() => this.onWillBlur()}
                     />
-                    <Text>Aucune erreur</Text>
+                    <Text style={styles.no_error_text}>Aucune erreur</Text>
                 </View>
             );
         }
@@ -109,6 +109,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: "center",
+    },
+    no_error_text: {
+        fontStyle: 'italic',
+        color: '#666666'
     },
     error_list: {
         flex: 1
