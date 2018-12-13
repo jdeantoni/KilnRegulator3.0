@@ -10,6 +10,14 @@ sudo npm install react-native-cli --global
 npm install
 ```
 
+## Build
+
+Generate API client from Swagger:
+
+```
+./generate-client.sh
+```
+
 ## Run
 
 Launch the project on your terminal with Expo:
