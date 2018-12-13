@@ -577,14 +577,6 @@
   };
 
   /**
-   * Set path.
-   * @param {String} address
-   */
-  exports.prototype.setAddress = function(address) {
-    this.basePath = ('http://'+address).replace(/\/+$/, '');
-  };
-
-  /**
    * The default API client implementation.
    * @type {module:ApiClient}
    */
