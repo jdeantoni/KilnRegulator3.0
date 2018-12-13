@@ -78,3 +78,35 @@ patch -p1 -i android-sign.patch
 ```
 adb install ./android/app/build/outputs/apk/release/app-release.apk
 ```
+
+## Screen navigation
+
+### Home Page
+
+When the app is launched, the home page display two buttons:
+* You can connect your device to your kiln using the server IP address (don't forget the port).
+* If you're not next to your kiln, there is an off line mode.
+
+### Program choice
+
+You can modify and create programs from this page. Select a program in the list, then, you have four options:
+* Edit the program
+* Duplicate the program
+* Delete the program
+* Launch the program
+
+### Program edition
+
+Edit the program in this page. You can edit the segments in the table and see results in the graph.
+See in precision the temperature evolution with a cursor on the graph.
+
+### Settings
+
+Import and export kiln and phone programs.
+
+### Tracking cooking
+
+See the temperature evolution of the cooking. In brown, you can see the theoretical points, and in green the real ones.
+When you connect your device with a kiln already heating, you will see first this screen.
+When the kiln is stopped, you will see the last data from the cooking and the button will reinitialize the kiln state.
+If an error appear, the icon in the header bar will change and you can access to the errors list.
