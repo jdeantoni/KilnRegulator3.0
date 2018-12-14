@@ -270,8 +270,8 @@ void setup() {
 	delay(500); // wait for MAX chip to stabilize
 
 	// Shut off embedded LED
-	pinMode(13, OUTPUT);
-	digitalWrite(13, LOW);
+	pinMode(2, OUTPUT);
+	digitalWrite(2, LOW);
 
 	watchdog.init();
 
