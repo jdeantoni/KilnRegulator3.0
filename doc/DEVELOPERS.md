@@ -2,7 +2,7 @@
 
 ## Overall architecture
 
-![Croquis](https://raw.githubusercontent.com/jdeantoni/KilnRegulator3.0/master/doc/Overall_architecture.svg?sanitize=true)
+![Croquis](Overall_architecture.svg?sanitize=true)
 
 
 ### Communication protocol between Raspberry Pi Server and Arduino
