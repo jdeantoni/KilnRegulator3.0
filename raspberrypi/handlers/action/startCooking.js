@@ -30,7 +30,7 @@ exports.handler = function startCooking(req, res, next) {
         } else {
 
           const arduino = require('../../services/arduinorepository').first();
-          if (!arduino || aruino.errored) {
+          if (!arduino || arduino.errored) {
             res.status(503);
             res.send({errored: true});
             return;
