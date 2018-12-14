@@ -128,6 +128,8 @@ paths:
           description: "successful operation"
         409:
           description: "program already exists (uuid not unique)"
+        500:
+          description: "internal server error (database)"
   /programs/{uuid}:
     put:
       tags:
@@ -152,6 +154,41 @@ paths:
       responses:
         200:
           description: "successful operation"
+        400:
+          description: "missing uuid"
+        404:
+          description: "old program not found"
+        500:
+          description: "internal server error (database)"
+    delete:
+      tags:
+      - "programs"
+      summary: "delete program, ie. archive old program if referenced or delete it"
+      operationId: "deleteProgram"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "uuid"
+        type: "string"
+        required: true
+        format: "uuid"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Program"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "missing uuid"
+        404:
+          description: "old program not found"
+        500:
+          description: "internal server error (database)"
 
   /action/start:
     post:
