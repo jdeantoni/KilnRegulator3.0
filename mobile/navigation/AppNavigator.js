@@ -6,6 +6,7 @@ import TrackingCookingScreen from "../screens/TrackingCookingScreen";
 import EditProgramScreen from "../screens/EditProgramScreen";
 import ErrorsScreen from "../screens/ErrorsScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import HistoriesScreen from "../screens/HistoriesScreen";
 
 const MainStack = createStackNavigator({
     FindKiln: FindKilnScreen,
@@ -13,7 +14,8 @@ const MainStack = createStackNavigator({
     TrackingCooking: TrackingCookingScreen,
     EditProgram: EditProgramScreen,
     Errors: ErrorsScreen,
-    Settings: SettingsScreen
+    Settings: SettingsScreen,
+    Histories: HistoriesScreen
 });
 
 const AppContainer = createAppContainer(MainStack);

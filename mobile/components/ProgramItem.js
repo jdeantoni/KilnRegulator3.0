@@ -115,6 +115,8 @@ const styles = StyleSheet.create({
     main_container: {
         height: 100,
         flexDirection: 'row',
+        borderBottomColor: 'lightgrey',
+        borderBottomWidth: 1,
     },
     textId: {
         fontSize: 40
