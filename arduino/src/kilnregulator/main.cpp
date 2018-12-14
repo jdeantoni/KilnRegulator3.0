@@ -21,7 +21,7 @@
 
 #define MAX_KEY_LENGTH 31
 
-Adafruit_MAX31856 thermocouple(/*thermoCS*/10, /*thermoDI*/11, /*thermoDO*/12, /*thermoCLK*/13);
+Adafruit_MAX31856 thermocouple(/*thermoCS*/7);
 
 KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
@@ -29,7 +29,7 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{5000}; // 500ms sampling rate, more or less…
+Timer samplingTimer{250}; // 500ms sampling rate, more or less…
 
 WatchDog watchdog;
 
