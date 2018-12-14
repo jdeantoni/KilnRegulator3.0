@@ -8,6 +8,7 @@ var programSchema = new mongoose.Schema({
     targetTemperature: Number,
     slope: Number,
     duration: Number
-  }]
+  }],
+  archived: { type: Boolean, default: false}
 });
 mongoose.model('program', programSchema);
