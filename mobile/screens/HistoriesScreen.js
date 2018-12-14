@@ -50,7 +50,7 @@ export default class HistoriesScreen extends React.Component {
                 <FlatList
                     data={this.state.histories}
                     keyExtractor={(item) => {return item.uuid}}
-                    renderItem={({item}) => <HistoryItem history={item} api={this.cookingsAPI}/>}
+                    renderItem={({item}) => <HistoryItem history={item} navigation={this.props.navigation}/>}
                 />
             );
         }
