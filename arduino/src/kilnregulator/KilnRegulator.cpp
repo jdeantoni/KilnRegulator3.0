@@ -62,11 +62,11 @@ void KilnRegulator::regulate() {
 	if (windowSize * output / 255  > now - windowStartTime) { // heat
 		elementState = ElementState::HEATING;
 		digitalWrite(outputPin, HIGH); //heating elment on
-		digitalWrite(13, HIGH); //led on
+		digitalWrite(2, HIGH); //led on
 	} else { // let cool down
 		elementState = ElementState::STALE;
 		digitalWrite(outputPin, LOW); //heating element on
-		digitalWrite(13, LOW); //led off
+		digitalWrite(2, LOW); //led off
 	}
 }
 
@@ -111,6 +111,11 @@ int KilnRegulator::start(const Program &program) {
 	startDate = now();
 	currentSegmentStartDate = now();
 
+	//init PID if not yet done
+	if (pid.GetMode() != AUTOMATIC) {
+		pid.SetMode(AUTOMATIC);
+	}
+
 	return 0;
 }
 
@@ -118,13 +123,13 @@ int KilnRegulator::stop() {
 	if (state != KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
+	elementState = ElementState::STALE;
 	digitalWrite(outputPin, LOW);
-	digitalWrite(13, LOW);
+	digitalWrite(2, LOW);
 
 	endDate = now();
 
 	state = KilnState::STOPPED;
-	windowStartTime = 0;
 	return 0;
 }
 
@@ -132,6 +137,12 @@ int KilnRegulator::reset() {
 	if (state != KilnState::STOPPED) {
 		return ErrorCode::INVALID_STATE;
 	}
+
+	//clear PID
+	pid.SetMode(MANUAL);
+	output = 0;
+
+	windowStartTime = 0;
 
 	state = KilnState::READY;
 	return 0;
