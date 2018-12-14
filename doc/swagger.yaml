@@ -175,11 +175,6 @@ paths:
         type: "string"
         required: true
         format: "uuid"
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          $ref: "#/definitions/Program"
       responses:
         200:
           description: "successful operation"
