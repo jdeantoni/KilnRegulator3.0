@@ -4,6 +4,8 @@
 
 var mongoose = require('mongoose');
 
+var cookingRepository = require('./cookingrepository');
+
 class ProgramRepository {
   constructor() {
   }
@@ -54,6 +56,7 @@ class ProgramRepository {
   }
 
   remove(uuid, c) {
+    console.log("Remove " + uuid);
     const pr = this;
     mongoose.model('program').findOne({uuid: uuid}, function(err, program) {
       if (!err) {
@@ -79,6 +82,40 @@ class ProgramRepository {
           c(err, programs);
         }
       });
+  }
+
+  allNotArchived(c) {
+    const pr = this;
+    mongoose.model('program').find({ "archived": {$ne: true} })
+      .sort({name: 'ascending'})
+      .exec(function(err, programs) {
+        if (err) {
+          c(err, null);
+        } else {
+          programs = programs.map(function(program) {
+            return pr.parseMongoProgram(program);
+          });
+          c(err, programs);
+        }
+      });
+  }
+
+  archive(uuid, c) {
+    console.log("Archive " + uuid);
+    mongoose.model('program').update({'uuid' : uuid}, {'$set' : {'archived': true}}, c);
+  }
+
+  removeOrArchiveIfUsed(uuid, c) {
+    const pr = this;
+    cookingRepository.isPogramIdUsed(uuid, function(err, res) {
+      if (err) {
+        c(err);
+      } else if (res) {
+        pr.archive(uuid, c);
+      } else {
+        pr.remove(uuid, c);
+      }
+    });
   }
 }
 

@@ -90,6 +90,16 @@ class CookingRepository {
         }
       });
   }
+
+  isPogramIdUsed(programId, c) {
+    mongoose.model('cooking').count({programId: programId}, function (err, count) {
+      if(count > 0) {
+        c(err, true);
+      } else {
+        c(err, false);
+      }
+    });
+  }
 }
 
 /*
