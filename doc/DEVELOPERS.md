@@ -2,8 +2,7 @@
 
 ## Overall architecture
 
-![Croquis](Overall_architecture.svg?sanitize=true)
-
+[![Croquis](Overall_architecture.png?sanitize=true)](Overall_architecture.svg)
 
 ### Communication protocol between Raspberry Pi Server and Arduino
 
