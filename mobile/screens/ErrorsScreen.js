@@ -52,7 +52,9 @@ export default class ErrorsScreen extends React.Component {
                     />
                 </View>
                 <View style={styles.bottom_container}>
-                    <Button title={"Effacer tout"} onPress={() => {this.eraseErrors()}}/>
+                    <Button title={"Effacer tout"}
+                            onPress={() => {this.eraseErrors()}}
+                            color={colors.PRIMARY_COLOR}/>
                 </View>
             </View>
         );
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "stretch",
         flexDirection: 'column',
+        backgroundColor: colors.LIGHT_GREY
     },
     no_error: {
         flex: 1,

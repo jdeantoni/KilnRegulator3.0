@@ -58,30 +58,59 @@ class SettingsScreen extends React.Component {
                         title={this.secondItemTitle()}
                         onPress={() => this.export()}
                     />
-                    <SettingsList.Header headerStyle={{marginTop:-5}}/>
-                    <SettingsList.Item
-                        icon={
-                            <View style={styles.image_container}>
-                                <Image style={styles.image} source={images.history}/>
-                            </View>
-                        }
-                        hasNavArrow={true}
-                        itemWidth={70}
-                        titleStyle={{color:'black', fontSize: 16}}
-                        title={"Historique des cuissons"}
-                        onPress={() => this.props.navigation.navigate("Histories")}
-                    />
+                    {(offlineMode) ? null : this.displayHeader()}
+                    {(offlineMode) ? null : this.displayHistoryItem()}
+                    {(offlineMode) ? null : this.displayHeader()}
+                    {(offlineMode) ? null : this.displayErrorsItem()}
                 </SettingsList>
             </View>
         );
     }
 
     firstItemTitle() {
-        return (offlineMode) ? 'Écraser les modifications par les données du téléphone' : 'Envoyer les programmes du téléphone au four'
+        return (offlineMode) ? 'Écraser les modifications par les données du téléphone' : 'Envoyer les programmes du téléphone vers le four'
     }
 
     secondItemTitle() {
         return (offlineMode) ? 'Sauvegarder les modifications sur le téléphone' : 'Sauvegarder les programmes du four sur le téléphone'
+    }
+
+    displayHeader() {
+        return <SettingsList.Header headerStyle={{marginTop:-5}}/>;
+    }
+
+    displayHistoryItem() {
+        return (
+            <SettingsList.Item
+                icon={
+                    <View style={styles.image_container}>
+                        <Image style={styles.image} source={images.history}/>
+                    </View>
+                }
+                hasNavArrow={true}
+                itemWidth={70}
+                titleStyle={{color:'black', fontSize: 16}}
+                title={"Historique des cuissons"}
+                onPress={() => this.props.navigation.navigate("Histories")}
+            />
+        );
+    }
+
+    displayErrorsItem() {
+        return (
+            <SettingsList.Item
+                icon={
+                    <View style={styles.image_container}>
+                        <Image style={styles.image} source={images.error_settings}/>
+                    </View>
+                }
+                hasNavArrow={true}
+                itemWidth={70}
+                titleStyle={{color:'black', fontSize: 16}}
+                title={"Erreurs soulevées par le four"}
+                onPress={() => this.props.navigation.navigate("Errors")}
+            />
+        );
     }
 
     import() {

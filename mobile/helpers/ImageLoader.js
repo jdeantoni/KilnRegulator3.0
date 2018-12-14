@@ -20,6 +20,7 @@ const images = {
     edit: require('../assets/edit.png'),
     duplicate: require('../assets/duplicate.png'),
     history: require('../assets/history.png'),
+    error_settings: require('../assets/error_settings.png'),
 };
 
 export default images;

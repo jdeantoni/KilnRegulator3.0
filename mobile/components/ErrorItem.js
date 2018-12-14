@@ -15,8 +15,8 @@ export default class ErrorItem extends React.Component {
                         source={this.warningImage(error)}/>
                 </View>
                 <View style={styles.content_container}>
-                    <Text style={styles.error_text}>{error.message}</Text>
-                    <Text style={styles.time_text}>Notifiée le {completeIsoDateToUser(error.timestamp)}</Text>
+                    <Text style={styles.title_text}>{error.message}</Text>
+                    <Text style={styles.sub_text}>Notifiée le {completeIsoDateToUser(error.timestamp)}</Text>
                 </View>
             </View>
         )
@@ -41,7 +41,9 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 80,
         flexDirection: 'row',
-        margin: 5
+        margin: 5,
+        borderBottomColor: 'lightgrey',
+        borderBottomWidth: 1
     },
     left_container: {
         resizeMode: 'center',
