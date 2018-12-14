@@ -105,6 +105,22 @@ class ProgramRepository {
     mongoose.model('program').update({'uuid' : uuid}, {'$set' : {'archived': true}}, c);
   }
 
+  unArchive(uuid, c) {
+    console.log("Unarchive " + uuid);
+    mongoose.model('program').update({'uuid' : uuid}, {'$set' : {'archived': false}}, c);
+  }
+
+  isArchived(uuid, c) {
+    console.log("Isarchived " + uuid);
+    mongoose.model('program').count({'uuid': uuid, 'archived': true}, function (err, count) {
+      if(count > 0) {
+        c(err, true);
+      } else {
+        c(err, false);
+      }
+    });
+  }
+
   removeOrArchiveIfUsed(uuid, c) {
     const pr = this;
     cookingRepository.isPogramIdUsed(uuid, function(err, res) {
