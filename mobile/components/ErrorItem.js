@@ -57,10 +57,10 @@ const styles = StyleSheet.create({
         margin: 5,
         justifyContent: 'center'
     },
-    error_text: {
+    title_text: {
         fontWeight: 'bold',
     },
-    time_text: {
+    sub_text: {
         fontStyle: 'italic',
         color: '#666666',
     }

@@ -44,7 +44,7 @@ class SettingsScreen extends React.Component {
                         itemWidth={70}
                         titleStyle={{color:'black', fontSize: 16}}
                         title={this.firstItemTitle()}
-                        onPress={() => {this.import()}}
+                        onPress={() => this.import()}
                     />
                     <SettingsList.Item
                         icon={
@@ -56,9 +56,21 @@ class SettingsScreen extends React.Component {
                         itemWidth={70}
                         titleStyle={{color:'black', fontSize: 16}}
                         title={this.secondItemTitle()}
-                        onPress={() => {this.export()}}
+                        onPress={() => this.export()}
                     />
                     <SettingsList.Header headerStyle={{marginTop:-5}}/>
+                    <SettingsList.Item
+                        icon={
+                            <View style={styles.image_container}>
+                                <Image style={styles.image} source={images.history}/>
+                            </View>
+                        }
+                        hasNavArrow={true}
+                        itemWidth={70}
+                        titleStyle={{color:'black', fontSize: 16}}
+                        title={"Historique des cuissons"}
+                        onPress={() => this.props.navigation.navigate("Histories")}
+                    />
                 </SettingsList>
             </View>
         );
