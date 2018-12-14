@@ -131,6 +131,8 @@ class ChooseProgramScreen extends React.Component {
                                     this.props.navigation.navigate("TrackingCooking", {
                                         program: this.props.selectedProgram
                                     });
+                                } else if (response.status === 503) {
+                                    this.error503Alert();
                                 }
                                 else throw new Error("HTTP response status not code 200 as expected.");
                             })
@@ -139,6 +141,14 @@ class ChooseProgramScreen extends React.Component {
                                 Alert.alert("Erreur", "Connexion réseau échouée");
                             })
                 },
+            ]);
+    }
+
+    error503Alert() {
+        Alert.alert("Démarrage de la cuisson", "Le four est en erreur. Voulez-vous accéder aux erreurs ?",
+            [
+                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                {text: 'Oui', onPress: () => this.props.navigation.navigate("Errors")},
             ]);
     }
 
