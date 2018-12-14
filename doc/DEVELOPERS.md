@@ -4,7 +4,46 @@
 
 ![Croquis](https://raw.githubusercontent.com/jdeantoni/KilnRegulator3.0/master/doc/Overall_architecture.svg?sanitize=true)
 
-## API
+
+### Communication protocol between Raspberry Pi Server and Arduino
+
+Communication between the Raspberry Pi and Arduino is done through the virtual serial port exposed on top of the Arduino USB link.
+
+Messages are serialized from JavaScript objects to Messagepack binary format.
+
+Raspberry Pi Server sends command to the Arduino upon request coming from the client trough the REST API.
+
+Commands sent to the Arduino are:
+ * `["start", segmentCount]`: start the program transmitted through `segment` commands, switching from "ready" to "running" state
+ * `["stop"]`: stop the current program before it has ended, forcing a switch from "running" to "stopped" state
+ * `["reset"]`: reset to initial state, switching from "stopped" to "ready" state
+ * `["segment", segmentNumber, targetTemperature, slope, duration]`: transmit a segment for the next program to run
+ * `["timesync", timestamp]`: send current timestamp (in seconds) to synchronize Arduino's clock
+ * `["setpoint", setpoint]`: manually set the target temperature
+
+Arduino regularly sends status update:
+```
+{
+	"command": "status",
+	"s": kilnState,
+	"eS": elementState,
+	"cS": currentSegment,
+	"t": temperature,
+	"o": output,
+	"sP": setPoint,
+	"ts": timestamp
+}
+```
+and timesync requests:
+```
+{
+	"command": "timesync"
+}
+```
+
+Message from the Raspberry Pi Server to the Arduino are always acknowledged by the Arduino. The Arduino compute a CRC8 of the received data and append it to the acknowledgment. Message contains a sequence ID that is sent back in the acknowledgment.
+
+### Raspberry Pi Server REST API for Mobile client
 
 REST API between the Raspberry Pi NodeJS server and the mobile React-Native app is defined using Swagger in the `doc/swagger.yaml` file.
 
@@ -42,6 +81,10 @@ Defined in `arduino/.editorconfig`
 
 
 ### Code architecture
+
+All the libraries are added as git submodules under the `src/` folder. Only the `src/kilnregulator/` subfolder actually contains original source code for the Arduino application.
+
+
 
 ## Raspberry Pi server
 
