@@ -176,6 +176,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		//stop cooking
 	} else if (!strncmp(key, "reset", keyLength+1)) {
 		errCode = kilnRegulator.reset();
+		program.count = 0;
 		//reset cooking
 	} else if (!strncmp(key, "timesync", keyLength+1)) {
 		if (arraySize < 2) {

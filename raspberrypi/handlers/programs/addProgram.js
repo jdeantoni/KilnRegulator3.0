@@ -28,8 +28,27 @@ exports.handler = function addProgram(req, res, next) {
       res.send({error: err});
       console.error(err);
     } else if (exists) {
-      res.status(409);
-      res.send({error: 'Program with uuid ' + req.body.uuid + ' already exists.'});
+      programRepository.isArchived(req.body.uuid, function(err, archived) {
+        if (err) {
+          res.status(500);
+          res.send({error: err});
+          console.error(err);
+        } else if (archived) { //program has been archived previously (deleted but still had a cooking referencing it), so assume it's the same and unarchive
+          programRepository.unArchive(req.body.uuid, function(err, program) {
+            if (err) {
+              res.status(500);
+              res.send({error: err});
+              console.error(err);
+            } else {
+              console.log("Unarchived: " + uuid);
+              res.send(program);
+            }
+          });
+        } else { //program is still available, uuid duplicates not allowed
+          res.status(409);
+          res.send({error: 'Program with uuid ' + req.body.uuid + ' already exists.'});
+        }
+      });
     } else {
       programRepository.add({
         uuid: req.body.uuid,

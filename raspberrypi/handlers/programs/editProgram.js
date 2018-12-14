@@ -16,6 +16,12 @@
 exports.handler = function editProgram(req, res, next) {
   const programRepository = require('../../services/programrepository');
 
+  if (!req.params.hasOwnProperty('uuid')) {
+    res.status(400);
+    res.send('Missing uuid');
+    return;
+  }
+
   const keys = ['uuid', 'name', 'segments', 'lastModificationDate'];
   for (const k in keys) {
     if (!(req.body.hasOwnProperty(keys[k]) && req.body[keys[k]] != null)) {
@@ -34,7 +40,7 @@ exports.handler = function editProgram(req, res, next) {
       res.status(404);
       res.send({error: 'Program with uuid ' + req.body.uuid + ' does not exist.'});
     } else {
-      programRepository.remove(req.params.uuid, function(err, doc) {
+      programRepository.removeOrArchiveIfUsed(req.params.uuid, function(err, doc) {
         if (err) {
           res.status(500);
           res.send({error: err});
