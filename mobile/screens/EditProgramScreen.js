@@ -1,7 +1,7 @@
 import React from "react";
-import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, BackHandler, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Table from "../components/Table";
-import {displayArrowWithMessage, offlineMode} from "../helpers/NavigationHelper";
+import {displaySimpleArrow, offlineMode} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
@@ -12,14 +12,26 @@ import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
 import segmentsToChart from "../helpers/ChartHelper";
 import connect from "react-redux/es/connect/connect";
 import colors from "../styles/colors";
+import images from "../helpers/ImageLoader";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: 'Édition d\'un programme',
-        headerLeft: displayArrowWithMessage(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
+        headerLeft: (navigation.state.params === undefined || navigation.state.params.headerLeft === undefined) ?
+            displaySimpleArrow() : navigation.state.params.headerLeft,
         headerTintColor: "white",
         headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
+
+    componentWillMount() {
+        this.props.navigation.setParams({
+            headerLeft: (
+                <TouchableOpacity style={{paddingLeft: 16}} onPress={() => this.handleBackPress()}>
+                    <Image source={images.arrow} style={{height: 24, width: 24}}/>
+                </TouchableOpacity>
+            )
+        });
+    }
 
     constructor(props) {
         super(props);
@@ -67,7 +79,7 @@ class EditProgramScreen extends React.Component {
                     </View>
 
                     <Button
-                        title={"Sauvegarder le programme"}
+                        title={"Sauvegarder et quitter"}
                         onPress={() => this.saveProgram()}
                         color={colors.PRIMARY_COLOR}/>
                 </View>
@@ -81,6 +93,10 @@ class EditProgramScreen extends React.Component {
         if (!this.checkIntegrity()) {
             return;
         }
+        if (!this.haveThereBeenChanges(this.initProgram, this.state.programName.trim(), unitToDev(this.state.segments))) {
+            this.props.navigation.navigate("ChooseProgram");
+            return;
+        }
         Alert.alert("Sauvegarder", "Voulez-vous enregistrer vos modifications ?",
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
@@ -91,7 +107,6 @@ class EditProgramScreen extends React.Component {
                             segments: unitToDev(this.state.segments),
                             lastModificationDate: (new Date()).toISOString()
                         };
-
                         if (offlineMode) {
                             if (this.initProgram !== undefined) {
                                 this.props.dispatch({ type: DELETE_PROGRAM, value: this.initProgram.uuid });
@@ -173,6 +188,27 @@ class EditProgramScreen extends React.Component {
         return true;
     }
 
+    haveThereBeenChanges(oldProgram, newName, newSegments) {
+        if (oldProgram === undefined || newSegments.length !== oldProgram.segments.length) {
+            return true;
+        }
+        for (let i in oldProgram.segments) {
+            if (!this.arraysEqual(oldProgram.segments[i], newSegments[i])) return true;
+        }
+        return oldProgram.name !== newName;
+    }
+
+    arraysEqual(a, b) {
+        if (a == null || b == null || a.length !== b.length) return false;
+        for (let k in a) {
+            if (!b.hasOwnProperty(k) || a[k] !== b[k]) return false;
+        }
+        for (let k in b) {
+            if (!a.hasOwnProperty(k) || a[k] !== b[k]) return false;
+        }
+        return true;
+    }
+
     addBackListener() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
@@ -182,11 +218,15 @@ class EditProgramScreen extends React.Component {
     }
 
     handleBackPress = () => {
-        Alert.alert("Retour", "Êtes-vous sûr de quitter la page sans conserver les modifications ?",
-            [
-                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () => this.props.navigation.navigate("ChooseProgram")},
-            ]);
+        if (this.haveThereBeenChanges(this.initProgram, this.state.programName.trim(), unitToDev(this.state.segments))) {
+            Alert.alert("Retour", "Êtes-vous sûr de quitter la page sans conserver les modifications ?",
+                [
+                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                    {text: 'Oui', onPress: () => this.props.navigation.navigate("ChooseProgram")},
+                ]);
+        } else {
+            this.props.navigation.navigate("ChooseProgram");
+        }
         return true;
     };
 }
