@@ -107,7 +107,21 @@ class ProgramItem extends React.Component {
     }
 
     eraseProgram() {
-        this.props.dispatch({ type: DELETE_PROGRAM, value: this.program.uuid });
+        if (offlineMode) {
+            this.props.dispatch({ type: DELETE_PROGRAM, value: this.program.uuid });
+        } else {
+            this.programApi.deleteProgram(this.program.uuid)
+                .then((response) => {
+                    if (response.ok) {
+                        this.props.dispatch({ type: DELETE_PROGRAM, value: this.program.uuid });
+                    }
+                    else throw new Error("HTTP response status not code 200 as expected.");
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("Erreur", "Connexion réseau échouée");
+                });
+        }
     }
 }
 
