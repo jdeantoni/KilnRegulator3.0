@@ -34,14 +34,14 @@ class ChooseProgramScreen extends React.Component {
         headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
-    componentWillMount(){
+    componentWillMount() {
         this.props.navigation.setParams({
             headerLeft: (
                 <TouchableOpacity style={{paddingLeft: 16}} onPress={() => this.handleBackPress()}>
                     <Image source={images.arrow} style={{height: 24, width: 24}}/>
                 </TouchableOpacity>
             )
-        })
+        });
     }
 
     constructor(props) {
@@ -171,9 +171,9 @@ class ChooseProgramScreen extends React.Component {
 
     fetchingData = async () => {
         try {
-            const programs = JSON.parse(await AsyncStorage.getItem('PROGRAMS'));
-            this.props.dispatch({ type: UPDATE_PROGRAMS, value: programs });
-            return programs !== null;
+            this.initialPrograms = JSON.parse(await AsyncStorage.getItem('PROGRAMS'));
+            this.props.dispatch({ type: UPDATE_PROGRAMS, value: this.initialPrograms });
+            return this.initialPrograms !== null;
         } catch (error) {
             console.log(error);
             return false;
@@ -192,15 +192,19 @@ class ChooseProgramScreen extends React.Component {
 
     handleBackPress = () => {
         if (offlineMode) {
-            Alert.alert("Retour", "Voulez-vous quitter la page en sauvegardant les modifications sur le téléphone ?",
-                [
-                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                    {text: 'Quitter sans sauvegarder', onPress: () => {this.props.navigation.navigate("FindKiln");}},
-                    {text: 'Quitter et sauvegarder', onPress: () => {
-                            this.persistingData();
-                            this.props.navigation.navigate("FindKiln");
-                        }}
-                ]);
+            if (this.haveThereBeenChanges(this.initialPrograms, this.props.programs)) {
+                Alert.alert("Retour", "Voulez-vous quitter la page en sauvegardant les modifications sur le téléphone ?",
+                    [
+                        {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                        {text: 'Quitter sans sauvegarder', onPress: () => {this.props.navigation.navigate("FindKiln");}},
+                        {text: 'Quitter et sauvegarder', onPress: () => {
+                                this.persistingData();
+                                this.props.navigation.navigate("FindKiln");
+                            }}
+                    ]);
+            } else {
+                this.props.navigation.navigate("FindKiln");
+            }
         } else {
             Alert.alert("Retour", "Êtes-vous sûr de vouloir vous déconnecter du four ?",
                 [
@@ -213,9 +217,20 @@ class ChooseProgramScreen extends React.Component {
                         }},
                 ]);
         }
-
         return true;
     };
+
+    haveThereBeenChanges(progs1, progs2) {
+        if (progs1 === undefined || progs2 === undefined || progs1.length !== progs2.length) {
+            return true;
+        }
+        for (let i in progs1) {
+            if (progs1[i].uuid !== progs2[i].uuid) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 const styles = StyleSheet.create({

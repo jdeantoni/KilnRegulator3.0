@@ -18,19 +18,23 @@ export function unitToUser(segments) {
 }
 
 export function unitToDev(segments) {
-    for (let i in segments) {
+    if (segments == null) return null;
+
+    let newSegments = JSON.parse(JSON.stringify(segments));
+
+    for (let i in newSegments) {
         if (segments[i].hasOwnProperty(DURATION)) {
-            segments[i][DURATION] *= 3600;
+            newSegments[i][DURATION] *= 3600;
         }
         if (segments[i].hasOwnProperty(SLOPE)) {
-            segments[i][SLOPE] /= 3600
+            newSegments[i][SLOPE] /= 3600
         }
         if (segments[i].hasOwnProperty(ID)) {
-            delete segments[i][ID];
+            delete newSegments[i][ID];
         }
     }
 
-    return segments;
+    return newSegments;
 }
 
 export function estimateTimeInSecondsForAllSegments(segments) {
