@@ -94,7 +94,7 @@ All the libraries are added as git submodules under the `src/` folder. Only the 
 
 Raspberry Pi server development can be done both on a Raspberry Pi 3 or a standard computer with a Linux distribution, although keep in mind that the architecture is different. Raspberry Pi 3 is ARMv7-A (armhf on Debian), a PC is x86_64 (amd64 on Debian, note that i686 is not supported).
 
-Raspberry Pi development requires `nodejs >= 8` and `npm` locally. Make sure you use a recent `npm` version or else modules may fail installing.
+Raspberry Pi development requires `nodejs >= 8` and `npm` locally. Make sure you use a recent `npm` version or else modules may fail installing (repository server may throw 405 errors). You may encounter this issue with the latest `npm` package on Raspbian.
 
 #### Development
 
