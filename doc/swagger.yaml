@@ -131,6 +131,30 @@ paths:
         500:
           description: "internal server error (database)"
   /programs/{uuid}:
+    get:
+      tags:
+      - "programs"
+      summary: "Get one program"
+      operationId: "getProgram"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "uuid"
+        type: "string"
+        required: true
+        format: "uuid"
+      responses:
+        200:
+          description: "all programs"
+          schema:
+            $ref: "#/definitions/Program"
+        400:
+          description: "missing uuid"
+        404:
+          description: "old program not found"
     put:
       tags:
       - "programs"
