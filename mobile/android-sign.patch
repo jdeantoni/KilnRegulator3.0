@@ -1,0 +1,38 @@
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -107,6 +107,16 @@
+             abiFilters "armeabi-v7a", "x86"
+         }
+     }
++    signingConfigs {
++        release {
++            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
++                storeFile file(MYAPP_RELEASE_STORE_FILE)
++                storePassword MYAPP_RELEASE_STORE_PASSWORD
++                keyAlias MYAPP_RELEASE_KEY_ALIAS
++                keyPassword MYAPP_RELEASE_KEY_PASSWORD
++            }
++        }
++    }
+     splits {
+         abi {
+             reset()
+@@ -119,6 +129,7 @@
+         release {
+             minifyEnabled enableProguardInReleaseBuilds
+             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
++            signingConfig signingConfigs.release
+         }
+     }
+     // applicationVariants are e.g. debug, release
+--- a/android/gradle.properties
++++ b/android/gradle.properties
+@@ -16,3 +16,8 @@
+ # This option should only be used with decoupled projects. More details, visit
+ # http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+ # org.gradle.parallel=true
++
++MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
++MYAPP_RELEASE_KEY_ALIAS=my-key-alias
++MYAPP_RELEASE_STORE_PASSWORD=password
++MYAPP_RELEASE_KEY_PASSWORD=password

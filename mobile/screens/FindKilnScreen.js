@@ -1,14 +1,19 @@
 import React from 'react';
 import {View, StyleSheet, Button, BackHandler, Alert, TextInput} from 'react-native';
-import displayHamburger from "../helpers/NavigationHelper";
 import {StatusAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
+import {setOfflineMode} from "../helpers/NavigationHelper";
+import connect from "react-redux/es/connect/connect";
+import {CLEAN_PROGRAMS} from "../helpers/Constants";
+import colors from "../styles/colors";
 
-export default class FindKilnScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => ({
-        title: 'FindKilnScreen',
+class FindKilnScreen extends React.Component {
+    static navigationOptions = () => ({
+        title: 'KilnRegulator3.0',
         headerLeft: <View/>,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
 
     constructor(props) {
@@ -20,7 +25,7 @@ export default class FindKilnScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.main_container}>
+            <View style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.onWillFocus()}
                     onWillBlur={() => this.onWillBlur()}
@@ -31,13 +36,23 @@ export default class FindKilnScreen extends React.Component {
                                value={this.state.ip}/>
                 </View>
                 <View style={styles.container}>
-                    <Button title={"Sélectionner four"} onPress={() => this.kilnSelected()}/>
+                    <Button title={"Se connecter au four"}
+                            onPress={() => this.kilnSelected()}
+                            color={colors.PRIMARY_COLOR}/>
+
+                </View>
+                <View style={styles.container}>
+                    <Button title={"Mode hors ligne"}
+                            onPress={() => this.offlineModeSelected()}
+                            color={colors.PRIMARY_COLOR}/>
                 </View>
             </View>
         );
     }
 
     onWillFocus() {
+        this.props.dispatch({ type: CLEAN_PROGRAMS });
+
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
@@ -66,6 +81,7 @@ export default class FindKilnScreen extends React.Component {
             })
             .then((response) => {
                 NetworkRoute.getInstance().setAddress(this.state.ip);
+                setOfflineMode(false);
                 if (response.state === "ready") {
                     this.props.navigation.navigate("ChooseProgram");
                 }
@@ -75,15 +91,20 @@ export default class FindKilnScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Connexion réseau échouée")
+                Alert.alert("Erreur", "Connexion réseau échouée");
             });
+    }
+
+    offlineModeSelected() {
+        setOfflineMode(true);
+        this.props.navigation.navigate("ChooseProgram")
     }
 }
 
 const styles = StyleSheet.create({
     main_container: {
         flex: 1,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         justifyContent: 'center',
         alignItems: "center"
     },
@@ -91,3 +112,5 @@ const styles = StyleSheet.create({
         padding: 10
     }
 });
+
+export default connect()(FindKilnScreen);

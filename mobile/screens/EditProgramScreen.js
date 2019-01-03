@@ -1,56 +1,75 @@
 import React from "react";
-import {Alert, BackHandler, Button, StyleSheet, Text, TextInput, View, KeyboardAvoidingView} from "react-native";
+import {Alert, BackHandler, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Table from "../components/Table";
-import connect from "react-redux/es/connect/connect";
-import {displayArrow} from "../helpers/NavigationHelper";
+import {displaySimpleArrow, offlineMode} from "../helpers/NavigationHelper";
 import {NavigationEvents} from "react-navigation";
 import uuidv4 from "uuid/v4"
 import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import EditProgramLineChart from "../components/EditProgramLineChart";
-import {getDurationFromTempAndSlope, getTempFromDurationAndSlope, unitToDev, unitToUser} from "../helpers/UnitsManager";
-import {
-    DURATION,
-    NO_PROG_SELECTED,
-    SLOPE,
-    TABLE_KEYS,
-    TARGET_TEMPERATURE,
-    TEMP_ORIGIN,
-    TIME_ORIGIN
-} from "../helpers/Constants";
+import {unitToDev, unitToUser} from "../helpers/UnitsHelper";
+import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
+import segmentsToChart from "../helpers/ChartHelper";
+import connect from "react-redux/es/connect/connect";
+import colors from "../styles/colors";
+import images from "../helpers/ImageLoader";
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
-        title: 'EditProgramScreen',
-        headerLeft: displayArrow(navigation, "Êtes-vous sûr de quitter la page sans conserver les modifications ?", "ChooseProgram"),
+        title: 'Édition d\'un programme',
+        headerLeft: (navigation.state.params === undefined || navigation.state.params.headerLeft === undefined) ?
+            displaySimpleArrow() : navigation.state.params.headerLeft,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor: colors.PRIMARY_COLOR }
     });
+
+    componentWillMount() {
+        this.props.navigation.setParams({
+            headerLeft: (
+                <TouchableOpacity style={{paddingLeft: 16}} onPress={() => this.handleBackPress()}>
+                    <Image source={images.arrow} style={{height: 24, width: 24}}/>
+                </TouchableOpacity>
+            )
+        });
+    }
 
     constructor(props) {
         super(props);
 
-        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        if (!offlineMode) {
+            this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
+        }
 
+        try {
+            this.initProgram = this.props.navigation.state.params.program;
+        } catch (e) {
+            this.initProgram = undefined;
+        }
         this.state = {
-            programName: (this.props.selectedProgram !== NO_PROG_SELECTED) ? this.props.programs[this.props.selectedProgram].name : "",
-            segments: (this.props.selectedProgram !== NO_PROG_SELECTED) ? unitToUser(this.props.programs[this.props.selectedProgram].segments) : [{}]
+            programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
+            segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments),
+            segmentsEditableState: (this.initProgram === undefined) ? [true,true,true] : this.initProgram.segmentsEditableState,
         };
     }
 
     render() {
         return (
-            <KeyboardAvoidingView style={styles.main_container} behavior="padding">
+            <View style={styles.main_container} behavior="padding">
                 <NavigationEvents
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
                 />
                 <View style={styles.graph}>
-                    <EditProgramLineChart data={this.dataToChart(this.state.segments)}/>
+                    <EditProgramLineChart data={segmentsToChart(this.state.segments)}/>
                 </View>
 
                 <View style={styles.table}>
                     <Table
                         segments={this.state.segments}
-                        onChangeValue={this.handleChangeValue}/>
+                        segmentsEditableState={this.state.segmentsEditableState}
+                        onChangeValue={this.handleChangeValue}
+                        onChangeState={this.handleChangeState}
+                        />
                 </View>
 
                 <View style={styles.bottom}>
@@ -64,17 +83,23 @@ class EditProgramScreen extends React.Component {
                     </View>
 
                     <Button
-                        title={"Sauvegarder le programme"}
-                        onPress={() => this.saveProgram()}/>
+                        title={"Sauvegarder et quitter"}
+                        onPress={() => this.saveProgram()}
+                        color={colors.PRIMARY_COLOR}/>
                 </View>
-            </KeyboardAvoidingView>
+            </View>
         );
     }
 
-    handleChangeValue = e => this.setState({segments: e});
+    handleChangeValue = e => {this.setState({segments: e}); };
+    handleChangeState = e => {this.setState({segmentsEditableState: e}); };
 
     saveProgram() {
         if (!this.checkIntegrity()) {
+            return;
+        }
+        if (!this.haveThereBeenChanges(this.initProgram, this.state.programName.trim(), unitToDev(this.state.segments))) {
+            this.props.navigation.navigate("ChooseProgram");
             return;
         }
         Alert.alert("Sauvegarder", "Voulez-vous enregistrer vos modifications ?",
@@ -85,31 +110,45 @@ class EditProgramScreen extends React.Component {
                             uuid: uuidv4(),
                             name: this.state.programName.trim(),
                             segments: unitToDev(this.state.segments),
+                            segmentsEditableState: this.state.segmentsEditableState,
                             lastModificationDate: (new Date()).toISOString()
                         };
-
-                        if (this.props.selectedProgram === NO_PROG_SELECTED) {
+                        if (offlineMode) {
+                            if (this.initProgram !== undefined) {
+                                this.props.dispatch({ type: DELETE_PROGRAM, value: this.initProgram.uuid });
+                            }
+                            this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                            this.props.navigation.navigate("ChooseProgram");
+                        }
+                        else if (this.initProgram === undefined) {
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
-                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
+                                    if (response.ok) {
+                                        this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                                        this.props.navigation.navigate("ChooseProgram");
+                                    }
+                                    else throw new Error("HTTP response status not code 200 as expected.");
                                 })
                                 .catch((error) => {
                                     console.log(error);
-                                    alert("Connexion réseau échouée")
-                                });
-                        } else {
-                            this.programApi.editProgram(this.props.selectedProgram, newProgram)
-                                .then((response) => {
-                                    if (!response.ok) throw new Error("HTTP response status not code 200 as expected.");
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                    alert("Connexion réseau échouée")
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
                         }
-                        this.props.dispatch({ type: "SELECT_PROGRAM", value: newProgram.uuid });
-
-                        this.props.navigation.navigate("ChooseProgram");
+                        else {
+                            this.programApi.editProgram(this.initProgram.uuid, newProgram)
+                                .then((response) => {
+                                    if (response.ok) {
+                                        this.props.dispatch({ type: DELETE_PROGRAM, value: this.initProgram.uuid });
+                                        this.props.dispatch({ type: ADD_PROGRAM, value: newProgram });
+                                        this.props.navigation.navigate("ChooseProgram");
+                                    }
+                                    else throw new Error("HTTP response status not code 200 as expected.");
+                                })
+                                .catch((error) => { 
+                                    console.log(error);
+                                    Alert.alert("Erreur", "Connexion réseau échouée");
+                                });
+                        }
                     }
                 },
             ]);
@@ -125,8 +164,10 @@ class EditProgramScreen extends React.Component {
             return false;
         }
         let segments = [...this.state.segments];
+        let isCorrect;
         for (let i = 0; i < segments.length; i++) {
-            this.checkSegmentIntegrity(segments[i], i);
+            isCorrect = this.checkSegmentIntegrity(segments[i], i);
+            if (!isCorrect) return false;
         }
         this.setState({segments: segments});
         return true;
@@ -134,7 +175,7 @@ class EditProgramScreen extends React.Component {
 
     checkSegmentIntegrity(segment, i) {
         for (let key in segment) {
-            if (segment[key] === "") {
+            if (segment[key] === "" || segment[key] === "-" || segment[key] === ".") {
                 delete segment[key];
                 continue;
             }
@@ -150,6 +191,28 @@ class EditProgramScreen extends React.Component {
             Alert.alert("Erreur", "Le segment " + (i+1) + " est incomplet.", [{text: 'Ok', onPress: () => {}}]);
             return false;
         }
+        return true;
+    }
+
+    haveThereBeenChanges(oldProgram, newName, newSegments) {
+        if (oldProgram === undefined || newSegments.length !== oldProgram.segments.length) {
+            return true;
+        }
+        for (let i in oldProgram.segments) {
+            if (!this.arraysEqual(oldProgram.segments[i], newSegments[i])) return true;
+        }
+        return oldProgram.name !== newName;
+    }
+
+    arraysEqual(a, b) {
+        if (a == null || b == null || a.length !== b.length) return false;
+        for (let k in a) {
+            if (!b.hasOwnProperty(k) || a[k] !== b[k]) return false;
+        }
+        for (let k in b) {
+            if (!a.hasOwnProperty(k) || a[k] !== b[k]) return false;
+        }
+        return true;
     }
 
     addBackListener() {
@@ -161,99 +224,23 @@ class EditProgramScreen extends React.Component {
     }
 
     handleBackPress = () => {
-        Alert.alert("Retour", "Êtes-vous sûr de quitter la page sans conserver les modifications ?",
-            [
-                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () => this.props.navigation.navigate("ChooseProgram")},
-            ]);
+        if (this.haveThereBeenChanges(this.initProgram, this.state.programName.trim(), unitToDev(this.state.segments))) {
+            Alert.alert("Retour", "Êtes-vous sûr de quitter la page sans conserver les modifications ?",
+                [
+                    {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+                    {text: 'Oui', onPress: () => this.props.navigation.navigate("ChooseProgram")},
+                ]);
+        } else {
+            this.props.navigation.navigate("ChooseProgram");
+        }
         return true;
     };
-
-    dataToChart(segments) {
-        let chartData = [{time: TIME_ORIGIN, temperature: TEMP_ORIGIN}];
-        let temp = 0;
-        let time = 0;
-        let segDuration;
-        let segTemp;
-        let segSlope;
-        let lastTemp;
-        let lastTime;
-        let timeWithSlope;
-        let tempWithSlope;
-        for (const i in segments) {
-            //set segment vars
-            segDuration = parseFloat(segments[i][DURATION]);
-            segTemp = parseFloat(segments[i][TARGET_TEMPERATURE]);
-            segSlope = parseFloat(segments[i][SLOPE]);
-            lastTemp = chartData[chartData.length-1].temperature;
-            lastTime = chartData[chartData.length-1].time;
-            timeWithSlope = getDurationFromTempAndSlope(segTemp, lastTemp, segSlope);
-            tempWithSlope = getTempFromDurationAndSlope(segDuration, segSlope);
-
-            //check properties
-            for (let key in segments[i]) {
-                if (segments[i][key] === "") {
-                    delete segments[i][key];
-                }
-            }
-            if ((segments[i].length < 2) || (segSlope === 0 && lastTemp !== segTemp)) {
-                continue;
-            }
-
-            //compute time
-            if (this.hasProperty(segments[i],[DURATION])) {
-                time += segDuration;
-            } else {
-                time += timeWithSlope;
-            }
-
-            //compute temperature
-            if (this.hasProperty(segments[i],[TARGET_TEMPERATURE])) {
-                temp = segTemp;
-            } else {
-                temp += tempWithSlope;
-            }
-
-            //add plateau if necessary
-            if (this.hasProperty(segments[i], TABLE_KEYS)) {
-                //horizontal segment
-                if (timeWithSlope < segDuration) {
-                    chartData[chartData.length] = {
-                        time: timeWithSlope + lastTime,
-                        temperature: temp
-                    };
-                }
-                //vertical segment
-                else if (timeWithSlope > segDuration) {
-                    chartData[chartData.length] = {
-                        time: time,
-                        temperature: tempWithSlope + lastTemp
-                    };
-                }
-            }
-
-            //create point
-            if (!Number.isNaN(time) && !Number.isNaN(temp)) {
-                chartData[chartData.length] = {time: time, temperature: temp};
-            }
-        }
-        return chartData;
-    }
-
-    hasProperty(object, properties) {
-        for (let i in properties) {
-            if (!object.hasOwnProperty(properties[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
 
 const styles = StyleSheet.create({
     main_container: {
         flex: 1,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         justifyContent: 'center',
         alignItems: "stretch",
 
@@ -266,7 +253,7 @@ const styles = StyleSheet.create({
         flex: 4,
     },
     bottom: {
-        backgroundColor: "#dddddd",
+        backgroundColor: colors.SECONDARY_LIGHT_COLOR,
         padding: 10
     },
     name_input: {
@@ -276,16 +263,10 @@ const styles = StyleSheet.create({
         paddingBottom: 3
     },
     text_input: {
-        backgroundColor: '#f2f2f2',
+        backgroundColor: colors.LIGHT_GREY,
         flex: 1,
         padding: 3
     }
 });
 
-const mapStateToProps = (state) => {
-    return {
-        selectedProgram: state.selectedProgram,
-        programs: state.programs
-    };
-};
-export default connect(mapStateToProps)(EditProgramScreen);
+export default connect()(EditProgramScreen);

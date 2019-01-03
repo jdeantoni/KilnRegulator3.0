@@ -78,7 +78,7 @@ class CookingRepository {
     const pr = this;
     mongoose.model('cooking').find({})
       .select('-samples')
-      .sort({name: 'ascending'})
+      .sort('-startDate')
       .exec(function(err, cookings) {
         if (err) {
           c(err, null);
@@ -89,6 +89,16 @@ class CookingRepository {
           c(err, cookings);
         }
       });
+  }
+
+  isPogramIdUsed(programId, c) {
+    mongoose.model('cooking').count({programId: programId}, function (err, count) {
+      if(count > 0) {
+        c(err, true);
+      } else {
+        c(err, false);
+      }
+    });
   }
 }
 

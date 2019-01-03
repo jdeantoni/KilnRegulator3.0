@@ -1,14 +1,14 @@
-import { ActionApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi, ApiClient } from './jsclient';
+import { ActionApi, CookingsApi, DebugApi, ErrorsApi, ProgramsApi, StatusApi, ApiClient } from './jsclient';
 
 class APIClient extends ApiClient {
     constructor(address) {
         super();
-        this.setAddress(address);
+        this.basePath = ('http://'+address).replace(/\/+$/, '');
     }
 
     callApi(path, httpMethod, pathParams, queryParams, collectionQueryParams, headerParams, formParams,
             bodyParam, authNames, contentTypes, accepts, returnType, callback) {
-        return fetch(this.buildUrl(path, pathParams),
+        return fetch(this.buildUrlForCall(path, pathParams),
             {
                 method: httpMethod,
                 headers: {
@@ -18,9 +18,33 @@ class APIClient extends ApiClient {
                 body: bodyParam === null ? null : JSON.stringify(bodyParam)
             });
     }
+
+    buildUrlForCall(path, pathParams) {
+        if (!path.match(/^\//)) {
+            path = '/' + path;
+        }
+        let url = this.basePath + path;
+        let _this = this;
+        url = url.replace(/\{([\w-]+)\}/g, function(fullMatch, key) {
+            let value;
+            if (pathParams.hasOwnProperty(key)) {
+                value = _this.paramToString(pathParams[key]);
+            } else {
+                value = fullMatch;
+            }
+            return encodeURIComponent(value);
+        });
+        return url;
+    };
 }
 
 class ActionAPI extends ActionApi {
+    constructor(address) {
+        super(new APIClient(address));
+    }
+}
+
+class CookingsAPI extends CookingsApi {
     constructor(address) {
         super(new APIClient(address));
     }
@@ -53,6 +77,7 @@ class StatusAPI extends StatusApi {
 export {
     ActionAPI,
     DebugAPI,
+    CookingsAPI,
     ErrorsAPI,
     ProgramsAPI,
     StatusAPI

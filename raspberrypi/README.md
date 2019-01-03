@@ -11,6 +11,9 @@ docker-compose
 ```
 
 ## Prepare
+
+To configure the Raspbian installation with a WiFi access point, watchdog, etc see conf/README.md
+
 The arduino is connected through usb serial to the raspberry and the rasberry connected to the development computer (e.g., by using ethernet). Then, in the later, you can either connect to the raspberry through ssh or directly launch commands on the raspberry. But First, on the raspberry
 
 Edit `raspberrypi/conf/udev/rules.d/arduino.rules` replacing the `idVendor` and `idProduct` by those of your Arduino device (that can be found in dmesg for instance).

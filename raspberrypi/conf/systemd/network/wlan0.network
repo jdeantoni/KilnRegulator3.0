@@ -1,0 +1,13 @@
+[Match]
+Name=wlan0
+
+[Network]
+IPForward=yes
+IPMasquerade=yes
+DHCPServer=yes
+Address=192.168.1.1/24
+
+[DHCPServer]
+EmitDNS=yes
+# EmitDNS should get the DNS server from the "uplink" interface by default, but doesn't work so set our own
+DNS=8.8.8.8

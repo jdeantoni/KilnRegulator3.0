@@ -180,6 +180,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		//stop cooking
 	} else if (!strncmp(key, "reset", keyLength+1)) {
 		errCode = kilnRegulator.reset();
+		program.count = 0;
 		//reset cooking
 	} else if (!strncmp(key, "timesync", keyLength+1)) {
 		if (arraySize < 2) {
@@ -274,8 +275,8 @@ void setup() {
 	delay(500); // wait for MAX chip to stabilize
 
 	// Shut off embedded LED
-	pinMode(13, OUTPUT);
-	digitalWrite(13, LOW);
+	pinMode(2, OUTPUT);
+	digitalWrite(2, LOW);
 
 	watchdog.init();
 
