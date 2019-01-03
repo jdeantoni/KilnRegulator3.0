@@ -33,7 +33,7 @@ private:
 	uint8_t elementState = ElementState::STALE;
 	int8_t currentSegment = -1;
 
-	unsigned long windowSize = 5000;
+	unsigned long windowSize = 60000;
 	unsigned long windowStartTime = 0;
 
 	Adafruit_MAX31856 &thermocouple;
@@ -45,8 +45,8 @@ private:
 	unsigned long currentSegmentStartDate = 0;
 	unsigned long endDate = 0;
 
-	double aggKp=4, aggKi=0.2, aggKd=1;
-	double consKp=1, consKi=0.05, consKd=0.25;
+	double aggKp=6, aggKi=0.3, aggKd=1;
+	double consKp=3, consKi=0.1, consKd=0.3;
 
 	int outputPin = -1;
 

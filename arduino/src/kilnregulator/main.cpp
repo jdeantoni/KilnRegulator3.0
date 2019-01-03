@@ -21,7 +21,8 @@
 
 #define MAX_KEY_LENGTH 31
 
-Adafruit_MAX31856 thermocouple(/*thermoCS*/7);
+////   Adafruit_MAX31856 maxDAC(MAXcs, MAXdi, MAXdo, MAXclk);
+Adafruit_MAX31856 thermocouple(/*thermoCS*/7,4,5,3);
 
 KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
@@ -268,7 +269,7 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
 
 	delay(500); // wait for MAX chip to stabilize
 
@@ -288,6 +289,7 @@ void setup() {
 }
 
 void loop() {
+
 	if (Serial.available()) {
 		receiveMessage(streamCRC, kilnRegulator);
 	}
@@ -312,5 +314,5 @@ void loop() {
 	lcdMonitor.draw(kilnRegulator);
 
 	watchdog.update();
-	delay(100);
+	delay(300);
 }
