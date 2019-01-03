@@ -6,5 +6,4 @@ npm-debug.*
 *.key
 *.mobileprovision
 .idea
-package-lock.json
 network/jsclient/*

@@ -47,7 +47,8 @@ class EditProgramScreen extends React.Component {
         }
         this.state = {
             programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
-            segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments)
+            segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments),
+            segmentsEditableState: (this.initProgram === undefined) ? [true,true,true] : this.initProgram.segmentsEditableState,
         };
     }
 
@@ -65,7 +66,10 @@ class EditProgramScreen extends React.Component {
                 <View style={styles.table}>
                     <Table
                         segments={this.state.segments}
-                        onChangeValue={this.handleChangeValue}/>
+                        segmentsEditableState={this.state.segmentsEditableState}
+                        onChangeValue={this.handleChangeValue}
+                        onChangeState={this.handleChangeState}
+                        />
                 </View>
 
                 <View style={styles.bottom}>
@@ -87,7 +91,8 @@ class EditProgramScreen extends React.Component {
         );
     }
 
-    handleChangeValue = e => this.setState({segments: e});
+    handleChangeValue = e => {this.setState({segments: e}); };
+    handleChangeState = e => {this.setState({segmentsEditableState: e}); };
 
     saveProgram() {
         if (!this.checkIntegrity()) {
@@ -105,6 +110,7 @@ class EditProgramScreen extends React.Component {
                             uuid: uuidv4(),
                             name: this.state.programName.trim(),
                             segments: unitToDev(this.state.segments),
+                            segmentsEditableState: this.state.segmentsEditableState,
                             lastModificationDate: (new Date()).toISOString()
                         };
                         if (offlineMode) {
@@ -138,7 +144,7 @@ class EditProgramScreen extends React.Component {
                                     }
                                     else throw new Error("HTTP response status not code 200 as expected.");
                                 })
-                                .catch((error) => {
+                                .catch((error) => { 
                                     console.log(error);
                                     Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
