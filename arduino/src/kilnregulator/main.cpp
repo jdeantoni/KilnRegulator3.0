@@ -17,10 +17,12 @@
 #include "Timer.h"
 #include "Time.h"
 #include "WatchDog.h"
+#include "LCDMonitor.h"
 
 #define MAX_KEY_LENGTH 31
 
-Adafruit_MAX31856 thermocouple(/*thermoCS*/10, /*thermoDI*/11, /*thermoDO*/12, /*thermoCLK*/13);
+////   Adafruit_MAX31856 maxDAC(MAXcs, MAXdi, MAXdo, MAXclk);
+Adafruit_MAX31856 thermocouple(/*thermoCS*/7,4,5,3);
 
 KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
@@ -28,9 +30,11 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{5000}; // 500ms sampling rate, more or less…
+Timer samplingTimer{250}; // 500ms sampling rate, more or less…
 
 WatchDog watchdog;
+
+LCDMonitor lcdMonitor(/*cs*/10, /*dc*/8, /*rst*/9);
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -266,7 +270,7 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
 
 	delay(500); // wait for MAX chip to stabilize
 
@@ -276,6 +280,8 @@ void setup() {
 
 	watchdog.init();
 
+	lcdMonitor.init();
+
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
@@ -284,6 +290,7 @@ void setup() {
 }
 
 void loop() {
+
 	if (Serial.available()) {
 		receiveMessage(streamCRC, kilnRegulator);
 	}
@@ -305,6 +312,8 @@ void loop() {
 		}
 	}
 
+	lcdMonitor.draw(kilnRegulator);
+
 	watchdog.update();
-	delay(100);
+	delay(300);
 }

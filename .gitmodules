@@ -19,3 +19,9 @@
 [submodule "rpi3-mongodb3"]
 	path = rpi3-mongodb3
 	url = https://github.com/piernov/rpi3-mongodb3.git
+[submodule "arduino/src/Adafruit-ST7735-Library"]
+	path = arduino/src/Adafruit-ST7735-Library
+	url = https://github.com/adafruit/Adafruit-ST7735-Library.git
+[submodule "arduino/src/Adafruit-GFX-Library"]
+	path = arduino/src/Adafruit-GFX-Library
+	url = https://github.com/adafruit/Adafruit-GFX-Library.git

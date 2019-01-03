@@ -92,6 +92,10 @@ int8_t KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
 }
 
+unsigned long KilnRegulator::getStartDate() const {
+	return startDate;
+}
+
 int KilnRegulator::start(const Program &program) {
 
 	if (state != KilnState::READY) {
@@ -130,6 +134,7 @@ int KilnRegulator::stop() {
 	endDate = now();
 
 	state = KilnState::STOPPED;
+	windowStartTime = 0;
 	return 0;
 }
 
@@ -145,6 +150,13 @@ int KilnRegulator::reset() {
 	windowStartTime = 0;
 
 	state = KilnState::READY;
+    elementState = ElementState::STALE;
+    startDate = 0.0;
+    currentSegment = -1;
+	currentSegmentStartDate = 0.0;
+    endDate = 0;
+    output = 0.0;
+	setpoint = -1.0;
 	return 0;
 }
 
