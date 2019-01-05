@@ -107,7 +107,7 @@ export default class Table extends React.Component {
 
     changeValueInData(rowId, headerKey, value) {
         if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
-            (value !== "-" && value !== "." && Number.isNaN(Number.parseFloat(value)) && value !== "")) {
+        (value !== "-" && value !== "."  && value !== "" && (Number.isNaN(Number.parseFloat(value) && headerKey !== DURATION)))) { //
             return false
         }
         if (headerKey !== SLOPE && value[0] === "-") {
@@ -134,6 +134,17 @@ export default class Table extends React.Component {
         }
         else
         if (headerKey === DURATION) { //editing duration
+            //formating duration
+            var formatToDo = value.toString().indexOf(':')
+            if ( formatToDo !== -1 && (value.toString().length - formatToDo) == 3){ //only if the forme is *X:XX
+                var splittedVal = value.toString().split(':')
+                value=Number.parseFloat(splittedVal[0])+Number.parseFloat(splittedVal[1]/60)
+            }
+            //if not yet a number, return...
+            if (Number.isNaN(Number.parseFloat(value))) {
+                return false
+            }
+
             slope =  array[rowId][SLOPE]
             targetTemp =  array[rowId][TARGET_TEMPERATURE]
             //target temp is computed
