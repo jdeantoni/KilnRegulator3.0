@@ -9,7 +9,7 @@ export default class Table extends React.Component {
         super(props);
         this.state = {
             data: this.props.segments,
-            dataEditableState:this.props.segmentsEditableState
+            dataEditableState:this.props.segmentsEditableStates
         };
 
         this.dataHeaders = ["Segment", "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];

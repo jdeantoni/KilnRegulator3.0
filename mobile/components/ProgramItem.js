@@ -86,6 +86,7 @@ class ProgramItem extends React.Component {
             uuid: uuidv4(),
             name: this.program.name,
             segments: this.program.segments,
+            segmentEditableStates:this.program.segmentEditableStates,
             lastModificationDate: (new Date()).toISOString()
         };
 

@@ -30,7 +30,8 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{250}; // 500ms sampling rate, more or less…
+// Timer samplingTimer{250}; // 500ms sampling rate, more or less…
+Timer samplingTimer{1000}; // 2s sampling rate, more or less…
 
 WatchDog watchdog;
 
