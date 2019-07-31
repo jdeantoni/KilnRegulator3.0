@@ -6,4 +6,6 @@ npm-debug.*
 *.key
 *.mobileprovision
 .idea
+android
+ios
 network/jsclient/*

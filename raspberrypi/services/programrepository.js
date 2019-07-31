@@ -22,6 +22,7 @@ class ProgramRepository {
 
   parseMongoProgram(mProgram) {
     let segments = [];
+    let segmentEditableStates = mProgram.segmentEditableStates;
     mProgram.segments.forEach(function(mSegment) {
       let segment = {};
       if (mSegment.targetTemperature != null)
@@ -36,7 +37,8 @@ class ProgramRepository {
       uuid: mProgram.uuid,
       name: mProgram.name,
       lastModificationDate: mProgram.lastModificationDate,
-      segments: segments
+      segments: segments,
+      segmentEditableStates
     }
   }
 
