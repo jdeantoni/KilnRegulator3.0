@@ -30,8 +30,7 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-// Timer samplingTimer{250}; // 500ms sampling rate, more or less…
-Timer samplingTimer{1000}; // 2s sampling rate, more or less…
+Timer samplingTimer{100000}; // 10000ms sampling rate, more or less…
 
 WatchDog watchdog;
 
@@ -40,7 +39,7 @@ LCDMonitor lcdMonitor(/*cs*/10, /*dc*/8, /*rst*/9);
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
 time_t lastTimesyncRequest = 0;
-int timeout = 5000;
+int timeout = 50000;
 int timeoutCounter = 0;
 
 // Acknowledgment or error if code != 0

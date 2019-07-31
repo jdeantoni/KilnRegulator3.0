@@ -1,6 +1,6 @@
 KERNEL!="ttyUSB[0-9]*|ttyACM[0-9]*", GOTO="serial_end"
 
-SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523",
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0001",
 	SYMLINK+="arduino/6"
 LABEL="serial_end"
 
