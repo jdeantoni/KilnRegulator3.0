@@ -1,43 +1,58 @@
+import {
+    ADD_PROGRAM,
+    CLEAN_PROGRAMS,
+    DELETE_PROGRAM,
+    NO_PROG_SELECTED,
+    SELECT_PROGRAM,
+    UPDATE_PROGRAMS
+} from "../../helpers/Constants";
+
 const initialState = {
-    selectedProgram: "",
-    programs: {}
-    /*{id: 1, name: "Poterie", segments: [{target: 573, slope: 0.027777}, {target: 1200, duration: 7200}, {target: 50, slope: -0.027777}, {}]},
-    {id: 2, name: "Email cuit", segments: [{target: 1100, duration: 14400}, {target: 1000, duration: 7200}, {}]},
-    {id: 3, name: "Email non cuit", segments: [{target: 1100, duration: 14400}, {target: 1000, duration: 3600}, {}]},
-    {id: 4, name: "Verre", segments: [{target: 1100, duration: 14400}, {target: 1000, duration: 9000}, {}]},
-    {id: 5, name: "Engobe", segments: [{target: 1100, duration: 14400}, {target: 1000, duration: 7200}, {}]},
-    {id: 6, name: "Cookie", segments: [{target: 130, duration: 3600}, {}]}*/
+    selectedProgram: NO_PROG_SELECTED,
+    programs: []
 };
 
 function togglePrograms(state = initialState, action) {
     let nextState;
     switch(action.type) {
-        case "SELECT_PROGRAM":
+        case SELECT_PROGRAM:
             nextState = {
                 ...state,
-                selectedProgram: (action.value === state.selectedProgram) ? "" : action.value
+                selectedProgram: (action.value === state.selectedProgram) ? NO_PROG_SELECTED : action.value
             };
             return nextState || state;
 
-        case "ADD_PROGRAM":
+        case ADD_PROGRAM:
             nextState = {
-                ...state,
+                programs: (state.programs === undefined || state.programs == null || state.programs.length === 0) ?
+                                [action.value] : state.programs.concat(action.value),
                 selectedProgram: action.value.uuid
             };
-            nextState.programs[action.value.uuid] = action.value;
             return nextState;
 
-        case "DELETE_PROGRAM":
-            nextState = { ...state };
-            delete nextState.programs[action.value];
-            return nextState;
-
-        case "UPDATE_PROGRAMS":
-            nextState = { ...state };
-            for (let i = 0; i < action.value.length; i++) {
-                nextState.programs[action.value[i].uuid] = action.value[i];
+        case DELETE_PROGRAM:
+            let newArray = state.programs.slice();
+            for (let i in newArray) {
+                if (newArray[parseInt(i)].uuid === action.value) {
+                    newArray.splice(parseInt(i), 1);
+                    break;
+                }
             }
+            nextState = {
+                ...state,
+                programs: newArray
+            };
             return nextState;
+
+        case UPDATE_PROGRAMS:
+            nextState = {
+                ...state,
+                programs: action.value
+            };
+            return nextState;
+
+        case CLEAN_PROGRAMS:
+            return initialState;
 
         default:
             return state;

@@ -9,8 +9,9 @@ import {
     VictoryScatter,
     VictoryLabel
 } from "victory-native";
-import {hoursToHoursAndMinutes} from "../helpers/UnitsManager";
+import {hoursToHoursAndMinutes} from "../helpers/UnitsHelper";
 import {TEMP_ORIGIN, TIME_ORIGIN} from "../helpers/Constants";
+import colors from "../styles/colors";
 
 export default class EditProgramLineChart extends React.Component {
     constructor(props) {
@@ -18,25 +19,26 @@ export default class EditProgramLineChart extends React.Component {
 
         this.state = {
             dimensions: undefined,
-            data: this.props.data,
             activePoint: null
-        }
+        };
     }
 
     render() {
         if (this.state.dimensions === undefined) return <View style={styles.container} onLayout={this.onLayout}/>;
-        if (this.state.data.length <= 1) return <View/>;
+        if (this.props.data.length <= 1) return <View/>;
 
         return (
             <View style={styles.container}>
                 <VictoryChart
                     theme={VictoryTheme.material}
-                    height={270} width={this.state.width}
+                    width={this.state.width}
+                    padding={{ left: 60, top: 80, right: 20, bottom: 90 }}
                     containerComponent={<VictoryCursorContainer
                         cursorDimension="x"
                         cursorLabel={cursor => { return {
                             message: (hoursToHoursAndMinutes(cursor.x) + " | " + this.getTemperatureFromTimeInSegments(cursor.x) + "°C"),
-                            dimensions: this.state.dimensions}; }}
+                            dimensions: this.state.dimensions};
+                        }}
                         onCursorChange={this.handleCursorChange.bind(this)}
                         cursorLabelComponent={<ChartCursorLabel/>}
                     />}
@@ -50,10 +52,10 @@ export default class EditProgramLineChart extends React.Component {
                     />
                     <VictoryLine
                         style={{
-                            data: { stroke: "#c43a31" },
+                            data: { stroke: colors.PRIMARY_COLOR },
                             parent: { border: "1px solid #ccc"},
                         }}
-                        data={this.state.data}
+                        data={this.props.data}
                         x={"time"}
                         y={"temperature"}
                     />
@@ -72,12 +74,11 @@ export default class EditProgramLineChart extends React.Component {
     }
 
     displayPoint() {
-        if (this.state.activePoint == null) return;
-
         return (
             this.state.activePoint ?
                 <VictoryScatter data={[this.state.activePoint]} style={{data: {size: 100} }}/>
-                : null);
+                : null
+        );
     }
 
     onLayout = event => {
@@ -90,14 +91,14 @@ export default class EditProgramLineChart extends React.Component {
         let lastPoint = {time: TIME_ORIGIN, temperature: TEMP_ORIGIN};
         let nextPoint;
 
-        for (let i in this.state.data) {
-            if (this.state.data[i].time < time) {
-                lastPoint = this.state.data[i];
-            } else if (this.state.data[i].time > time) {
-                nextPoint = this.state.data[i];
+        for (let i in this.props.data) {
+            if (this.props.data[i].time < time) {
+                lastPoint = this.props.data[i];
+            } else if (this.props.data[i].time > time) {
+                nextPoint = this.props.data[i];
                 break;
             } else {
-                return this.state.data[i].temperature;
+                return this.props.data[i].temperature;
             }
         }
 
@@ -113,7 +114,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5fcff"
     }
 });
 

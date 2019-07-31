@@ -25,6 +25,7 @@ services:
       - /dev:/dev
     privileged: true
   mongo:
+    restart: always
     image: mongo
     volumes:
       - /srv/KilnRegulator:/data/db

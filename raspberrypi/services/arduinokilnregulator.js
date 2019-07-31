@@ -12,11 +12,15 @@ class ArduinoKilnRegulator {
     const akr = this;
     this.arduino = new ArduinoMessagePack(dev, baudRate);
 
-    this.temperature = 0.0;
-    this.state = "";
-    this.elementState = "";
-    this.currentSegment = -1;
-    this.timestamp = 0; // timestamp from beginning of cooking
+    this.status = {
+      temperature: 0.0,
+      state: "",
+      elementState: "",
+      currentSegment: -1,
+      output: 0,
+      setPoint: 0,
+      timestamp: 0
+    };
 
     this.cooking = {};
 
@@ -72,15 +76,20 @@ class ArduinoKilnRegulator {
   }
 
   updateState(data) {
-    this.state = this.findStateName(data.state);
-    this.elementState = this.findElementStateName(data.elementState);
-    this.currentSegment = data.currentSegment;
-    this.temperature = data.temperature;
+    let status = { // convert between short names and long names, and between index and enum string
+      state: this.findStateName(data.s),
+      elementState: this.findElementStateName(data.eS),
+      currentSegment: data.cS,
+      temperature: data.t,
+      output: data.o,
+      setPoint: data.sP,
+      timestamp: data.ts
+    }
 
-    // upadte current cooking
-    if (this.cooking.startDate) { // cooking started
+    // update current cooking
+    if (status.state != "ready" && this.cooking.startDate) { // cooking started, collect samples even in stopped state
       const startDate = Math.floor(Date.parse(this.cooking.startDate) / 1000);
-      let timestamp = data.timestamp - startDate; // timestamp from start of program in seconds
+      let timestamp = status.timestamp - startDate; // timestamp from start of program in seconds
 
       if (timestamp < 0 && this.cooking.offset === undefined) { // arduino not exactly synced… add offset.
         this.cooking.offset = timestamp;
@@ -89,10 +98,13 @@ class ArduinoKilnRegulator {
         timestamp -= this.cooking.offset;
       }
 
-      this.timestamp = timestamp;
+      status.timestamp = timestamp;
 
-      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: data.temperature});
+      // save new segment in database
+      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
     }
+
+    this.status = status;
   }
 
   findStateName(state) {
@@ -158,8 +170,18 @@ class ArduinoKilnRegulator {
       akn.cooking.uuid = uuidv1();
       akn.cooking.startDate = (new Date()).toISOString();
       akn.cooking.programId = program.uuid;
+      delete akn.cooking.offset; // reset offset
 
       cookingRepository.add(akn.cooking);
+    });
+  }
+
+  reset() {
+    const akn = this;
+    this.arduino.write(["reset"]);
+    this.arduino.emitter.once('ack-reset', function(msg) {
+      console.log('Reset!');
+      akn.cooking = {};
     });
   }
 

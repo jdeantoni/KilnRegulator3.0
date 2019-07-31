@@ -25,6 +25,7 @@ services:
       - /dev:/dev
     privileged: true
   mongo:
+    restart: always
     build:
       context: rpi3-mongodb3
       dockerfile: Dockerfile

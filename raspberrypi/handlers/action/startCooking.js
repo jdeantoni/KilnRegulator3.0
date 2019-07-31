@@ -13,7 +13,7 @@ exports.handler = function startCooking(req, res, next) {
     return;
   }
 
-	programRepository.exists(req.body.uuid, function(err, exists) {
+  programRepository.exists(req.body.uuid, function(err, exists) {
     if (err) {
       res.status(500);
       res.send({error: err});
@@ -30,7 +30,7 @@ exports.handler = function startCooking(req, res, next) {
         } else {
 
           const arduino = require('../../services/arduinorepository').first();
-          if (!arduino) {
+          if (!arduino || arduino.errored) {
             res.status(503);
             res.send({errored: true});
             return;

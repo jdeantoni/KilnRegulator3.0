@@ -16,22 +16,24 @@ public:
 
 	void updateState();
 	double getTemperature() const;
-	int getState() const;
-	int getElementState() const;
-	int getCurrentSegment() const;
+	uint8_t getState() const;
+	uint8_t getElementState() const;
+	int8_t getCurrentSegment() const;
+	unsigned long getStartDate() const;
 
 	int start(const Program &program);
 	int stop();
+	int reset();
 	int setSetpoint(double);
 	double output = 0.0;
 	double setpoint = -1.0;
 private:
 	double temperature = 0.0;
-	int state = KilnState::READY;
-	int elementState = ElementState::STALE;
-	int currentSegment = -1;
+	uint8_t state = KilnState::READY;
+	uint8_t elementState = ElementState::STALE;
+	int8_t currentSegment = -1;
 
-	unsigned long windowSize = 45000;
+	unsigned long windowSize = 60000;
 	unsigned long windowStartTime = 0;
 
 	Adafruit_MAX31856 &thermocouple;
@@ -43,8 +45,8 @@ private:
 	unsigned long currentSegmentStartDate = 0;
 	unsigned long endDate = 0;
 
-	double aggKp=4, aggKi=0.2, aggKd=1;
-	double consKp=1, consKi=0.05, consKd=0.25;
+	double aggKp=6, aggKi=0.3, aggKd=1;
+	double consKp=3, consKi=0.1, consKd=0.3;
 
 	int outputPin = -1;
 

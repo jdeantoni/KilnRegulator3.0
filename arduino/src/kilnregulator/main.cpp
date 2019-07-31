@@ -17,10 +17,12 @@
 #include "Timer.h"
 #include "Time.h"
 #include "WatchDog.h"
+#include "LCDMonitor.h"
 
 #define MAX_KEY_LENGTH 31
 
-Adafruit_MAX31856 thermocouple(/*thermoCS*/10, /*thermoDI*/11, /*thermoDO*/12, /*thermoCLK*/13);
+////   Adafruit_MAX31856 maxDAC(MAXcs, MAXdi, MAXdo, MAXclk);
+Adafruit_MAX31856 thermocouple(/*thermoCS*/7,4,5,3);
 
 KilnRegulator kilnRegulator(thermocouple, /*outputPin*/2);
 
@@ -30,7 +32,10 @@ Program program;
 
 Timer samplingTimer{100000}; // 10000ms sampling rate, more or less…
 
+
 WatchDog watchdog;
+
+LCDMonitor lcdMonitor(/*cs*/10, /*dc*/8, /*rst*/9);
 
 char key[MAX_KEY_LENGTH+1] = "\0"; // buffer to store received map key
 
@@ -174,6 +179,10 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	} else if (!strncmp(key, "stop", keyLength+1)) {
 		errCode = kilnRegulator.stop();
 		//stop cooking
+	} else if (!strncmp(key, "reset", keyLength+1)) {
+		errCode = kilnRegulator.reset();
+		program.count = 0;
+		//reset cooking
 	} else if (!strncmp(key, "timesync", keyLength+1)) {
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;
@@ -185,7 +194,6 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		errCode = msgpack::readInt(stream, timestamp);
 		if (errCode) { // not error code but success
 			setTime(timestamp);
-			errCode = timestamp;
 			lastTimesyncRequest = 0;
 			timeoutCounter = 0;
 		} else {
@@ -221,9 +229,11 @@ readerror:
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	size_t mapSize = 8;
 
-	int state =  kilnRegulator.getState();
-	int elementState =  kilnRegulator.getElementState();
-	int segment = kilnRegulator.getCurrentSegment();
+	uint32_t timestamp = now(); // get it first because it may send a time syncronisation request
+
+	uint8_t state =  kilnRegulator.getState();
+	uint8_t elementState =  kilnRegulator.getElementState();
+	int8_t segment = kilnRegulator.getCurrentSegment();
 	double temperature = kilnRegulator.getTemperature();
 
 	msgpack::writeMapSize(stream, mapSize);
@@ -231,26 +241,26 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 	msgpack::writeString(stream, "command");
 	msgpack::writeString(stream, "status");
 
-	msgpack::writeString(stream, "state");
-	msgpack::writeInt16(stream, state);
+	msgpack::writeString5(stream, "s", 1); //"state"
+	msgpack::writeIntU8(stream, state);
 
-	msgpack::writeString(stream, "elementState");
-	msgpack::writeInt16(stream, elementState);
+	msgpack::writeString5(stream, "eS", 2); //"elementState"
+	msgpack::writeIntU8(stream, elementState);
 
-	msgpack::writeString(stream, "currentSegment");
-	msgpack::writeInt16(stream, segment);
+	msgpack::writeString5(stream, "cS", 2); //"currentSegment"
+	msgpack::writeInt8(stream, segment);
 
-	msgpack::writeString(stream, "temperature");
+	msgpack::writeString5(stream, "t", 1); //"temperature"
 	msgpack::writeFloat32(stream, temperature);
 
-	msgpack::writeString(stream, "output");
+	msgpack::writeString5(stream, "o", 1); //"output"
 	msgpack::writeFloat32(stream, kilnRegulator.output);
 
-	msgpack::writeString(stream, "setPoint");
+	msgpack::writeString5(stream, "sP", 2); //"setPoint"
 	msgpack::writeFloat32(stream, kilnRegulator.setpoint);
 
-	msgpack::writeString(stream, "timestamp");
-	msgpack::writeIntU32(stream, now());
+	msgpack::writeString5(stream, "ts", 2); //"timestamp"
+	msgpack::writeIntU32(stream, timestamp);
 }
 
 
@@ -261,15 +271,17 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
 
 	delay(500); // wait for MAX chip to stabilize
 
 	// Shut off embedded LED
-	pinMode(13, OUTPUT);
-	digitalWrite(13, LOW);
+	pinMode(2, OUTPUT);
+	digitalWrite(2, LOW);
 
 	watchdog.init();
+
+	lcdMonitor.init();
 
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
@@ -279,6 +291,7 @@ void setup() {
 }
 
 void loop() {
+
 	if (Serial.available()) {
 		receiveMessage(streamCRC, kilnRegulator);
 	}
@@ -300,6 +313,8 @@ void loop() {
 		}
 	}
 
+	lcdMonitor.draw(kilnRegulator);
+
 	watchdog.update();
-	delay(100);
+	delay(300);
 }

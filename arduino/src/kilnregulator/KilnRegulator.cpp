@@ -59,12 +59,14 @@ void KilnRegulator::regulate() {
 	if (now - windowStartTime > windowSize) { //time to shift the Relay Window
 		windowStartTime += windowSize;
 	}
-	if (windowSize * output / 255  > now - windowStartTime) {
-		digitalWrite(outputPin, HIGH);
-		digitalWrite(13, HIGH);
-	} else {
-		digitalWrite(outputPin, LOW);
-		digitalWrite(13, LOW);
+	if (windowSize * output / 255  > now - windowStartTime) { // heat
+		elementState = ElementState::HEATING;
+		digitalWrite(outputPin, HIGH); //heating elment on
+		digitalWrite(2, HIGH); //led on
+	} else { // let cool down
+		elementState = ElementState::STALE;
+		digitalWrite(outputPin, LOW); //heating element on
+		digitalWrite(2, LOW); //led off
 	}
 }
 
@@ -78,21 +80,25 @@ double KilnRegulator::getTemperature() const {
 	return temperature;
 }
 
-int KilnRegulator::getState() const {
+uint8_t KilnRegulator::getState() const {
 	return state;
 }
 
-int KilnRegulator::getElementState() const {
+uint8_t KilnRegulator::getElementState() const {
 	return elementState;
 }
 
-int KilnRegulator::getCurrentSegment() const {
+int8_t KilnRegulator::getCurrentSegment() const {
 	return currentSegment;
+}
+
+unsigned long KilnRegulator::getStartDate() const {
+	return startDate;
 }
 
 int KilnRegulator::start(const Program &program) {
 
-	if (state == KilnState::RUNNING) {
+	if (state != KilnState::READY) {
 		return ErrorCode::INVALID_STATE;
 	}
 	/*if (setpoint < 0) {
@@ -109,6 +115,11 @@ int KilnRegulator::start(const Program &program) {
 	startDate = now();
 	currentSegmentStartDate = now();
 
+	//init PID if not yet done
+	if (pid.GetMode() != AUTOMATIC) {
+		pid.SetMode(AUTOMATIC);
+	}
+
 	return 0;
 }
 
@@ -116,13 +127,36 @@ int KilnRegulator::stop() {
 	if (state != KilnState::RUNNING) {
 		return ErrorCode::INVALID_STATE;
 	}
+	elementState = ElementState::STALE;
 	digitalWrite(outputPin, LOW);
-	digitalWrite(13, LOW);
+	digitalWrite(2, LOW);
 
 	endDate = now();
 
 	state = KilnState::STOPPED;
 	windowStartTime = 0;
+	return 0;
+}
+
+int KilnRegulator::reset() {
+	if (state != KilnState::STOPPED) {
+		return ErrorCode::INVALID_STATE;
+	}
+
+	//clear PID
+	pid.SetMode(MANUAL);
+	output = 0;
+
+	windowStartTime = 0;
+
+	state = KilnState::READY;
+    elementState = ElementState::STALE;
+    startDate = 0.0;
+    currentSegment = -1;
+	currentSegmentStartDate = 0.0;
+    endDate = 0;
+    output = 0.0;
+	setpoint = -1.0;
 	return 0;
 }
 
