@@ -419,6 +419,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Segment"
+      segmentEditableStates:
+        type: "array"
+        items:
+          type: "boolean"
   Sample:
     type: "object"
     properties:

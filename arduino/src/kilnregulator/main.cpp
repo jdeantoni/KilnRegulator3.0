@@ -32,7 +32,6 @@ Program program;
 
 Timer samplingTimer{100000}; // 10000ms sampling rate, more or less…
 
-
 WatchDog watchdog;
 
 LCDMonitor lcdMonitor(/*cs*/10, /*dc*/8, /*rst*/9);
