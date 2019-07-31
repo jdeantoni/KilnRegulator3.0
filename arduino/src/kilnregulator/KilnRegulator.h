@@ -31,7 +31,7 @@ private:
 	int elementState = ElementState::STALE;
 	int currentSegment = -1;
 
-	unsigned long windowSize = 5000;
+	unsigned long windowSize = 45000;
 	unsigned long windowStartTime = 0;
 
 	Adafruit_MAX31856 &thermocouple;
