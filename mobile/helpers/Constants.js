@@ -1,5 +1,5 @@
 const TIME_ORIGIN = 0;
-const TEMP_ORIGIN = 0;
+const TEMP_ORIGIN = 20;
 
 const NO_PROG_SELECTED = "";
 

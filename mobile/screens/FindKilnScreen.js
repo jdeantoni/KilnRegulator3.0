@@ -19,7 +19,7 @@ class FindKilnScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ip: ""
+            ip: "192.168.88.1:3000"
         };
     }
 
@@ -30,11 +30,11 @@ class FindKilnScreen extends React.Component {
                     onWillFocus={() => this.onWillFocus()}
                     onWillBlur={() => this.onWillBlur()}
                 />
-                <View style={styles.container}>
+                {/* <View style={styles.container}>
                     <TextInput placeholder={"Adresse IP"}
                                onChangeText={(text) => this.setState({ip: text})}
                                value={this.state.ip}/>
-                </View>
+                </View> */}
                 <View style={styles.container}>
                     <Button title={"Se connecter au four"}
                             onPress={() => this.kilnSelected()}

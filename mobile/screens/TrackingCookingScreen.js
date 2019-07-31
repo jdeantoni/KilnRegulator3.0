@@ -119,7 +119,7 @@ class TrackingCookingScreen extends React.Component {
         }
         this.getTemperature();
 
-        this.interval = setInterval(() => this.getTemperature(), 5000);
+        this.interval = setInterval(() => this.getTemperature(), 15000);
     }
 
     onWillBlur() {

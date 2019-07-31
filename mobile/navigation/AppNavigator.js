@@ -8,6 +8,9 @@ import ErrorsScreen from "../screens/ErrorsScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import HistoriesScreen from "../screens/HistoriesScreen";
 import HistoryScreen from "../screens/HistoryScreen";
+import ParametersScreen from "../screens/ParametersScreen";
+
+
 
 const MainStack = createStackNavigator({
     FindKiln: FindKilnScreen,
@@ -17,7 +20,8 @@ const MainStack = createStackNavigator({
     Errors: ErrorsScreen,
     Settings: SettingsScreen,
     Histories: HistoriesScreen,
-    History: HistoryScreen
+    History: HistoryScreen,
+    Parameters:ParametersScreen
 });
 
 const AppContainer = createAppContainer(MainStack);

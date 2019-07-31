@@ -62,6 +62,7 @@ class SettingsScreen extends React.Component {
                     {(offlineMode) ? null : this.displayHistoryItem()}
                     {(offlineMode) ? null : this.displayHeader()}
                     {(offlineMode) ? null : this.displayErrorsItem()}
+                    {this.displayCustomization()}
                 </SettingsList>
             </View>
         );
@@ -92,6 +93,23 @@ class SettingsScreen extends React.Component {
                 titleStyle={{color:'black', fontSize: 16}}
                 title={"Historique des cuissons"}
                 onPress={() => this.props.navigation.navigate("Histories")}
+            />
+        );
+    }
+
+    displayCustomization() {
+        return (
+            <SettingsList.Item
+                icon={
+                    <View style={styles.image_container}>
+                        <Image style={styles.image} source={images.settings}/>
+                    </View>
+                }
+                hasNavArrow={true}
+                itemWidth={70}
+                titleStyle={{color:'black', fontSize: 16}}
+                title={"Paramètres"}
+                onPress={() => this.props.navigation.navigate("Parameters")}
             />
         );
     }
