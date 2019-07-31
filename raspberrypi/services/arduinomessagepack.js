@@ -70,7 +70,7 @@ class ArduinoMessagePack extends Arduino {
            * Acknowledgment received, check CRC
            */
           if (!arduino.msgBacklog.hasOwnProperty(msg.id)) {
-            c(null, 'Arduino: Message id not found in backlog');
+            c(null, 'Arduino: Message id not found in backlog'+msg);
             return;
           }
           const origMsg = arduino.msgBacklog[msg.id];
