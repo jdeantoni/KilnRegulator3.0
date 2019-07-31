@@ -13,7 +13,7 @@
     "jest-serializer": "^23.0.1",
     "querystring": "^0.2.0",
     "react": "16.6.3",
-    "react-native": "0.57.7",
+    "react-native": "^0.57.7",
     "react-native-gesture-handler": "^1.0.10",
     "react-native-settings-list": "^1.8.0",
     "react-navigation": "^3.0.5",

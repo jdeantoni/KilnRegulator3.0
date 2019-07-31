@@ -9,7 +9,7 @@ export default class Table extends React.Component {
         super(props);
         this.state = {
             data: this.props.segments,
-            dataEditableState:this.props.segmentsEditableStates
+            dataEditableState:this.props.segmentsEditableStates != null ? this.props.segmentsEditableStates : [true, true, true]
         };
 
         this.dataHeaders = ["Segment", "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];
@@ -69,7 +69,7 @@ export default class Table extends React.Component {
                     keyboardType="numeric"
                     editable = {this.state.dataEditableState[this.giveEditableStateIndex(key, headerKey)]}
                     />
-                
+
             </View>
         );
     }
@@ -113,7 +113,7 @@ export default class Table extends React.Component {
         if (headerKey !== SLOPE && value[0] === "-") {
             value = Math.abs(value);
         }
-        
+
         let array = [...this.state.data];
         let editArray = [...this.state.dataEditableState];
 
@@ -121,16 +121,16 @@ export default class Table extends React.Component {
             duration =  array[rowId][DURATION]
             targetTemp =  array[rowId][TARGET_TEMPERATURE]
             //target temp is computed
-            if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (duration != null)){  
+            if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (duration != null)){
                 array[rowId][TARGET_TEMPERATURE] = ''+((value * duration)+ this.getTargetTempOfRow(rowId-1))
                 editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)] = false
-            } 
+            }
             else
             //Duration is computed
-            if ((duration == null || !editArray[this.giveEditableStateIndex(rowId,DURATION)]) && (targetTemp != null)){ 
+            if ((duration == null || !editArray[this.giveEditableStateIndex(rowId,DURATION)]) && (targetTemp != null)){
                 array[rowId][DURATION] = ''+((targetTemp-this.getTargetTempOfRow(rowId-1))/value)
                 editArray[this.giveEditableStateIndex(rowId,DURATION)] = false
-            } 
+            }
         }
         else
         if (headerKey === DURATION) { //editing duration
@@ -148,35 +148,35 @@ export default class Table extends React.Component {
             slope =  array[rowId][SLOPE]
             targetTemp =  array[rowId][TARGET_TEMPERATURE]
             //target temp is computed
-            if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (slope != null)){  
+            if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (slope != null)){
                 array[rowId][TARGET_TEMPERATURE] = ''+((value * slope) + this.getTargetTempOfRow(rowId-1))
                 editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)] = false
-            } 
+            }
             else
             //slope is computed
-            if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (targetTemp != null)){ 
+            if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (targetTemp != null)){
                 array[rowId][SLOPE] = ''+((targetTemp - this.getTargetTempOfRow(rowId-1))/value)
                 editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false
-            } 
+            }
         }
         else
         if (headerKey === TARGET_TEMPERATURE) { //editing target temp
             slope =  array[rowId][SLOPE]
             duration =  array[rowId][DURATION]
             //duration is computed
-            if ((duration == null || !editArray[this.giveEditableStateIndex(rowId,DURATION)]) && (slope != null)){  
+            if ((duration == null || !editArray[this.giveEditableStateIndex(rowId,DURATION)]) && (slope != null)){
                 array[rowId][DURATION] = ''+((value - this.getTargetTempOfRow(rowId-1))/slope)
                 editArray[this.giveEditableStateIndex(rowId,DURATION)] = false
-            } 
+            }
             else
             //slope is computed
-            if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (duration != null)){ 
+            if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (duration != null)){
                 array[rowId][SLOPE] = ''+((value - this.getTargetTempOfRow(rowId-1))/duration)
                 editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false
             }
         }
 
-        
+
         array[rowId][headerKey] = value;
         this.setState({data: array});
         this.setState({dataEditableState: editArray})
@@ -192,10 +192,10 @@ export default class Table extends React.Component {
         headerKeyNumber = 0
         if (headerKey == DURATION){
             headerKeyNumber = 1
-        } 
+        }
         if (headerKey == SLOPE){
         headerKeyNumber = 2
-        } 
+        }
         return ((key*3) + headerKeyNumber)
     }
 
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     },
     lockedCell: {
         flex: 3,
-        backgroundColor: colors.MY_GREY, 
+        backgroundColor: colors.MY_GREY,
         justifyContent: 'center',
         alignItems: 'center'
     },

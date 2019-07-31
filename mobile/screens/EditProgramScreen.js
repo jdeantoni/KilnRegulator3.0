@@ -48,7 +48,7 @@ class EditProgramScreen extends React.Component {
         this.state = {
             programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
             segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments),
-            segmentsEditableState: (this.initProgram === undefined) ? [true,true,true] : this.initProgram.segmentsEditableState,
+            segmentsEditableState: (this.initProgram === undefined || this.initProgram.segmentsEditableStates == null) ? [true,true,true] : this.initProgram.segmentsEditableStates,
         };
     }
 
@@ -144,7 +144,7 @@ class EditProgramScreen extends React.Component {
                                     }
                                     else throw new Error("HTTP response status not code 200 as expected.");
                                 })
-                                .catch((error) => { 
+                                .catch((error) => {
                                     console.log(error);
                                     Alert.alert("Erreur", "Connexion réseau échouée");
                                 });
