@@ -15,6 +15,7 @@
     "react": "16.6.3",
     "react-native": "^0.57.7",
     "react-native-color-palette": "^2.0.3",
+    "react-native-dialog-input": "^1.0.7",
     "react-native-settings-list": "^1.8.0",
     "react-navigation": "^3.11.1",
     "react-redux": "^5.1.1",

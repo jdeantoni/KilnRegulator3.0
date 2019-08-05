@@ -217,6 +217,9 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	} else if (!strncmp(key, "getprogram", keyLength+1)) {
 		//send current program
 	}
+	else if (!strncmp(key, "delay", keyLength+1)) {
+		kilnRegulator.setState(KilnState::DELAYED);
+	}
 	sendAck(stream, msgId, key, errCode);
 	return true;
 readerror:

@@ -36,7 +36,7 @@ exports.handler = function startCooking(req, res, next) {
             return;
           }
 
-          arduino.start(program);
+          arduino.start(program, req.query.delay);
 
           res.send('');
           next()

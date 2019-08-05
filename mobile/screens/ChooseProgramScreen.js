@@ -20,8 +20,12 @@ import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Cons
 import images from "../helpers/ImageLoader";
 import ProgramItem from "../components/ProgramItem";
 import colors from "../styles/colors";
+import DialogInput from 'react-native-dialog-input';
 
 class ChooseProgramScreen extends React.Component {
+    state = {
+        isCookingDialogVisible : false
+    };
     static navigationOptions = ({ navigation }) => ({
         title: 'Choix du programme',
         headerLeft: (navigation.state.params === undefined || navigation.state.params.headerLeft === undefined) ?
@@ -73,8 +77,33 @@ class ChooseProgramScreen extends React.Component {
                             color={colors.PRIMARY_COLOR}/>
                     </View>
                 </View>
+                <DialogInput isDialogVisible={this.state.isCookingDialogVisible}
+                    title={"Prêt à lancer la cuisson"}
+                    message={"Pour différer la cuisson, renseigner le nombre d'heures ci dessous"}
+                    hintInput ={"départ différé ?"}
+                    submitInput={ (chosenDelay) =>{ this.sendCookingOrder(chosenDelay)}}
+                    closeDialog={ () => {this.showDialog(false); this.state.isCookingDialogVisible = false}}>
+                </DialogInput>
             </View>
         );
+    }
+
+    sendCookingOrder(chosenDelay){
+        this.actionAPI.startCooking({uuid: this.props.selectedProgram}, Number(chosenDelay))
+                            .then((response) => {
+                                if (response.ok) {
+                                    this.props.navigation.navigate("TrackingCooking", {
+                                        program: this.props.selectedProgram
+                                    });
+                                } else if (response.status === 503) {
+                                    this.error503Alert();
+                                }
+                                else throw new Error("HTTP response status not code 200 as expected.");
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                Alert.alert("Erreur", "Connexion réseau échouée");
+                            })
     }
 
     onWillFocus() {
@@ -121,7 +150,7 @@ class ChooseProgramScreen extends React.Component {
     }
 
     launchCooking() {
-        Alert.alert("Démarrage de la cuisson", "Êtes-vous sûr de vouloir lancer le processus de cuisson ?",
+        Alert.alert("Démarrage de la cuisson", "Pour différer la cuisson, renseigner le nombre d'heures ci dessous",
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
                 {text: 'Oui', onPress: () =>

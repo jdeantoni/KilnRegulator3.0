@@ -41,6 +41,11 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
         tft.setTextColor(ST77XX_BLUE);
         tft.println(" READY ");
         tft.setTextSize(4);
+    }else if (kr.getState() == KilnState::DELAYED){
+        tft.println("\n");
+        tft.setTextColor(ST77XX_BLUE);
+        tft.println(" DELAYED ");
+        tft.setTextSize(4);
     }else{
         tft.setTextSize(1);
         tft.println("");

@@ -226,11 +226,11 @@ paths:
               description: "UUID of program to start on oven"
               format: "uuid"
       - in: "query"
-        type: "integer"
+        type: "number"
         name: "delay"
         required: false
-        description: "optional time for delayed cooking"
-        format: "integer"
+        description: "optional time for delayed cooking, in hour"
+        format: "number"
       responses:
         200:
           description: "successful operation"

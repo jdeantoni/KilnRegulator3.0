@@ -25,6 +25,7 @@ class ArduinoKilnRegulator {
     this.cooking = {};
 
     this.errored = false;
+    this.delay = 0;
 
     eh.on('error', function(msg, timestamp) {
       akr.errored = true;
@@ -117,8 +118,8 @@ class ArduinoKilnRegulator {
 
   // if a segment is missing a parameter, try to estimate it
   fillSegment(segment, oldSegment) {
-    let oldTemperature = 0;
-    if (oldSegment)
+    let oldTemperature = 20;
+    if (oldSegment !== 20)
       oldTemperature = oldSegment.targetTemperature;
 
     if (segment.targetTemperature == null) {
@@ -145,8 +146,13 @@ class ArduinoKilnRegulator {
     });
   }
 
-  start(program) {
-    const akn = this;
+  start(program, d) {
+    this.delay = d;//delay is in hour
+    //todo notify the arduino that it is delayed
+    setTimeout(this.actualStart, this.delay*60000);
+  }
+
+  actualStart(){const akn = this;
     const arduino = this.arduino;
     const segments = program.segments;
     for (const i in segments) {

@@ -98,7 +98,7 @@ unsigned long KilnRegulator::getStartDate() const {
 
 int KilnRegulator::start(const Program &program) {
 
-	if (state != KilnState::READY) {
+	if ((state != KilnState::READY) && (state != KilnState::DELAYED)) {
 		return ErrorCode::INVALID_STATE;
 	}
 	/*if (setpoint < 0) {

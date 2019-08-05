@@ -22,7 +22,7 @@ exports.handler = function editProgram(req, res, next) {
     return;
   }
 
-  const keys = ['uuid', 'name', 'segments', 'lastModificationDate'];
+  const keys = ['uuid', 'name', 'segments', 'lastModificationDate', 'segmentEditableStates'];
   for (const k in keys) {
     if (!(req.body.hasOwnProperty(keys[k]) && req.body[keys[k]] != null)) {
       res.status(400);
@@ -51,6 +51,7 @@ exports.handler = function editProgram(req, res, next) {
             name: req.body.name,
             segments: req.body.segments,
             lastModificationDate: req.body.lastModificationDate
+            segmentEditableStates: req.body.segmentEditableStates
           }, function(err, program) {
             if (err) {
               res.status(500);
