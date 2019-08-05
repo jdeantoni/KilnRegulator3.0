@@ -8,18 +8,19 @@ class APIClient extends ApiClient {
 
     callApi(path, httpMethod, pathParams, queryParams, collectionQueryParams, headerParams, formParams,
             bodyParam, authNames, contentTypes, accepts, returnType, callback) {
-        return fetch(this.buildUrlForCall(path, pathParams),
+        return fetch(this.buildUrlForCall(path, pathParams, queryParams),
             {
                 method: httpMethod,
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: bodyParam === null ? null : JSON.stringify(bodyParam)
+                body: bodyParam === null ? null : JSON.stringify(bodyParam),
+                query : queryParams === null ?  null : Number(queryParams[0])
             });
     }
 
-    buildUrlForCall(path, pathParams) {
+    buildUrlForCall(path, pathParams, queryParams) {
         if (!path.match(/^\//)) {
             path = '/' + path;
         }
@@ -34,6 +35,9 @@ class APIClient extends ApiClient {
             }
             return encodeURIComponent(value);
         });
+        if(queryParams !== null){
+            url = url+'?'+queryParams.paramToString
+        }
         return url;
     };
 }
