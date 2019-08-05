@@ -208,7 +208,6 @@ paths:
           description: "old program not found"
         500:
           description: "internal server error (database)"
-
   /action/start:
     post:
       tags:
@@ -226,6 +225,16 @@ paths:
               type: "string"
               description: "UUID of program to start on oven"
               format: "uuid"
+        - in: "delay"
+        name: "delay"
+        required: false
+        schema:
+          type: "object"
+          properties:
+            uuid:
+              type: "integer"
+              description: "optional time for delayed cooking"
+              format: "integer"
       responses:
         200:
           description: "successful operation"
