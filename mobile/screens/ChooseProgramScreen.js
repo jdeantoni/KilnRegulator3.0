@@ -81,8 +81,15 @@ class ChooseProgramScreen extends React.Component {
                     title={"Prêt à lancer la cuisson"}
                     message={"Pour différer la cuisson, renseigner le nombre d'heures ci dessous"}
                     hintInput ={"départ différé ?"}
-                    submitInput={ (chosenDelay) =>{ this.sendCookingOrder(chosenDelay)}}
-                    closeDialog={ () => {this.showDialog(false); this.state.isCookingDialogVisible = false}}>
+                    submitInput={ (chosenDelay) => { 
+                        this.sendCookingOrder(chosenDelay)
+                        this.setState({ isCookingDialogVisible: false }) 
+                        }
+                    }
+                    closeDialog={ () => {
+                                        this.setState({ isCookingDialogVisible: false }) 
+                                        this.showDialog(false) 
+                }}>
                 </DialogInput>
             </View>
         );
@@ -150,27 +157,28 @@ class ChooseProgramScreen extends React.Component {
     }
 
     launchCooking() {
-        Alert.alert("Démarrage de la cuisson", "Pour différer la cuisson, renseigner le nombre d'heures ci dessous",
-            [
-                {text: 'Annuler', onPress: () => {}, style: 'cancel'},
-                {text: 'Oui', onPress: () =>
-                        this.actionAPI.startCooking({uuid: this.props.selectedProgram})
-                            .then((response) => {
-                                if (response.ok) {
-                                    this.props.navigation.navigate("TrackingCooking", {
-                                        program: this.props.selectedProgram
-                                    });
-                                } else if (response.status === 503) {
-                                    this.error503Alert();
-                                }
-                                else throw new Error("HTTP response status not code 200 as expected.");
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                                Alert.alert("Erreur", "Connexion réseau échouée");
-                            })
-                },
-            ]);
+        this.setState({ isCookingDialogVisible: true });
+        // Alert.alert("Démarrage de la cuisson", "Pour différer la cuisson, renseigner le nombre d'heures ci dessous",
+        //     [
+        //         {text: 'Annuler', onPress: () => {}, style: 'cancel'},
+        //         {text: 'Oui', onPress: () =>
+        //                 this.actionAPI.startCooking({uuid: this.props.selectedProgram})
+        //                     .then((response) => {
+        //                         if (response.ok) {
+        //                             this.props.navigation.navigate("TrackingCooking", {
+        //                                 program: this.props.selectedProgram
+        //                             });
+        //                         } else if (response.status === 503) {
+        //                             this.error503Alert();
+        //                         }
+        //                         else throw new Error("HTTP response status not code 200 as expected.");
+        //                     })
+        //                     .catch((error) => {
+        //                         console.log(error);
+        //                         Alert.alert("Erreur", "Connexion réseau échouée");
+        //                     })
+        //         },
+        //     ]);
     }
 
     error503Alert() {

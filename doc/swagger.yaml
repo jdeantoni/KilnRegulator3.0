@@ -362,6 +362,7 @@ definitions:
         - "running"
         - "stopped"
         - "error"
+        - "delayed"
       elementState:
         type: "string"
         enum:
@@ -380,6 +381,7 @@ definitions:
         - "running"
         - "stopped"
         - "error"
+        - "delayed"
       elementState:
         type: "string"
         enum:

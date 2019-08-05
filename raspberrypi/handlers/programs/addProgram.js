@@ -54,7 +54,7 @@ exports.handler = function addProgram(req, res, next) {
         uuid: req.body.uuid,
         name: req.body.name,
         segments: req.body.segments,
-        lastModificationDate: req.body.lastModificationDate
+        lastModificationDate: req.body.lastModificationDate,
         segmentEditableStates:req.body.segmentEditableStates
       }, function(err, program) {
         if (err) {
