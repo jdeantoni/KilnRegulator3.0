@@ -17,7 +17,7 @@ public:
 	void updateState();
 	double getTemperature() const;
 	uint8_t getState() const;
-	setState(uint8_t);
+	void setState(uint8_t);
 	uint8_t getElementState() const;
 	int8_t getCurrentSegment() const;
 	unsigned long getStartDate() const;

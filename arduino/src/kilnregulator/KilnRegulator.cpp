@@ -84,6 +84,10 @@ uint8_t KilnRegulator::getState() const {
 	return state;
 }
 
+void setState(uint8_t newState){
+	state = newState;
+}
+
 uint8_t KilnRegulator::getElementState() const {
 	return elementState;
 }
