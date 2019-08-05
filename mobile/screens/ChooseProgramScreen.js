@@ -221,7 +221,7 @@ class ChooseProgramScreen extends React.Component {
     };
 
     haveThereBeenChanges(progs1, progs2) {
-        if (progs1 === undefined || progs2 === undefined || progs1.length !== progs2.length) {
+        if (progs1 === undefined || progs1 === null ||progs2 === null || progs2 === undefined || progs1.length !== progs2.length) {
             return true;
         }
         for (let i in progs1) {

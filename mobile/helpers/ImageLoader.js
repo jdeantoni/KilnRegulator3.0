@@ -1,6 +1,7 @@
 const images = {
     hamburger: require('../assets/menu.png'),
-    minus: require('../assets/minus.png'),
+    // minus: require('../assets/minus.png'),
+    minus: require('../assets/garbage.png'),
     arrow: require('../assets/left_arrow.png'),
     heating: require('../assets/heating.png'),
     cooling: require('../assets/cooling.png'),

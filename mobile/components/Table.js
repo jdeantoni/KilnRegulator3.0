@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
     },
     minus: {
-        height: 20,
-        width: 20
+        height: 16,
+        width: 12
     }
 });
