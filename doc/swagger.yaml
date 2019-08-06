@@ -230,7 +230,7 @@ paths:
         name: "delay"
         required: false
         description: "optional time for delayed cooking, in hour"
-        format: "number"
+        format: "float"
       responses:
         200:
           description: "successful operation"
@@ -405,9 +405,9 @@ definitions:
         description: "slope in °C/second"
         format: "float"
       duration:
-        type: "integer"
+        type: "number"
         description: "duration in seconds"
-        format: "int64"
+        format: "float"
   Program:
     type: "object"
     properties:

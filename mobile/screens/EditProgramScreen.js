@@ -110,8 +110,8 @@ class EditProgramScreen extends React.Component {
                             uuid: uuidv4(),
                             name: this.state.programName.trim(),
                             segments: unitToDev(this.state.segments),
-                            segmentsEditableStates: this.state.segmentsEditableStates,
-                            lastModificationDate: (new Date()).toISOString()
+                            lastModificationDate: (new Date()).toISOString(),
+                            segmentsEditableStates: this.state.segmentsEditableStates
                         };
                         if (offlineMode) {
                             if (this.initProgram !== undefined) {
