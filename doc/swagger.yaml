@@ -225,12 +225,10 @@ paths:
               type: "string"
               description: "UUID of program to start on oven"
               format: "uuid"
-      - in: "query"
-        type: "number"
-        name: "delay"
-        required: false
-        description: "optional time for delayed cooking, in hour"
-        format: "float"
+            delay:
+              type: "number"
+              description: "optional time for delayed cooking, in hour"
+              format: "float"
       responses:
         200:
           description: "successful operation"

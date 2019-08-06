@@ -88,7 +88,6 @@ class ChooseProgramScreen extends React.Component {
                     }
                     closeDialog={ () => {
                                         this.setState({ isCookingDialogVisible: false }) 
-                                        this.showDialog(false) 
                 }}>
                 </DialogInput>
             </View>
@@ -96,7 +95,8 @@ class ChooseProgramScreen extends React.Component {
     }
 
     sendCookingOrder(chosenDelay){
-        this.actionAPI.startCooking({uuid: this.props.selectedProgram}, Number(chosenDelay))
+        console.log("cooking delay is set to "+ Number(chosenDelay));
+        this.actionAPI.startCooking({uuid: this.props.selectedProgram, delay:Number(chosenDelay)})
                             .then((response) => {
                                 if (response.ok) {
                                     this.props.navigation.navigate("TrackingCooking", {

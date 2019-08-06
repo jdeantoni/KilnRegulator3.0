@@ -318,5 +318,5 @@ void loop() {
 	lcdMonitor.draw(kilnRegulator);
 
 	watchdog.update();
-	delay(300);
+	delay(1000);
 }

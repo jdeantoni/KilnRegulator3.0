@@ -16,7 +16,6 @@ class APIClient extends ApiClient {
                     'Content-Type': 'application/json',
                 },
                 body: bodyParam === null ? null : JSON.stringify(bodyParam),
-                query : queryParams === null ?  null : queryParams.paramToString
             });
     }
 
@@ -35,9 +34,6 @@ class APIClient extends ApiClient {
             }
             return encodeURIComponent(value);
         });
-        if(queryParams !== null && queryParams.paramToString !== undefined){
-            url = url+'?'+queryParams.paramToString
-        }
         return url;
     };
 }
