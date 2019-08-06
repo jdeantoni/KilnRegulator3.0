@@ -14,7 +14,7 @@ class ArduinoKilnRegulator {
 
     this.status = {
       temperature: 0.0,
-      state: "",
+      state: "ready",
       elementState: "",
       currentSegment: -1,
       output: 0,
@@ -119,7 +119,7 @@ class ArduinoKilnRegulator {
   // if a segment is missing a parameter, try to estimate it
   fillSegment(segment, oldSegment) {
     let oldTemperature = 20;
-    if (oldSegment !== 20)
+    if (oldSegment != null)
       oldTemperature = oldSegment.targetTemperature;
 
     if (segment.targetTemperature == null) {
@@ -149,12 +149,13 @@ class ArduinoKilnRegulator {
   start(program, d) {
     this.delay = d;//delay is in hour
     //todo notify the arduino that it is delayed
-    setTimeout(this.actualStart, this.delay*60000);
+    console.log("cooking will start in "+this.delay+" hours, i.e., "+Number(this.delay*3600)+" seconds....");
+    setTimeout(function() { this.actualStart(program.segments) }.bind(this), Number(this.delay*3600000));
   }
 
-  actualStart(){const akn = this;
+  actualStart(segments){
+    const akn = this;
     const arduino = this.arduino;
-    const segments = program.segments;
     for (const i in segments) {
       let segment = segments[i];
       let oldSegment = null;
@@ -170,7 +171,7 @@ class ArduinoKilnRegulator {
       ]]);
     }
 
-    this.arduino.write(["start", program.segments.length]);
+    this.arduino.write(["start", segments.length]);
     this.arduino.emitter.once('ack-start', function(msg) {
       console.log('Started!');
       akn.cooking.uuid = uuidv1();

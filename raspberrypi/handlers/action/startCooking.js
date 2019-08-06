@@ -35,8 +35,12 @@ exports.handler = function startCooking(req, res, next) {
             res.send({errored: true});
             return;
           }
-
-          arduino.start(program, req.query.delay);
+          console.log("startCooking.js -> setted delay for cooking is "+req.body.delay);
+          if (req.body.delay ===undefined){
+            arduino.start(program, 0);
+          }else{
+            arduino.start(program, req.body.delay);
+          }
 
           res.send('');
           next()
