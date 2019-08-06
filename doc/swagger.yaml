@@ -426,7 +426,7 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Segment"
-      segmentEditableStates:
+      segmentsEditableStates:
         type: "array"
         items:
           type: "boolean"

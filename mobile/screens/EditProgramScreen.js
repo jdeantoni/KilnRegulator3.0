@@ -48,7 +48,7 @@ class EditProgramScreen extends React.Component {
         this.state = {
             programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
             segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments),
-            segmentsEditableState: (this.initProgram === undefined || this.initProgram.segmentsEditableStates == null) ? [true,true,true] : this.initProgram.segmentsEditableStates,
+            segmentsEditableStates: (this.initProgram === undefined || this.initProgram.segmentsEditableStates == null) ? [true,true,true] : this.initProgram.segmentsEditableStates,
         };
     }
 
@@ -66,7 +66,7 @@ class EditProgramScreen extends React.Component {
                 <View style={styles.table}>
                     <Table
                         segments={this.state.segments}
-                        segmentsEditableState={this.state.segmentsEditableState}
+                        segmentsEditableStates={this.state.segmentsEditableStates}
                         onChangeValue={this.handleChangeValue}
                         onChangeState={this.handleChangeState}
                         />
@@ -91,8 +91,8 @@ class EditProgramScreen extends React.Component {
         );
     }
 
-    handleChangeValue = e => {this.setState({segments: e}); };
-    handleChangeState = e => {this.setState({segmentsEditableState: e}); };
+    handleChangeValue = e => {this.setState({segments: e}); this.setState({segmentsEditableStates: e.dataEditableState}); };
+    handleChangeState = es => {this.setState({segmentsEditableStates: es}); };
 
     saveProgram() {
         if (!this.checkIntegrity()) {
@@ -121,6 +121,7 @@ class EditProgramScreen extends React.Component {
                             this.props.navigation.navigate("ChooseProgram");
                         }
                         else if (this.initProgram === undefined) {
+                            console.log("Programme: "+newProgram.segmentsEditableStates)
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
                                     if (response.ok) {
