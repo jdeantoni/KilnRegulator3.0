@@ -26,6 +26,8 @@ public:
 	int stop();
 	int reset();
 	int setSetpoint(double);
+	int setWakeupDate(int);
+	int getWakeupDate();
 	double output = 0.0;
 	double setpoint = -1.0;
 private:
@@ -45,6 +47,8 @@ private:
 	unsigned long startDate = 0;
 	unsigned long currentSegmentStartDate = 0;
 	unsigned long endDate = 0;
+
+	unsigned long wakeupDate = 0;
 
 	double aggKp=6, aggKi=0.3, aggKd=1;
 	double consKp=3, consKi=0.1, consKd=0.3;

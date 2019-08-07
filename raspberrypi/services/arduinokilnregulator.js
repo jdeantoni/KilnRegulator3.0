@@ -19,7 +19,8 @@ class ArduinoKilnRegulator {
       currentSegment: -1,
       output: 0,
       setPoint: 0,
-      timestamp: 0
+      timestamp: 0,
+      delay: 0
     };
 
     this.cooking = {};
@@ -84,7 +85,8 @@ class ArduinoKilnRegulator {
       temperature: data.t,
       output: data.o,
       setPoint: data.sP,
-      timestamp: data.ts
+      timestamp: data.ts,
+      delay:data.d
     }
 
     // update current cooking
@@ -148,12 +150,16 @@ class ArduinoKilnRegulator {
 
   start(program, d) {
     this.delay = d;//delay is in hour
-    //todo notify the arduino that it is delayed
-    console.log("cooking will start in "+this.delay+" hours, i.e., "+Number(this.delay*3600)+" seconds....");
-    setTimeout(function() { this.actualStart(program.segments) }.bind(this), Number(this.delay*3600000));
+    console.log("arduinoKilRegulator.js => cooking will start in "+this.delay+" hours, i.e., "+parseInt(this.delay*3600)+" seconds....");
+    setTimeout(function() { this.actualStart(program.segments, program) }.bind(this), Number(this.delay*3600000));
+    this.arduino.write(["delay", parseInt(this.delay*60)]);
+        this.arduino.emitter.once('ack-delay', function(msg) {
+          console.log('cooking have been delayed of '+parseInt(this.delay*60)+ 'minutes');
+        });
   }
 
-  actualStart(segments){
+  actualStart(segments, program){
+    console.log("actual cooking started");
     const akn = this;
     const arduino = this.arduino;
     for (const i in segments) {

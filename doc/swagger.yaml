@@ -351,6 +351,9 @@ definitions:
   Status:
     type: "object"
     properties:
+      delay:
+        type: "integer"
+        format: "int32"
       errored:
         type: "boolean"
       state:
