@@ -61,10 +61,10 @@ export default class ParametersScreen extends React.Component {
                             colors.SECONDARY_LIGHT_COLOR = '#deffdb'
                             this.storeData('@colors.SECONDARY_LIGHT_COLOR', colors.SECONDARY_LIGHT_COLOR)
                         }
-                        if (color === "#9B59B6"){
-                            colors.PRIMARY_DARK_COLOR = '#8B49A6'
+                        if (color === "#d18202"){
+                            colors.PRIMARY_DARK_COLOR = '#d18202'
                             this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
-                            colors.PRIMARY_LIGHT_COLOR = '#AB69C6'
+                            colors.PRIMARY_LIGHT_COLOR = '#f1A222'
                             this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
                         }
                         if (color === "#8E44AD"){
@@ -81,7 +81,7 @@ export default class ParametersScreen extends React.Component {
                         }
                     }}
                     value={colors.PRIMARY_COLOR}
-                    colors={['#C0392B', '#419e39', '#9B59B6', '#8E44AD', '#2980B9']}
+                    colors={['#C0392B', '#419e39', '#d18202', '#8E44AD', '#2980B9']}
                     title={"couleur principale"}
                     />
 
