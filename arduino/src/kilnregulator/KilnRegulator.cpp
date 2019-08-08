@@ -128,7 +128,7 @@ int KilnRegulator::start(const Program &program) {
 }
 
 int KilnRegulator::stop() {
-	if (state != KilnState::RUNNING) {
+	if (state != KilnState::RUNNING && state != KilnState::DELAYED) {
 		return ErrorCode::INVALID_STATE;
 	}
 	elementState = ElementState::STALE;

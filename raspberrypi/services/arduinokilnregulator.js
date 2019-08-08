@@ -27,6 +27,7 @@ class ArduinoKilnRegulator {
 
     this.errored = false;
     this.delay = 0;
+    this.timerProcess = 0;
 
     eh.on('error', function(msg, timestamp) {
       akr.errored = true;
@@ -142,6 +143,10 @@ class ArduinoKilnRegulator {
   }
 
   stop() {
+    if (this.timerProcess != 0){
+      clearTimeout(this.timerProcess);
+      this.timerProcess = 0;
+    }
     this.arduino.write(["stop"]);
     this.arduino.emitter.once('ack-stop', function(msg) {
       console.log('Stopped!');
@@ -151,7 +156,7 @@ class ArduinoKilnRegulator {
   start(program, d) {
     this.delay = d;//delay is in hour
     console.log("arduinoKilRegulator.js => cooking will start in "+this.delay+" hours, i.e., "+parseInt(this.delay*3600)+" seconds....");
-    setTimeout(function() { this.actualStart(program.segments, program) }.bind(this), Number(this.delay*3600000));
+    this.timerProcess = setTimeout(function() { this.actualStart(program.segments, program) }.bind(this), Number(this.delay*3600000));
     this.arduino.write(["delay", parseInt(this.delay*60)]);
         this.arduino.emitter.once('ack-delay', function(msg) {
           console.log('cooking have been delayed of '+parseInt(this.delay*60)+ 'minutes');
