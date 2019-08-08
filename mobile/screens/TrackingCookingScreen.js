@@ -53,20 +53,28 @@ class TrackingCookingScreen extends React.Component {
     render() {
         if(this.state.isDelayed){
             return (
-                <View style={styles.loading}>
-                     <NavigationEvents
-                        onWillFocus={() => this.onWillFocus()}
-                        onWillBlur={() => this.onWillBlur()}
-                    />
-                    <Image source={images.wait} style={{width: 150, height: 150}}/>
-                    <Text style = {styles.delay_text}>
-                    {"\n"}
-                   la cuisson est différée.{"\n"} 
-                   Elle commencera dans {"\n"}
-                   </Text>
-                   <Text style = {styles.delay_time}>
-                   {prettyPrintDuration(this.state.delayDate/60)}
+                <View style={styles.main_container}>
+                    <View style={styles.loading}>
+                        <NavigationEvents
+                            onWillFocus={() => this.onWillFocus()}
+                            onWillBlur={() => this.onWillBlur()}
+                        />
+                        <Image source={images.wait} style={{width: 150, height: 150}}/>
+                        <Text style = {styles.delay_text}>
+                        {"\n"}
+                    la cuisson est différée.{"\n"} 
+                    Elle commencera dans {"\n"}
                     </Text>
+                    <Text style = {styles.delay_time}>
+                    {prettyPrintDuration(this.state.delayDate/60)}
+                        </Text>
+                    </View>
+                    <View style={styles.button}>
+                        <Button
+                            title={this.state.isStopped ? "Retour aux programmes" : "Arrêt"}
+                            onPress={() => this.stopButton()}
+                            color={colors.PRIMARY_COLOR}/>
+                    </View>
                 </View>
             );     
         }
