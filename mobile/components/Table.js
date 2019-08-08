@@ -1,19 +1,38 @@
 import React from "react";
-import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert} from "react-native";
+import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert, Keyboard} from "react-native";
 import images from "../helpers/ImageLoader";
 import {SLOPE, DURATION, TARGET_TEMPERATURE, TEMP_ORIGIN} from "../helpers/Constants";
 import colors from "../styles/colors";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import {prettyPrintDuration} from "../helpers/UnitsHelper"
+
 
 export default class Table extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             data: this.props.segments,
-            dataEditableState:this.props.segmentsEditableStates != null ? this.props.segmentsEditableStates : [true, true, true]
+            dataEditableState:this.props.segmentsEditableStates != null ? this.props.segmentsEditableStates : [true, true, true],
+            isDateTimePickerVisible: Array(this.props.segments.length).fill(false)
         };
 
         this.dataHeaders = ["Segment", "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];
     }
+
+    showDateTimePicker = (e,index) => {
+        
+        var falseArray = Array(this.state.data.length).fill(false);
+        falseArray[index] = true;
+        console.log(index,"farray= ", falseArray, "val ", falseArray[index])
+        this.setState( {isDateTimePickerVisible:falseArray});
+      };
+     
+      hideDateTimePicker = () => {
+        var falseArray = Array(this.state.data.length).fill(false);
+        this.setState( {isDateTimePickerVisible:falseArray});
+      };
+     
+     
 
     renderHeader() {
         let res = [];
@@ -47,7 +66,7 @@ export default class Table extends React.Component {
                     <Text>{key+1}</Text>
                 </View>
                 {this.renderCell(TARGET_TEMPERATURE, 500, 4, key)}
-                {this.renderCell(DURATION, 6.5, 4, key)}
+                {this.renderDurationCell(DURATION, 6.5, 5, key)}
                 {this.renderCell(SLOPE, 100, 4, key)}
                 <View style={styles.suppr_cell}>
                     <TouchableOpacity onPress={() => this.removeSegment(key)}>
@@ -58,21 +77,52 @@ export default class Table extends React.Component {
         );
     }
 
-    renderCell(headerKey, placeholder, maxLength, key) {
+    renderCell(headerKey, placeholder, maxLength, index) {
         return (
-            <View style={this.state.dataEditableState[this.giveEditableStateIndex(key, headerKey)] ? styles.cell: styles.lockedCell}>
+            <View style={this.state.dataEditableState[this.giveEditableStateIndex(index, headerKey)] ? styles.cell: styles.lockedCell}>
                 <TextInput
                     placeholder={`${placeholder}`}
-                    onChangeText={(text) => {this.changeValueInData(key, headerKey, text)}}
-                    value={this.giveValue(this.state.data[key][headerKey])}
+                    onChangeText={(text) => {this.changeValueInData(index, headerKey, text)}}
+                    value={this.giveValue(this.state.data[index][headerKey])}
                     maxLength={maxLength}
                     keyboardType="numeric"
-                    editable = {this.state.dataEditableState[this.giveEditableStateIndex(key, headerKey)]}
+                    editable = {this.state.dataEditableState[this.giveEditableStateIndex(index, headerKey)]}
                     />
 
             </View>
         );
     }
+
+    renderDurationCell(headerKey, placeholder, maxLength, index) {
+        return (
+            <View style={this.state.dataEditableState[this.giveEditableStateIndex(index, headerKey)] ? styles.cell: styles.lockedCell}>
+                <TextInput
+                    placeholder={`${placeholder}`}
+                    onFocus={(e) => this.showDateTimePicker(e,index)}
+                    // onChangeText={(text) => {this.changeValueInData(key, headerKey, text)}}
+                    value={prettyPrintDuration(this.state.data[index][headerKey])}
+                    maxLength={maxLength}
+                    keyboardType= "numeric"
+                    editable = {this.state.dataEditableState[this.giveEditableStateIndex(index, headerKey)]}
+                    />
+            <DateTimePicker
+                isVisible={this.state.isDateTimePickerVisible[index]}
+                onConfirm={ (date) =>{ 
+                    // console.log("A date has been picked: ", (date.getMinutes()/60), " key", key, "hk", headerKey);
+                    this.changeValueInData(index, headerKey, parseFloat((date.getHours() + (date.getMinutes()/60))))
+                    Keyboard.dismiss();
+                    this.hideDateTimePicker();
+                    }
+                }
+                // date= {new Date("2019-08-7T06:00:00.000Z")}
+                onCancel={this.hideDateTimePicker}
+                mode = 'time'
+            />
+            </View>
+        );
+    }
+
+   
 
     render() {
         return (
@@ -122,7 +172,7 @@ export default class Table extends React.Component {
             targetTemp =  array[rowId][TARGET_TEMPERATURE]
             //target temp is computed
             if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (duration != null)){
-                array[rowId][TARGET_TEMPERATURE] = ''+((value * duration)+ this.getTargetTempOfRow(rowId-1))
+                array[rowId][TARGET_TEMPERATURE] = ''+parseInt((value * duration)+ this.getTargetTempOfRow(rowId-1))
                 editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)] = false
             }
             else
@@ -149,7 +199,7 @@ export default class Table extends React.Component {
             targetTemp =  array[rowId][TARGET_TEMPERATURE]
             //target temp is computed
             if ((targetTemp == null || !editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)]) && (slope != null)){
-                array[rowId][TARGET_TEMPERATURE] = ''+((value * slope) + this.getTargetTempOfRow(rowId-1))
+                array[rowId][TARGET_TEMPERATURE] = ''+parseInt((value * slope) + this.getTargetTempOfRow(rowId-1))
                 editArray[this.giveEditableStateIndex(rowId,TARGET_TEMPERATURE)] = false
             }
             else

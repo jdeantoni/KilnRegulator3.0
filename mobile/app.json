@@ -6,7 +6,7 @@
     "description": "The objective is to provide a cheap and up to date kiln regulator based on a micro controller and a smart phone app.",
     "slug": "KilnRegulator",
     "privacy": "public",
-    "sdkVersion": "31.0.0",
+    "sdkVersion": "34.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",

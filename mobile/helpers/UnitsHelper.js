@@ -1,5 +1,20 @@
 import {DURATION, ID, SLOPE, TARGET_TEMPERATURE} from "./Constants";
 
+/**
+ * print a format H:MM from a float in hour
+ * @param {*} fhour: a float representation of a duration in hour
+ */
+export function prettyPrintDuration(fhour){
+    if (fhour === undefined){ fhour = 0.0}
+    var ihour = Math.trunc(fhour)
+    var iminutes = Math.fround((fhour-ihour)*60)
+    if (iminutes < 10){
+         return ihour+'h0'+iminutes
+    }else{
+         return ihour+'h'+iminutes
+    }
+}
+
 export function unitToUser(segments) {
     if (segments == null) return null;
 

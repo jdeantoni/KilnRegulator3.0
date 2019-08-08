@@ -13,6 +13,8 @@ import TrackingImageItem from "../components/TrackingImageItem";
 import images from "../helpers/ImageLoader";
 import TrackingTextItem from "../components/TrackingTextItem";
 import colors from "../styles/colors";
+import {prettyPrintDuration} from "../helpers/UnitsHelper"
+
 
 class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -42,11 +44,33 @@ class TrackingCookingScreen extends React.Component {
             realData: [],
             theoreticData: null,
             elementState: STALE,
-            isStopped: false
+            isStopped: false,
+            delayDate:this.props.startDate,
+            isDelayed: false
         };
     }
 
     render() {
+        if(this.state.isDelayed){
+            return (
+                <View style={styles.loading}>
+                     <NavigationEvents
+                        onWillFocus={() => this.onWillFocus()}
+                        onWillBlur={() => this.onWillBlur()}
+                    />
+                    <Image source={images.wait} style={{width: 150, height: 150}}/>
+                    <Text style = {styles.delay_text}>
+                    {"\n"}
+                   la cuisson est différée.{"\n"} 
+                   Elle commencera dans {"\n"}
+                   </Text>
+                   <Text style = {styles.delay_time}>
+                   {prettyPrintDuration(this.state.delayDate/60)}
+                    </Text>
+                </View>
+            );     
+        }
+
         if (!this.currentProgram) {
             return (
                 <View style={styles.loading}>
@@ -59,6 +83,7 @@ class TrackingCookingScreen extends React.Component {
             );
         }
         const {currentTemperature, remainingTime, elapsedTime, expectedTemperature, expectedTimeRemaining} = this.infoToDisplay();
+
 
         return (
             <View style={styles.main_container}>
@@ -112,6 +137,22 @@ class TrackingCookingScreen extends React.Component {
     onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 
+        this.statusApi.getStatus()
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            else throw new Error("HTTP response status not code 200 as expected.");
+        }).then((response) => {
+            console.log("TrackingCookingScreen.js ==> response is "+JSON.stringify(response))
+            if (response.state === "delayed"){
+                this.setState({isDelayed: true, delayDate: response.delay});
+
+            }else{
+                this.setState({isDelayed: false});
+            }
+        })
+
         if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty("program")) {
             this.getCurrentCookingFromProps();
         } else if (this.currentProgram !== null) {
@@ -151,7 +192,11 @@ class TrackingCookingScreen extends React.Component {
                 } else {
                     this.setState({ temperature: response.sample.temperature });
                 }
-
+                if (response.state === "delayed"){
+                    this.setState({isDelayed: true, delayDate: response.delay});
+                }else{
+                    this.setState({isDelayed: false});
+                }
             })
             .catch((error) => {
                 console.log(error);
@@ -165,21 +210,23 @@ class TrackingCookingScreen extends React.Component {
                 if (response.ok) {
                     return response.json();
                 }
-                else throw new Error("HTTP response status not code 200 as expected.");
+                else throw new Error("HTTP response status not code 200 as expected. cooking not started yet");
             })
             .then((response) => {
-                this.startDate = new Date(response.startDate);
-                this.currentProgram = this.findProgram(response.programId);
-                this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
+                if (!this.state.isDelayed){
+                    this.startDate = new Date(response.startDate);
+                    this.currentProgram = this.findProgram(response.programId);
+                    this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
 
-                this.setState({
-                    theoreticData: segmentsToChart(this.currentProgram.segments),
-                    realData: response.samples
-                });
+                    this.setState({
+                        theoreticData: segmentsToChart(this.currentProgram.segments),
+                        realData: response.samples
+                    });
+                }
             })
             .catch((error) => {
                 console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
+                // Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 
@@ -373,6 +420,15 @@ const styles = StyleSheet.create({
     terminated_text: {
         textAlign: 'center',
         fontSize: 28
+    },
+    delay_time: {
+        color: "red",
+        textAlign: 'center',
+        fontSize: 32
+    },
+    delay_text: {
+        textAlign: 'center',
+        fontSize: 20
     },
     terminated_container: {
         flex: 1,

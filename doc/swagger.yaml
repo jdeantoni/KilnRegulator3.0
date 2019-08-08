@@ -407,7 +407,7 @@ definitions:
         format: "float"
       duration:
         type: "number"
-        description: "duration in seconds"
+        description: "duration in hours"
         format: "float"
   Program:
     type: "object"
