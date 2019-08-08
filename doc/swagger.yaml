@@ -351,6 +351,9 @@ definitions:
   Status:
     type: "object"
     properties:
+      delay:
+        type: "integer"
+        format: "int32"
       errored:
         type: "boolean"
       state:
@@ -404,7 +407,7 @@ definitions:
         format: "float"
       duration:
         type: "number"
-        description: "duration in seconds"
+        description: "duration in hours"
         format: "float"
   Program:
     type: "object"
