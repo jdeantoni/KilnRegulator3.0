@@ -42,9 +42,21 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
         tft.println(" READY ");
         tft.setTextSize(4);
     }else if (kr.getState() == KilnState::DELAYED){
-        tft.println("\n");
-        tft.setTextColor(ST77XX_BLUE);
-        tft.println(" DELAYED ");
+        tft.setTextSize(2);
+	tft.setTextColor(ST77XX_RED);
+        tft.println(" DELAYED \n");
+	tft.setTextColor(ST77XX_BLACK);
+	tft.setTextSize(1);
+	tft.println("start cooking in\n");
+	tft.print("  ");
+	tft.setTextSize(2);
+	unsigned int secondesBeforeCooking = ((kr.getWakeupDate() - now()));
+	unsigned int minutesBeforeCooking = (unsigned int)(secondesBeforeCooking/60);
+	minutesBeforeCooking++;
+	tft.setTextColor(ST77XX_RED);
+	tft.print(minutesBeforeCooking);
+	tft.setTextColor(ST77XX_BLACK);
+	tft.println(" min");
         tft.setTextSize(4);
     }else{
         tft.setTextSize(1);

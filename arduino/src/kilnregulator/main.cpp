@@ -19,6 +19,9 @@
 #include "WatchDog.h"
 #include "LCDMonitor.h"
 
+void sendState(Stream &stream, KilnRegulator &kilnRegulator);
+
+
 #define MAX_KEY_LENGTH 31
 
 ////   Adafruit_MAX31856 maxDAC(MAXcs, MAXdi, MAXdo, MAXclk);
@@ -219,8 +222,18 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	}
 	else if (!strncmp(key, "delay", keyLength+1)) {
 		kilnRegulator.setState(KilnState::DELAYED);
+		int delay = -1; //in s
+		errCode = msgpack::readInt(stream, delay);
+		if (errCode) { // not error code but success
+			errCode = kilnRegulator.setWakeupDate(delay);
+		} else {
+			errCode = ErrorCode::BAD_REQUEST;
+			goto readerror;
+		}
 	}
 	sendAck(stream, msgId, key, errCode);
+	kilnRegulator.updateState(); //update state as quick as possible for user expererience
+	sendState(streamCRC, kilnRegulator);
 	return true;
 readerror:
 	while (Serial.available()) Serial.read(); //clear input buffer
@@ -229,7 +242,7 @@ readerror:
 }
 
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
-	size_t mapSize = 8;
+	size_t mapSize = 9;
 
 	uint32_t timestamp = now(); // get it first because it may send a time syncronisation request
 
@@ -263,6 +276,16 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::writeString5(stream, "ts", 2); //"timestamp"
 	msgpack::writeIntU32(stream, timestamp);
+	
+	msgpack::writeString5(stream, "d", 1); //"delay"
+	if (state == KilnState::DELAYED){
+		unsigned int secondesBeforeCooking = ((kilnRegulator.getWakeupDate() - now()));
+		unsigned int minutesBeforeCooking = (unsigned int)(secondesBeforeCooking/60);
+		msgpack::writeIntU32(stream, minutesBeforeCooking);
+	}else{
+		msgpack::writeIntU32(stream, 0);
+	}
+		
 }
 
 
@@ -288,7 +311,8 @@ void setup() {
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
-
+	kilnRegulator.updateState();
+	sendState(streamCRC, kilnRegulator);
 	samplingTimer.start(millis());
 }
 

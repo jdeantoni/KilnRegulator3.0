@@ -18,7 +18,7 @@ double KilnRegulator::computeSetPoint() {
 	if (program == nullptr) {
 		return -1;
 	}
-	double setPoint = 0;
+	double setPoint = 20; //default temp
 	if (currentSegmentStartDate + program->segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
 		 currentSegment++;
 		 currentSegmentStartDate = now();
@@ -168,4 +168,13 @@ int KilnRegulator::setSetpoint(double setpoint) {
 	if (setpoint < 0 || setpoint > 2048) return ErrorCode::TEMP_OUT_OF_BOUNDS;
 	this->setpoint = setpoint;
 	return 0;
+}
+
+int KilnRegulator::setWakeupDate(int delay){
+	wakeupDate = now() + (60*delay);
+	return 0;
+}
+
+int KilnRegulator::getWakeupDate(){
+	return wakeupDate;
 }
