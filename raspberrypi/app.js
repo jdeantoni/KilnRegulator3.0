@@ -38,5 +38,5 @@ swaggerRoutes(app, {
 })
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+app.disable('etag');
 module.exports = app;
