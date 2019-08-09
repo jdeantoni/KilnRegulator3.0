@@ -14,6 +14,21 @@ void KilnRegulator::init() {
 	//pid.SetOutputLimits(0, windowSize);
 }
 
+//internal helper
+void KilnRegulator::updateCurrentSegmentKind(){
+//check is a "full heat" segment, i.e., duration and slope ==0
+	 if (currentSegment == -1){
+		 return;
+	 }
+	 
+	 if(program->segments[currentSegment].isFull){
+		 currentSegmentKind = SegmentKind::FULL;
+	 }else{
+		 currentSegmentKind = SegmentKind::NORMAL;
+	 }
+ }
+
+
 double KilnRegulator::computeSetPoint() {
 	if (program == nullptr) {
 		return -1;
@@ -61,19 +76,45 @@ void KilnRegulator::regulate() {
 	}
 	if (windowSize * output / 255  > now - windowStartTime) { // heat
 		elementState = ElementState::HEATING;
-		digitalWrite(outputPin, HIGH); //heating elment on
+		digitalWrite(outputPin, HIGH); //heating element on
 		digitalWrite(2, HIGH); //led on
 	} else { // let cool down
 		elementState = ElementState::STALE;
-		digitalWrite(outputPin, LOW); //heating element on
+		digitalWrite(outputPin, LOW); //heating element off
 		digitalWrite(2, LOW); //led off
 	}
 }
 
+void KilnRegulator::heatUntilCommandReach(){
+	setSetpoint(program->segments[currentSegment].temperature);
+	if( this->temperature >= program->segments[currentSegment].temperature){
+		//stop heating
+		digitalWrite(outputPin, LOW); //heating element off
+		digitalWrite(2, LOW); //led off
+		//move next segment
+		currentSegment++;
+		currentSegmentStartDate = now();
+		if (currentSegment >= program->count) { // finished
+			stop();
+		}
+		return;
+	}else{
+		elementState = ElementState::HEATING;
+		digitalWrite(outputPin, HIGH); //heating element on
+		digitalWrite(2, HIGH); //led on
+	}
+}
+
 void KilnRegulator::updateState() {
-	temperature = thermocouple.readThermocoupleTemperature();
-	if (/*setpoint > -1 && */state == KilnState::RUNNING)
-		regulate();
+	this->temperature = thermocouple.readThermocoupleTemperature();
+	updateCurrentSegmentKind();
+	if (state == KilnState::RUNNING){
+		if (currentSegmentKind == SegmentKind::NORMAL){
+			regulate();
+		}else{
+			heatUntilCommandReach();
+		}
+	}
 }
 
 double KilnRegulator::getTemperature() const {
@@ -177,4 +218,8 @@ int KilnRegulator::setWakeupDate(int delay){
 
 int KilnRegulator::getWakeupDate(){
 	return wakeupDate;
+}
+
+SegmentKind KilnRegulator::getSegmentKind(){
+	return currentSegmentKind;
 }

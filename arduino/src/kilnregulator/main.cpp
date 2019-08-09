@@ -33,7 +33,7 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{100000}; // 10000ms sampling rate, more or less…
+Timer samplingTimer{10000}; // 10000ms sampling rate, more or less…
 
 WatchDog watchdog;
 
@@ -117,7 +117,6 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	 * CRC computation
 	 */
 	stream.resetCRC();
-
 	strcpy(key, "request");
 
 	errCode = msgpack::readArraySize(stream, arraySize);
@@ -150,6 +149,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		double temperature = -1;
 		double slope = -1;
 		unsigned long duration = 0;
+		bool isFull = false;
 		errCode = msgpack::readArraySize(stream, arraySize);
 		//assert arraySize == 3
 
@@ -157,13 +157,15 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		errCode = forceReadDouble(stream, temperature);
 		errCode = forceReadDouble(stream, slope);
 		errCode = msgpack::readInt(stream, duration);
+		errCode = msgpack::readBool(stream, isFull);
 
 		//assert id >= 0 && id < MAX_SEGMENT_COUNT
 
 		program.segments[id] = {
 			.temperature = temperature,
 			.slope = slope,
-			.duration = duration
+			.duration = duration,
+			.isFull = isFull
 		};
 		program.count++;
 	}
@@ -202,7 +204,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
 		}
-	} else if (!strncmp(key, "setpoint", keyLength+1)) {
+	} else if (!strncmp(key, "setpoint", keyLength+1)) { //is it really used ? f so, why ?
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
@@ -296,7 +298,7 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
 
 	delay(500); // wait for MAX chip to stabilize
 

@@ -178,7 +178,8 @@ class ArduinoKilnRegulator {
         parseInt(i),
         segment.targetTemperature,
         segment.slope,
-        segment.duration
+        segment.duration,
+        segment.isFull
       ]]);
     }
 

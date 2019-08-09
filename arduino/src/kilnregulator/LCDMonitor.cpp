@@ -68,27 +68,35 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
         tft.setTextSize(1);
 
         tft.println("");
-        tft.println("Temps ecoule:");
-        tft.setTextSize(2);
-        snprintf(strbuf, 11, "%7dh%d", hours, minutes);
-        tft.println(strbuf);
-        tft.setTextSize(1);
-
-        tft.println("");
-        tft.setTextSize(2);
-        switch (elementState) {
-            case ElementState::HEATING:
-                tft.setTextColor(ST77XX_RED);
-                tft.println("  Heating");
-                break;
-            case ElementState::STALE:
-                tft.setTextColor(ST77XX_BLACK);
-                tft.println("   Stale");
-                break;
-            case ElementState::COOLING:
-                tft.setTextColor(ST77XX_BLUE);
-                tft.println("  Cooling");
-                break;
-        }
+        if(kr.getState() == KilnState::STOPPED){
+		tft.setTextColor(ST77XX_GREEN);
+		tft.println("Cuisson finie :)");
+	}else{
+		tft.println("Temps ecoule:");
+		tft.setTextSize(2);
+		snprintf(strbuf, 11, "%7dh%d", hours, minutes);
+		tft.println(strbuf);
+		tft.setTextSize(1);
+		tft.println("");
+		tft.setTextSize(2);
+		switch (elementState) {
+		    case ElementState::HEATING:
+			tft.setTextColor(ST77XX_RED);
+			tft.println("  chauffe");
+			if(kr.getSegmentKind() == SegmentKind::FULL){
+				tft.setTextSize(1);
+				tft.println("  a fond :)");
+			}
+			break;
+		    case ElementState::STALE:
+			tft.setTextColor(ST77XX_BLACK);
+			tft.println("  repos");
+			break;
+		    case ElementState::COOLING:
+			tft.setTextColor(ST77XX_BLUE);
+			tft.println("  refroidit");
+			break;
+		}
+	}
     }
 }
