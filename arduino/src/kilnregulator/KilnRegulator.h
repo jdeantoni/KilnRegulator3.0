@@ -7,6 +7,7 @@
 #include "Program.h"
 #include "ElementState.h"
 #include "KilnState.h"
+#include "SegmentKind.h"
 #include "ErrorCode.h"
 
 class KilnRegulator {
@@ -20,6 +21,7 @@ public:
 	void setState(uint8_t);
 	uint8_t getElementState() const;
 	int8_t getCurrentSegment() const;
+	SegmentKind getSegmentKind();
 	unsigned long getStartDate() const;
 
 	int start(const Program &program);
@@ -35,6 +37,8 @@ private:
 	uint8_t state = KilnState::READY;
 	uint8_t elementState = ElementState::STALE;
 	int8_t currentSegment = -1;
+	SegmentKind currentSegmentKind = SegmentKind::NORMAL;
+	
 
 	unsigned long windowSize = 60000;
 	unsigned long windowStartTime = 0;
@@ -44,6 +48,8 @@ private:
 
 	void regulate();
 	double computeSetPoint();
+	void heatUntilCommandReach();
+	void updateCurrentSegmentKind();
 	unsigned long startDate = 0;
 	unsigned long currentSegmentStartDate = 0;
 	unsigned long endDate = 0;

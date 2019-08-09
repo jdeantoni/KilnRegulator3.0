@@ -5,6 +5,7 @@ struct Segment {
 	double temperature;
 	double slope;
 	unsigned long duration;
+	bool isFull;
 };
 
 #endif//_SEGMENT_H_

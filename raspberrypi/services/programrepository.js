@@ -24,6 +24,7 @@ class ProgramRepository {
     let segments = [];
     mProgram.segments.forEach(function(mSegment) {
       let segment = {};
+      segment.isFull = mSegment.isFull;
       if (mSegment.targetTemperature != null)
         segment.targetTemperature = mSegment.targetTemperature;
       if (mSegment.slope != null)
