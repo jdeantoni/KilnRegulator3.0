@@ -1,11 +1,11 @@
 import React from "react";
 import {View, Text, StyleSheet, Button, ScrollView, TouchableOpacity, Image, TextInput, Alert, Keyboard} from "react-native";
 import images from "../helpers/ImageLoader";
-import {SLOPE, DURATION, TARGET_TEMPERATURE, TEMP_ORIGIN} from "../helpers/Constants";
+import {SLOPE, DURATION, TARGET_TEMPERATURE, TEMP_ORIGIN, IS_FULL} from "../helpers/Constants";
 import colors from "../styles/colors";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {prettyPrintDuration} from "../helpers/UnitsHelper"
-
+import CheckBox from 'react-native-check-box'
 
 export default class Table extends React.Component {
     constructor(props) {
@@ -16,7 +16,7 @@ export default class Table extends React.Component {
             isDateTimePickerVisible: Array(this.props.segments.length).fill(false)
         };
 
-        this.dataHeaders = ["Segment", "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];
+        this.dataHeaders = ["#", 'max ?', "T° cible (°C)", "Durée (h)", "Pente (°C/h)"];
     }
 
     showDateTimePicker = (e,index) => {
@@ -60,11 +60,23 @@ export default class Table extends React.Component {
     }
 
     renderRow(row, key) {
+        if (this.state.data[key][IS_FULL] === undefined){
+            this.state.data[key][IS_FULL]= false;
+        }
         return (
             <View key={key} style={styles.row}>
                 <View style={styles.cell}>
                     <Text>{key+1}</Text>
                 </View>
+                <CheckBox
+                    style={{flex: 1, padding: 10}}
+                    onClick={() => {
+                        this.changeValueInData(key, IS_FULL, !this.state.data[key][IS_FULL]);
+                        console.log("press: ",this.state.data[key][IS_FULL]);
+                     }}
+                    isChecked={this.state.data[key][IS_FULL]}
+                    leftText={""}
+                />
                 {this.renderCell(TARGET_TEMPERATURE, 500, 4, key)}
                 {this.renderDurationCell(DURATION, 6.5, 5, key)}
                 {this.renderCell(SLOPE, 100, 4, key)}
@@ -150,22 +162,51 @@ export default class Table extends React.Component {
 
     removeSegment(index) {
         let array = [...this.state.data];
+        let editArray = [...this.state.dataEditableState]
         array.splice(index, 1);
-        this.setState({data: array});
+        editArray.splice(index*3, 3);
+        this.setState({data: array, dataEditableState:editArray});
         this.props.onChangeValue(array);
+        this.props.onChangeState(editArray);
     }
 
     changeValueInData(rowId, headerKey, value) {
-        if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
-        (value !== "-" && value !== "."  && value !== "" && (Number.isNaN(Number.parseFloat(value) && headerKey !== DURATION)))) { //
-            return false
-        }
-        if (headerKey !== SLOPE && value[0] === "-") {
-            value = Math.abs(value);
-        }
+        console.log("changeValueInData: ", headerKey, '  ', value);
+    //    if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
+    //     (value !== "-" && value !== "."  && value !== "" && (typeof value !== "boolean" && Number.isNaN(Number.parseFloat(value) && headerKey !== DURATION)))) { //
+    //         return false
+    //     }
+    //     if (headerKey !== SLOPE && value[0] === "-") {
+    //         value = Math.abs(value);
+    //     }
 
         let array = [...this.state.data];
         let editArray = [...this.state.dataEditableState];
+
+        console.log("header: ",headerKey, "  isfull? ",array[rowId][IS_FULL])
+
+        //full seg
+        if (headerKey === IS_FULL ||  value === true ){
+            console.log("full...")
+            if (array[rowId][TARGET_TEMPERATURE] === undefined){
+                return false;
+            }
+            array[rowId][SLOPE] = 250; 
+            array[rowId][DURATION] = ((array[rowId][TARGET_TEMPERATURE] - this.getTargetTempOfRow(rowId-1))/array[rowId][SLOPE])
+            console.log("duration : ", array[rowId][DURATION], ' ', this.getTargetTempOfRow(rowId-1), ' ', array[rowId][TARGET_TEMPERATURE])
+            editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false;
+            editArray[this.giveEditableStateIndex(rowId,DURATION)] = false;
+
+        }
+        //unfull
+        if (headerKey === IS_FULL &&  value === false ){
+            console.log("unfull...")
+            array[rowId][SLOPE] = undefined; 
+            array[rowId][DURATION] = undefined;
+            editArray[this.giveEditableStateIndex(rowId,SLOPE)] = true;
+            editArray[this.giveEditableStateIndex(rowId,DURATION)] = true;
+
+        }
 
         if (headerKey === SLOPE) { //editing slope
             duration =  array[rowId][DURATION]
@@ -205,7 +246,8 @@ export default class Table extends React.Component {
             else
             //slope is computed
             if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (targetTemp != null)){
-                array[rowId][SLOPE] = ''+((targetTemp - this.getTargetTempOfRow(rowId-1))/value)
+                var s = ''+((targetTemp - this.getTargetTempOfRow(rowId-1))/value);
+                array[rowId][SLOPE] = s
                 editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false
             }
         }
@@ -221,13 +263,19 @@ export default class Table extends React.Component {
             else
             //slope is computed
             if ((slope == null || !editArray[this.giveEditableStateIndex(rowId,SLOPE)]) && (duration != null)){
-                array[rowId][SLOPE] = ''+((value - this.getTargetTempOfRow(rowId-1))/duration)
+                var s = ''+((value - this.getTargetTempOfRow(rowId-1))/duration)
+                array[rowId][SLOPE] = s
                 editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false
             }
         }
 
-
+        // console.log("slope: ",array[rowId][SLOPE] )
+        // if (array[rowId][SLOPE] === "Infinity"){
+        //     array[rowId][SLOPE] = 0;
+        //     console.log("modified slope: ",array[rowId][SLOPE] )
+        // }
         array[rowId][headerKey] = value;
+        console.log("enf of changeValueInData: ", JSON.stringify(array[rowId]));
         this.setState({data: array});
         this.setState({dataEditableState: editArray})
         this.props.onChangeValue(array);

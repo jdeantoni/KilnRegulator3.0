@@ -409,6 +409,10 @@ definitions:
         type: "number"
         description: "duration in hours"
         format: "float"
+      isFull:
+        type: "boolean"
+        description: "indicate if the kiln must heat as quick as possible or follow a slope"
+        format: "boolean"
   Program:
     type: "object"
     properties:

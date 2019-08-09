@@ -6,7 +6,7 @@ import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
 import TrackingLineChart from "../components/TrackingLineChart";
 import connect from "react-redux/es/connect/connect";
-import segmentsToChart from "../helpers/ChartHelper";
+import {segmentsToChart,keepOnlyFullSegments} from "../helpers/ChartHelper";
 import {estimateTimeInSecondsForAllSegments, secondsToUser} from "../helpers/UnitsHelper";
 import {COOLING, HEATING, STALE, TEMP_ORIGIN, TIME_ORIGIN, UPDATE_PROGRAMS} from "../helpers/Constants";
 import TrackingImageItem from "../components/TrackingImageItem";
@@ -43,6 +43,7 @@ class TrackingCookingScreen extends React.Component {
             temperature: 0.0,
             realData: [],
             theoreticData: null,
+            theoreticDataFull : null,
             elementState: STALE,
             isStopped: false,
             delayDate:this.props.startDate,
@@ -102,6 +103,7 @@ class TrackingCookingScreen extends React.Component {
                 <View style={styles.chart_container}>
                     <TrackingLineChart
                         theoreticData={this.state.theoreticData}
+                        theoreticDataFull = {this.state.theoreticDataFull}
                         realData={this.state.realData}/>
                 </View>
                 <View style={styles.program_name_container}>
@@ -225,9 +227,11 @@ class TrackingCookingScreen extends React.Component {
                     this.startDate = new Date(response.startDate);
                     this.currentProgram = this.findProgram(response.programId);
                     this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
-
+                    var tData = segmentsToChart(this.currentProgram.segments)
+                    console.log("data in tracking 2", tData)
                     this.setState({
-                        theoreticData: segmentsToChart(this.currentProgram.segments),
+                        theoreticData: tData,
+                        theoreticDataFull: keepOnlyFullSegments(tData),
                         realData: response.samples
                     });
                 }
@@ -247,9 +251,11 @@ class TrackingCookingScreen extends React.Component {
             }
         }
         this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
-
+        var tData = segmentsToChart(this.currentProgram.segments)
+        console.log("data in tracking", tData)
         this.setState({
-            theoreticData: segmentsToChart(this.currentProgram.segments),
+            theoreticData: tData,
+            theoreticDataFull: keepOnlyFullSegments(tData),
             realData: (!Array.isArray(this.state.realData) || this.state.realData === []) ? [] : [...this.state.realData]
         });
     }
@@ -261,6 +267,7 @@ class TrackingCookingScreen extends React.Component {
                     if (response.ok) {
                         this.setState({
                             realData: [],
+                            theoreticData: null,
                             theoreticData: null,
                             elementState: STALE,
                             isStopped: false

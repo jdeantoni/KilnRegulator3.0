@@ -61,7 +61,7 @@ export default class TrackingLineChart extends React.Component {
                     <VictoryGroup>
                         <VictoryLine
                             style={{
-                                data: { stroke: colors.PRIMARY_COLOR },
+                                data: { stroke: colors.PRIMARY_DARK_COLOR },
                                 parent: { border: "1px solid #ccc"},
                             }}
                             data={this.props.theoreticData}
@@ -69,11 +69,40 @@ export default class TrackingLineChart extends React.Component {
                             y={"temperature"}
                         />
                         {this.displayRealData()}
+                        {this.renderFullSegments(this.props.theoreticDataFull)
+                        }
+                       <VictoryScatter
+                        style={{
+                            data: { stroke: (d) => d.isFull ? colors.PRIMARY_DARK_COLOR:colors.PRIMARY_LIGHT_COLOR, 
+                                    strokeWidth : (d) => d.isFull ? 4:0 },
+                            parent: { border: "1px solid #ccc"},
+                        }}
+                        data={this.props.theoreticData}
+                        x={"time"}
+                        y={"temperature"}
+                    />
                     </VictoryGroup>
                     {this.displayPoint()}
                 </VictoryChart>
             </View>
         );
+    }
+
+    renderFullSegments(dataFull){
+        if (dataFull.length > 0){
+            return (<VictoryLine
+                        style={{
+                            parent: { border: "1px solid #ccc"},
+                            data: {
+                                stroke: "#FF0000"
+                                }
+                        }}
+                        data={dataFull}
+                        x={"time"}
+                        y={"temperature"}
+                    />
+            );
+        }
     }
 
     handleCursorChange(value) {

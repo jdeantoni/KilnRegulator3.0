@@ -1,11 +1,12 @@
-import {DURATION, ID, SLOPE, TARGET_TEMPERATURE} from "./Constants";
+import {DURATION, ID, SLOPE, TARGET_TEMPERATURE, TEMP_ORIGIN} from "./Constants";
 
 /**
  * print a format H:MM from a float in hour
  * @param {*} fhour: a float representation of a duration in hour
  */
 export function prettyPrintDuration(fhour){
-    if (fhour === undefined){ fhour = 0.0}
+    console.log("prettyPrintDuration :", fhour)
+    if (fhour === undefined){ return ''}
     var ihour = Math.trunc(fhour)
     var iminutes = Math.fround((fhour-ihour)*60)
     if (iminutes < 10){
@@ -16,8 +17,8 @@ export function prettyPrintDuration(fhour){
 }
 
 export function unitToUser(segments) {
-    if (segments == null) return null;
-
+    if (segments === null) return null;
+    console.log("unitToUser() ... segments", JSON.stringify(segments))
     let newSegments = JSON.parse(JSON.stringify(segments));
 
     for (let i in segments) {
@@ -32,11 +33,14 @@ export function unitToUser(segments) {
     return newSegments;
 }
 
+/**
+ * used for serialization in seconds.. mainly in editProgram...
+ * @param  segments 
+ */
 export function unitToDev(segments) {
-    if (segments == null) return null;
-
+    if (segments === null) return null;
+    console.log("unitToDev() ... segments", JSON.stringify(segments))
     let newSegments = JSON.parse(JSON.stringify(segments));
-
     for (let i in newSegments) {
         if (segments[i].hasOwnProperty(DURATION)) {
             newSegments[i][DURATION] *= 3600;
