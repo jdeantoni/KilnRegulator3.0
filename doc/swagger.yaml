@@ -354,6 +354,9 @@ definitions:
       delay:
         type: "integer"
         format: "int32"
+      currentSegment:
+        type: "string"
+        description: "id (number) of the current segment"
       errored:
         type: "boolean"
       state:

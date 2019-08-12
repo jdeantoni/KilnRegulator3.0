@@ -4,6 +4,7 @@ const ArduinoMessagePack = require('./arduinomessagepack');
 const ElementState = require('../model/elementState')
 const KilnState = require('../model/kilnState')
 const cookingRepository = require('./cookingrepository');
+const programRepository = require('./programrepository');
 
 const eh = require('./errorhandler');
 
@@ -23,8 +24,9 @@ class ArduinoKilnRegulator {
       delay: 0
     };
 
+    this.currentProgram = undefined;
     this.cooking = {};
-
+    this.isInFullSeg = false;
     this.errored = false;
     this.delay = 0;
     this.timerProcess = 0;
@@ -106,10 +108,82 @@ class ArduinoKilnRegulator {
 
       // save new segment in database
       cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
+      
+      
+      console.log('////////////////////  ADJUST PROGRAM !!')
+      console.log('this.currentProgram:',this.currentProgram)
+      console.log('this.status.currentSegment', this.status.currentSegment)
+      if (this.status.currentSegment >= 0 && this.currentProgram.segments[this.status.currentSegment].isFull){
+          console.log('increase ?')
+          this.increaseSegmentAccordingToRealData(timestamp)
+      }else if (this.isInFullSeg){
+          console.log('shrink ?')
+          this.shrinkSegmentAccordingToRealData(timestamp)
+      }
+      console.log('                        ////////////////////  ')
     }
 
     this.status = status;
   }
+  
+    increaseSegmentAccordingToRealData(timestamp){
+      if (this.currentProgram === undefined){
+        console.log('increaseSegmentAccordingToRealData => program undefined...');
+        return
+      }
+        this.isInFullSeg = true;
+        var lastTimeStamp = timestamp
+        var theoreticEndTime = 0;         
+        for (let i = 0; i <= this.status.currentSegment; i++){
+          theoreticEndTime += this.currentProgram.segments[i].duration //in seconds
+        }
+        console.log("two times :)",lastTimeStamp," ",theoreticEndTime)
+        if (theoreticEndTime < lastTimeStamp){
+            const dif = lastTimeStamp - theoreticEndTime;
+            this.currentProgram.segments[this.status.currentSegment].duration = this.currentProgram.segments[this.status.currentSegment].duration + dif
+            console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
+            var previoustemp= 20;
+            if (this.status.currentSegment > 0){
+              previousTemp = this.currentProgram.segments[this.status.currentSegment -1].targetTemperature
+            }
+            this.currentProgram.segments[this.status.currentSegment].slope = (this.currentProgram.segments[this.status.currentSegment].targetTemperature - previousTemp)/this.currentProgram.segments[this.status.currentSegment].duration;
+            
+        }
+        console.log('...');
+    }
+
+    shrinkSegmentAccordingToRealData(timestamp){
+      if (this.currentProgram === undefined){
+        return
+      }
+        this.isInFullSeg = false;
+        var lastTimeStamp = timestamp
+        var theoreticEndTime = 0;
+        for (let i = 0; i <= this.status.currentSegment; i++){
+          theoreticEndTime += this.currentProgram.segments[i].duration //in hours
+        }
+        theoreticEndTime *= 3600; //in seconds
+        console.log("two times :-/",lastTimeStamp," ",theoreticEndTime)
+        if (theoreticEndTime > lastTimeStamp){
+            const dif = lastTimeStamp - theoreticEndTime;
+            this.currentProgram.segments[this.status.currentSegment].duration = this.currentProgram.segments[this.status.currentSegment].duration - dif
+            console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
+
+           programRepository.remove(this.currentProgram.uuid,
+            () => {
+                console.log("progam "+this.currentProgram.name+" removed");
+              }
+            );
+            programRepository.add(this.currentProgram,
+            () => {
+                console.log("progam "+this.currentProgram.name+" added");
+              }
+            );
+        }
+        
+    }
+  
+  
 
   findStateName(state) {
     return KilnState[state];
@@ -156,15 +230,20 @@ class ArduinoKilnRegulator {
   start(program, d) {
     this.delay = d;//delay is in hour
     console.log("arduinoKilRegulator.js => cooking will start in "+this.delay+" hours, i.e., "+parseInt(this.delay*3600)+" seconds....");
-    this.timerProcess = setTimeout(function() { this.actualStart(program.segments, program) }.bind(this), Number(this.delay*3600000));
-    this.arduino.write(["delay", parseInt(this.delay*60)]);
-        this.arduino.emitter.once('ack-delay', function(msg) {
-          console.log('cooking have been delayed of '+parseInt(this.delay*60)+ 'minutes');
-        });
+    if (d > 0){
+      this.arduino.write(["delay", parseInt(this.delay*60)]);
+      this.arduino.emitter.once('ack-delay', function(msg) {
+            console.log('cooking have been delayed');
+          });
+      this.timerProcess = setTimeout(function() { this.actualStart(program.segments, program) }.bind(this), Number((this.delay*3600000)+1500));
+    }else{
+      this.actualStart(program.segments, program)
+    }
   }
 
   actualStart(segments, program){
     console.log("actual cooking started");
+    this.currentProgram = program;
     const akn = this;
     const arduino = this.arduino;
     for (const i in segments) {
@@ -196,6 +275,7 @@ class ArduinoKilnRegulator {
   }
 
   reset() {
+    this.currentProgram = undefined;
     const akn = this;
     this.arduino.write(["reset"]);
     this.arduino.emitter.once('ack-reset', function(msg) {
