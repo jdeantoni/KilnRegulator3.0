@@ -5,7 +5,7 @@ import {DURATION, ID, SLOPE, TARGET_TEMPERATURE, TEMP_ORIGIN} from "./Constants"
  * @param {*} fhour: a float representation of a duration in hour
  */
 export function prettyPrintDuration(fhour){
-    console.log("prettyPrintDuration :", fhour)
+    // console.log("prettyPrintDuration :", fhour)
     if (fhour === undefined){ return ''}
     var ihour = Math.trunc(fhour)
     var iminutes = Math.fround((fhour-ihour)*60)

@@ -25,7 +25,7 @@ export default class App extends React.Component {
               }
               const value4 = await AsyncStorage.getItem('@colors.SECONDARY_LIGHT_COLOR');
               if (value4 !== null) {
-                colors.PRIMARY_LIGHT_COLOR = value4;
+                colors.SECONDARY_LIGHT_COLOR_LIGHT_COLOR = value4;
               }
             } catch (error) {
               // Error retrieving data

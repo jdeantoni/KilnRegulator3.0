@@ -110,7 +110,10 @@ export default class Table extends React.Component {
             <View style={this.state.dataEditableState[this.giveEditableStateIndex(index, headerKey)] ? styles.cell: styles.lockedCell}>
                 <TextInput
                     placeholder={`${placeholder}`}
-                    onFocus={(e) => this.showDateTimePicker(e,index)}
+                    onFocus={(e) => {this.showDateTimePicker(e,index);                     
+                                     Keyboard.dismiss();
+                                    }
+                    }
                     // onChangeText={(text) => {this.changeValueInData(key, headerKey, text)}}
                     value={prettyPrintDuration(this.state.data[index][headerKey])}
                     maxLength={maxLength}
@@ -121,8 +124,8 @@ export default class Table extends React.Component {
                 isVisible={this.state.isDateTimePickerVisible[index]}
                 onConfirm={ (date) =>{ 
                     // console.log("A date has been picked: ", (date.getMinutes()/60), " key", key, "hk", headerKey);
+
                     this.changeValueInData(index, headerKey, parseFloat((date.getHours() + (date.getMinutes()/60))))
-                    Keyboard.dismiss();
                     this.hideDateTimePicker();
                     }
                 }
@@ -171,23 +174,26 @@ export default class Table extends React.Component {
     }
 
     changeValueInData(rowId, headerKey, value) {
-        console.log("changeValueInData: ", headerKey, '  ', value);
-    //    if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
-    //     (value !== "-" && value !== "."  && value !== "" && (typeof value !== "boolean" && Number.isNaN(Number.parseFloat(value) && headerKey !== DURATION)))) { //
-    //         return false
-    //     }
-    //     if (headerKey !== SLOPE && value[0] === "-") {
-    //         value = Math.abs(value);
-    //     }
+        if (headerKey !== IS_FULL && value === undefined){
+            value = 1
+        }
+        // console.log("changeValueInData: ", headerKey, '  ', value);
+       if (((value === "-" || value === ".") && headerKey !== SLOPE) ||
+        (value !== "-" && value !== "."  && value !== "" && (typeof value !== "boolean" && Number.isNaN(Number.parseFloat(value) && headerKey !== DURATION)))) { //
+            return false
+        }
+        if (headerKey !== SLOPE && value[0] === "-") {
+            value = Math.abs(value);
+        }
 
         let array = [...this.state.data];
         let editArray = [...this.state.dataEditableState];
 
-        console.log("header: ",headerKey, "  isfull? ",array[rowId][IS_FULL])
+        // console.log("header: ",headerKey, "  isfull? ",array[rowId][IS_FULL])
 
         //full seg
         if (headerKey === IS_FULL ||  value === true ){
-            console.log("full...")
+            // console.log("full...")
             if (array[rowId][TARGET_TEMPERATURE] === undefined){
                 return false;
             }
