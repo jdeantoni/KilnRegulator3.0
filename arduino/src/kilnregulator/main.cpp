@@ -151,7 +151,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		unsigned long duration = 0;
 		bool isFull = false;
 		errCode = msgpack::readArraySize(stream, arraySize);
-		//assert arraySize == 3
+		//assert arraySize == 4
 
 		errCode = msgpack::readInt(stream, id);
 		errCode = forceReadDouble(stream, temperature);

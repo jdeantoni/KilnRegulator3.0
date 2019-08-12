@@ -15,6 +15,7 @@ exports.handler = function getStatus(req, res, next) {
 
   res.send({
     delay: arduino.status.delay, //warning still in minutes here
+    currentSegment : arduino.status.currentSegment,
     errored: arduino.errored,
     state: arduino.status.state,
     elementState: arduino.status.elementState,

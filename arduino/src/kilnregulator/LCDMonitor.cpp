@@ -59,19 +59,22 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
 	tft.println(" min");
         tft.setTextSize(4);
     }else{
-        tft.setTextSize(1);
-        tft.println("");
-        tft.println("Temperature cible:");
-        tft.setTextSize(2);
-        snprintf(strbuf, 11, "%8d C", setpoint);
-        tft.println(strbuf);
-        tft.setTextSize(1);
 
-        tft.println("");
         if(kr.getState() == KilnState::STOPPED){
-		tft.setTextColor(ST77XX_GREEN);
-		tft.println("Cuisson finie :)");
+		tft.setTextSize(2);
+		tft.setTextColor(ST77XX_BLUE);
+		tft.println(" ");
+		tft.println(" cuisson");
+		tft.println(" terminee");
 	}else{
+		tft.setTextSize(1);
+		tft.println("");
+		tft.println("Temperature cible:");
+		tft.setTextSize(2);
+		snprintf(strbuf, 11, "%8d C", setpoint);
+		tft.println(strbuf);
+		tft.setTextSize(1);
+		tft.println("");
 		tft.println("Temps ecoule:");
 		tft.setTextSize(2);
 		snprintf(strbuf, 11, "%7dh%d", hours, minutes);

@@ -70,7 +70,8 @@ class ArduinoMessagePack extends Arduino {
            * Acknowledgment received, check CRC
            */
           if (!arduino.msgBacklog.hasOwnProperty(msg.id)) {
-            c(null, 'Arduino: Message id not found in backlog'+msg);
+          //TODO: check why the hell I receive this
+          //  c(null, 'Arduino: Message id not found in backlog'+msg);
             return;
           }
           const origMsg = arduino.msgBacklog[msg.id];
@@ -80,7 +81,7 @@ class ArduinoMessagePack extends Arduino {
           const expectedCrc = origMsg.crc;
           const actualCrc = msg.crc;
           if (expectedCrc != actualCrc) {
-            c(null, 'Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, origMsg.msg);
+            c(null, JSON.stringify(origMsg)+'--- Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, origMsg.msg);
             arduino.deleteFromBacklog(msg.id);
             return;
           }
