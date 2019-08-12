@@ -27,6 +27,7 @@ class ArduinoKilnRegulator {
     this.currentProgram = undefined;
     this.cooking = {};
     this.isInFullSeg = false;
+    this.hasBeenExtended = false;
     this.errored = false;
     this.delay = 0;
     this.timerProcess = 0;
@@ -109,21 +110,38 @@ class ArduinoKilnRegulator {
       // save new segment in database
       cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
       
-      
-      console.log('////////////////////  ADJUST PROGRAM !!')
-      console.log('this.currentProgram:',this.currentProgram)
-      console.log('this.status.currentSegment', this.status.currentSegment)
-      if (this.status.currentSegment >= 0 && this.currentProgram.segments[this.status.currentSegment].isFull){
-          console.log('increase ?')
-          this.increaseSegmentAccordingToRealData(timestamp)
-      }else if (this.isInFullSeg){
-          console.log('shrink ?')
-          this.shrinkSegmentAccordingToRealData(timestamp)
+      this.status = status;
+     
+      if (status.state != "stopped"){
+      //  console.log('////////////////////  ADJUST PROGRAM !!')
+       // console.log('this.currentProgram:',this.currentProgram)
+       // console.log('this.status.currentSegment', this.status.currentSegment)
+        if (this.status.currentSegment >= 0 && this.currentProgram.segments[this.status.currentSegment].isFull){
+       //     console.log('increase ?')
+            this.increaseSegmentAccordingToRealData(timestamp)
+        }else if (this.isInFullSeg){ //Actually was in full seg :)
+            this.isInFullSeg = false;
+            if (this.hasBeenExtended){
+              this.hasBeenExtended = false;
+              //save previous changes
+              programRepository.remove(this.currentProgram.uuid,
+              () => {
+                  console.log("progam "+this.currentProgram.name+" removed");
+                }
+              );
+              programRepository.add(this.currentProgram,
+              () => {
+                  console.log("progam "+this.currentProgram.name+" added");
+                }
+              );
+            }else{
+      //       console.log('shrink ?')
+             this.shrinkSegmentAccordingToRealData(timestamp)
+           }
+        }
+      //  console.log('                        ////////////////////  ')
       }
-      console.log('                        ////////////////////  ')
     }
-
-    this.status = status;
   }
   
     increaseSegmentAccordingToRealData(timestamp){
@@ -132,24 +150,24 @@ class ArduinoKilnRegulator {
         return
       }
         this.isInFullSeg = true;
-        var lastTimeStamp = timestamp
+        var lastTimeStamp = timestamp;
         var theoreticEndTime = 0;         
         for (let i = 0; i <= this.status.currentSegment; i++){
           theoreticEndTime += this.currentProgram.segments[i].duration //in seconds
         }
-        console.log("two times :)",lastTimeStamp," ",theoreticEndTime)
+        //console.log("two times :)",lastTimeStamp," ",theoreticEndTime)
         if (theoreticEndTime < lastTimeStamp){
             const dif = lastTimeStamp - theoreticEndTime;
             this.currentProgram.segments[this.status.currentSegment].duration = this.currentProgram.segments[this.status.currentSegment].duration + dif
-            console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
-            var previoustemp= 20;
+          //  console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
+            var previousTemp= 20;
             if (this.status.currentSegment > 0){
               previousTemp = this.currentProgram.segments[this.status.currentSegment -1].targetTemperature
             }
             this.currentProgram.segments[this.status.currentSegment].slope = (this.currentProgram.segments[this.status.currentSegment].targetTemperature - previousTemp)/this.currentProgram.segments[this.status.currentSegment].duration;
-            
+            this.hasBeenExtended = true;
         }
-        console.log('...');
+      //  console.log('...');
     }
 
     shrinkSegmentAccordingToRealData(timestamp){
@@ -159,16 +177,22 @@ class ArduinoKilnRegulator {
         this.isInFullSeg = false;
         var lastTimeStamp = timestamp
         var theoreticEndTime = 0;
-        for (let i = 0; i <= this.status.currentSegment; i++){
-          theoreticEndTime += this.currentProgram.segments[i].duration //in hours
+        for (let i = 0; i < this.status.currentSegment; i++){ //strict less since we moved to next segment
+          theoreticEndTime += this.currentProgram.segments[i].duration //in seconds
         }
-        theoreticEndTime *= 3600; //in seconds
-        console.log("two times :-/",lastTimeStamp," ",theoreticEndTime)
+        //console.log("two times :-/",lastTimeStamp," ",theoreticEndTime)
         if (theoreticEndTime > lastTimeStamp){
-            const dif = lastTimeStamp - theoreticEndTime;
-            this.currentProgram.segments[this.status.currentSegment].duration = this.currentProgram.segments[this.status.currentSegment].duration - dif
-            console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
-
+            const dif = theoreticEndTime - lastTimeStamp;
+            this.currentProgram.segments[this.status.currentSegment-1].duration = this.currentProgram.segments[this.status.currentSegment-1].duration - dif
+           // console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment-1].duration)
+            var previousTemp= 20;
+            if (this.status.currentSegment > 1){ //we are next seg
+              previousTemp = this.currentProgram.segments[this.status.currentSegment -2].targetTemperature
+            }
+         //   console.log('      previous target temp :',previousTemp);
+            this.currentProgram.segments[this.status.currentSegment-1].slope = (this.currentProgram.segments[this.status.currentSegment-1].targetTemperature - previousTemp)/this.currentProgram.segments[this.status.currentSegment-1].duration;
+          //  console.log('      new slope :',this.currentProgram.segments[this.status.currentSegment-1].slope);
+            
            programRepository.remove(this.currentProgram.uuid,
             () => {
                 console.log("progam "+this.currentProgram.name+" removed");
@@ -249,10 +273,10 @@ class ArduinoKilnRegulator {
     for (const i in segments) {
       let segment = segments[i];
       let oldSegment = null;
+      segment.duration = Math.trunc(segment.duration); //cut under seconds :-/
       if (i > 0)
         oldSegment = segments[i-1];
       segment = this.fillSegment(segment, oldSegment);
-
       arduino.write(['segment', [
         parseInt(i),
         segment.targetTemperature,

@@ -81,7 +81,7 @@ class ArduinoMessagePack extends Arduino {
           const expectedCrc = origMsg.crc;
           const actualCrc = msg.crc;
           if (expectedCrc != actualCrc) {
-            c(null, 'Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, origMsg.msg);
+            c(null, JSON.stringify(origMsg)+'--- Arduino: CRC error, ' + expectedCrc + ' != ' + actualCrc, origMsg.msg);
             arduino.deleteFromBacklog(msg.id);
             return;
           }
