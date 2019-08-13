@@ -21,6 +21,7 @@ export default class EditProgramLineChart extends React.Component {
             dimensions: undefined,
             activePoint: null
         };
+        
     }
 
     render() {
@@ -39,7 +40,7 @@ export default class EditProgramLineChart extends React.Component {
                             message: (hoursToHoursAndMinutes(cursor.x) + " | " + this.getTemperatureFromTimeInSegments(cursor.x) + "°C"),
                             dimensions: this.state.dimensions};
                         }}
-                        onCursorChange={this.handleCursorChange.bind(this)}
+                        onCursorChange={() =>this.handleCursorChange}
                         cursorLabelComponent={<ChartCursorLabel/>}
                     />}
                 >
@@ -52,7 +53,20 @@ export default class EditProgramLineChart extends React.Component {
                     />
                     <VictoryLine
                         style={{
-                            data: { stroke: colors.PRIMARY_COLOR },
+                            parent: { border: "1px solid #ccc"},
+                            data: {
+                                stroke: "#000000"
+                              }
+                        }}
+                        data={this.props.data}
+                        x={"time"}
+                        y={"temperature"}
+                    />
+                    {this.renderFullSegments(this.props.dataFull)}
+                    <VictoryScatter
+                        style={{
+                            data: { stroke: (d) => d.isFull ? colors.PRIMARY_DARK_COLOR:colors.PRIMARY_LIGHT_COLOR, 
+                                    strokeWidth : (d) => d.isFull ? 4:0 },
                             parent: { border: "1px solid #ccc"},
                         }}
                         data={this.props.data}
@@ -63,6 +77,23 @@ export default class EditProgramLineChart extends React.Component {
                 </VictoryChart>
             </View>
         );
+    }
+
+    renderFullSegments(dataFull){
+        if (dataFull.length > 0){
+            return (<VictoryLine
+                        style={{
+                            parent: { border: "1px solid #ccc"},
+                            data: {
+                                stroke: "#FF0000"
+                                }
+                        }}
+                        data={dataFull}
+                        x={"time"}
+                        y={"temperature"}
+                    />
+            );
+        }
     }
 
     handleCursorChange(value) {

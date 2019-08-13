@@ -13,10 +13,10 @@
 exports.handler = function addProgram(req, res, next) {
   const programRepository = require('../../services/programrepository');
 
-  const keys = ['uuid', 'name', 'segments', 'lastModificationDate'];
+  const keys = ['uuid', 'name', 'segments', 'lastModificationDate', 'segmentsEditableStates'];
   for (const k in keys) {
     if (!(req.body.hasOwnProperty(keys[k]) && req.body[keys[k]] != null)) {
-      res.status(400);
+      res.status(400+keys[k]);
       res.send('Missing ' + keys[k]);
       return;
     }
@@ -54,7 +54,8 @@ exports.handler = function addProgram(req, res, next) {
         uuid: req.body.uuid,
         name: req.body.name,
         segments: req.body.segments,
-        lastModificationDate: req.body.lastModificationDate
+        lastModificationDate: req.body.lastModificationDate,
+        segmentsEditableStates:req.body.segmentsEditableStates
       }, function(err, program) {
         if (err) {
           res.status(500);

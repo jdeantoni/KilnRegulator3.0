@@ -41,37 +41,65 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
         tft.setTextColor(ST77XX_BLUE);
         tft.println(" READY ");
         tft.setTextSize(4);
+    }else if (kr.getState() == KilnState::DELAYED){
+        tft.setTextSize(2);
+	tft.setTextColor(ST77XX_RED);
+        tft.println(" DELAYED \n");
+	tft.setTextColor(ST77XX_BLACK);
+	tft.setTextSize(1);
+	tft.println("start cooking in\n");
+	tft.print("  ");
+	tft.setTextSize(2);
+	unsigned int secondesBeforeCooking = ((kr.getWakeupDate() - now()));
+	unsigned int minutesBeforeCooking = (unsigned int)(secondesBeforeCooking/60);
+	minutesBeforeCooking++;
+	tft.setTextColor(ST77XX_RED);
+	tft.print(minutesBeforeCooking);
+	tft.setTextColor(ST77XX_BLACK);
+	tft.println(" min");
+        tft.setTextSize(4);
     }else{
-        tft.setTextSize(1);
-        tft.println("");
-        tft.println("Temperature cible:");
-        tft.setTextSize(2);
-        snprintf(strbuf, 11, "%8d C", setpoint);
-        tft.println(strbuf);
-        tft.setTextSize(1);
 
-        tft.println("");
-        tft.println("Temps ecoule:");
-        tft.setTextSize(2);
-        snprintf(strbuf, 11, "%7dh%d", hours, minutes);
-        tft.println(strbuf);
-        tft.setTextSize(1);
-
-        tft.println("");
-        tft.setTextSize(2);
-        switch (elementState) {
-            case ElementState::HEATING:
-                tft.setTextColor(ST77XX_RED);
-                tft.println("  Heating");
-                break;
-            case ElementState::STALE:
-                tft.setTextColor(ST77XX_BLACK);
-                tft.println("   Stale");
-                break;
-            case ElementState::COOLING:
-                tft.setTextColor(ST77XX_BLUE);
-                tft.println("  Cooling");
-                break;
-        }
+        if(kr.getState() == KilnState::STOPPED){
+		tft.setTextSize(2);
+		tft.setTextColor(ST77XX_BLUE);
+		tft.println(" ");
+		tft.println(" cuisson");
+		tft.println(" terminee");
+	}else{
+		tft.setTextSize(1);
+		tft.println("");
+		tft.println("Temperature cible:");
+		tft.setTextSize(2);
+		snprintf(strbuf, 11, "%8d C", setpoint);
+		tft.println(strbuf);
+		tft.setTextSize(1);
+		tft.println("");
+		tft.println("Temps ecoule:");
+		tft.setTextSize(2);
+		snprintf(strbuf, 11, "%7dh%d", hours, minutes);
+		tft.println(strbuf);
+		tft.setTextSize(1);
+		tft.println("");
+		tft.setTextSize(2);
+		switch (elementState) {
+		    case ElementState::HEATING:
+			tft.setTextColor(ST77XX_RED);
+			tft.println("  chauffe");
+			if(kr.getSegmentKind() == SegmentKind::FULL){
+				tft.setTextSize(1);
+				tft.println("  a fond :)");
+			}
+			break;
+		    case ElementState::STALE:
+			tft.setTextColor(ST77XX_BLACK);
+			tft.println("  repos");
+			break;
+		    case ElementState::COOLING:
+			tft.setTextColor(ST77XX_BLUE);
+			tft.println("  refroidit");
+			break;
+		}
+	}
     }
 }

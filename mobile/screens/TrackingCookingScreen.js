@@ -6,13 +6,16 @@ import NetworkRoute from "../network/NetworkRoute";
 import {NavigationEvents} from "react-navigation";
 import TrackingLineChart from "../components/TrackingLineChart";
 import connect from "react-redux/es/connect/connect";
-import segmentsToChart from "../helpers/ChartHelper";
+import {segmentsToChart,keepOnlyFullSegments} from "../helpers/ChartHelper";
 import {estimateTimeInSecondsForAllSegments, secondsToUser} from "../helpers/UnitsHelper";
+import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
 import {COOLING, HEATING, STALE, TEMP_ORIGIN, TIME_ORIGIN, UPDATE_PROGRAMS} from "../helpers/Constants";
 import TrackingImageItem from "../components/TrackingImageItem";
 import images from "../helpers/ImageLoader";
 import TrackingTextItem from "../components/TrackingTextItem";
 import colors from "../styles/colors";
+import {prettyPrintDuration} from "../helpers/UnitsHelper"
+
 
 class TrackingCookingScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
@@ -32,21 +35,54 @@ class TrackingCookingScreen extends React.Component {
 
         this.statusApi = new StatusAPI(NetworkRoute.getInstance().getAddress());
         this.actionApi = new ActionAPI(NetworkRoute.getInstance().getAddress());
-
+        this.programApi = new ProgramsAPI(NetworkRoute.getInstance().getAddress());
         if (this.props.programs === undefined || this.props.programs.length === 0) {
-            this.getPrograms(new ProgramsAPI(NetworkRoute.getInstance().getAddress()));
+            this.getPrograms(this.programApi);
         }
 
         this.state = {
             temperature: 0.0,
             realData: [],
             theoreticData: null,
+            theoreticDataFull : null,
             elementState: STALE,
-            isStopped: false
+            isStopped: false,
+            delayDate:this.props.startDate,
+            isDelayed: false,
+            currentSegment : 0,
+            isInFullSeg : false
         };
     }
 
     render() {
+        if(this.state.isDelayed){
+            return (
+                <View style={styles.main_container}>
+                    <View style={styles.loading}>
+                        <NavigationEvents
+                            onWillFocus={() => this.onWillFocus()}
+                            onWillBlur={() => this.onWillBlur()}
+                        />
+                        <Image source={images.wait} style={{width: 150, height: 150}}/>
+                        <Text style = {styles.delay_text}>
+                        {"\n"}
+                    la cuisson est différée.{"\n"} 
+                    Elle commencera dans {"\n"}
+                    </Text>
+                    <Text style = {styles.delay_time}>
+                    {prettyPrintDuration(this.state.delayDate/60)}
+                        </Text>
+                    </View>
+                    <View style={styles.button}>
+                        <Button
+                            title={this.state.isStopped ? "Retour aux programmes" : "Arrêt"}
+                            onPress={() => this.stopButton()}
+                            color={colors.PRIMARY_COLOR}/>
+                    </View>
+                </View>
+            );     
+        }
+
         if (!this.currentProgram) {
             return (
                 <View style={styles.loading}>
@@ -60,6 +96,8 @@ class TrackingCookingScreen extends React.Component {
         }
         const {currentTemperature, remainingTime, elapsedTime, expectedTemperature, expectedTimeRemaining} = this.infoToDisplay();
 
+
+
         return (
             <View style={styles.main_container}>
                 <NavigationEvents
@@ -69,6 +107,7 @@ class TrackingCookingScreen extends React.Component {
                 <View style={styles.chart_container}>
                     <TrackingLineChart
                         theoreticData={this.state.theoreticData}
+                        theoreticDataFull = {this.state.theoreticDataFull}
                         realData={this.state.realData}/>
                 </View>
                 <View style={styles.program_name_container}>
@@ -102,6 +141,83 @@ class TrackingCookingScreen extends React.Component {
         );
     }
 
+    increaseSegmentAccordingToRealData(){
+        this.setState({isInFullSeg : true})
+        if (this.state.realData == undefined || this.state.realData == null ){
+            return
+        }
+        var lastTimeStamp = this.state.realData[this.state.realData.length-1].timestamp
+        var theoreticEndTime = this.state.theoreticData[this.state.currentSegment+1].time
+        // console.log("two times :)",lastTimeStamp," ",theoreticEndTime)
+        if (theoreticEndTime < lastTimeStamp){
+            const dif = lastTimeStamp - theoreticEndTime;
+            let array = [...this.state.theoreticData]
+            let arrayFull = [...this.state.theoreticDataFull]
+            for(var i = this.state.currentSegment+1; i < array.length; i++) {
+                array[i].time = array[i].time + dif
+                this.currentProgram.segments[i-2].duration = this.currentProgram.segments[i-2].duration + (dif/3600)
+                if (i < arrayFull.length){
+                    arrayFull[i].time = arrayFull[i].time + dif
+                }
+            }
+
+            this.setState({theoreticData: array, theoreticDataFull : arrayFull})
+            if (! this.currentProgram.name.endsWith("_M")){
+                this.currentProgram.name = this.currentProgram.name+'_M'
+            }
+            // this.programApi.editProgram(this.currentProgram.uuid, this.currentProgram)
+            // .then((response) => {
+            //     if (response.ok) {
+            //         this.props.dispatch({ type: DELETE_PROGRAM, value: this.currentProgram.uuid });
+            //         this.props.dispatch({ type: ADD_PROGRAM, value: this.currentProgram });
+            //     }
+            //     else throw new Error("HTTP response status not code 200 as expected.");
+            // })
+            // .catch((error) => {
+            //     console.log(error);
+            //     Alert.alert("Erreur", "Connexion réseau échouée");
+            // });
+        }
+    }
+
+    shrinkSegmentAccordingToRealData(){
+        this.setState({isInFullSeg : false})
+        if (this.state.realData == undefined || this.state.realData == null ){
+            return
+        }
+        var lastTimeStamp = this.state.realData[this.state.realData.length-2].timestamp //-2 to get the last sample in full seg
+        var theoreticEndTime = this.state.theoreticData[this.state.currentSegment].time //warning, no + one since we want previous seg
+        // console.log("two times :-/",lastTimeStamp," ",theoreticEndTime)
+        if (theoreticEndTime > lastTimeStamp){
+            const dif = theoreticEndTime - lastTimeStamp;
+            let array = [...this.state.theoreticData]
+            let arrayFull = [...this.state.theoreticDataFull]
+            console.log('modifies prog', this.currentProgram.segments, ' cs ', this.state.currentSegment)
+            for(var i = this.state.currentSegment; i < array.length; i++) {
+                array[i].time = array[i].time - dif
+                this.currentProgram.segments[i-1].duration = this.currentProgram.segments[i-1].duration - (dif/3600) 
+                if (i < arrayFull.length){
+                    arrayFull[i].time = arrayFull[i].time - dif
+                }
+            }
+            this.setState({theoreticData: array, theoreticDataFull : arrayFull})
+            if (! this.currentProgram.name.endsWith("_M")){
+                this.currentProgram.name = this.currentProgram.name+'_M'
+            }
+            // this.programApi.editProgram(this.currentProgram.uuid, this.currentProgram)
+            // .then((response) => {
+            //     if (response.ok) {
+            //         this.props.dispatch({ type: DELETE_PROGRAM, value: this.currentProgram.uuid });
+            //         this.props.dispatch({ type: ADD_PROGRAM, value: this.currentProgram });
+            //     }
+            //     else throw new Error("HTTP response status not code 200 as expected.");
+            // })
+            // .catch((error) => {
+            //     console.log(error);
+            //     Alert.alert("Erreur", "Connexion réseau échouée");
+            // });
+        }
+    }
 
     displayRemainingTime(remainingTime) {
         return (this.state.isStopped) ?
@@ -111,6 +227,24 @@ class TrackingCookingScreen extends React.Component {
 
     onWillFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+
+        this.statusApi.getStatus()
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            else throw new Error("HTTP response status not code 200 as expected.");
+        }).then((response) => {
+            console.log("TrackingCookingScreen.js ==> response is "+JSON.stringify(response))
+            if (response.state === "delayed"){
+                this.setState({currentSegment: response.currentSegment, isDelayed: true, delayDate: response.delay});
+
+            }else{
+                this.setState({currentSegment: response.currentSegment, isDelayed: false});
+            }
+            console.log("current segment",this.state.currentSegment)
+
+        })
 
         if (this.props.navigation.state.params !== undefined && this.props.navigation.state.params.hasOwnProperty("program")) {
             this.getCurrentCookingFromProps();
@@ -139,8 +273,10 @@ class TrackingCookingScreen extends React.Component {
                 if (response.errored) {
                     this.props.navigation.setParams({errored: response.errored});
                 }
+                console.log("received state: ",response.state)
                 if (response.state === "running" || response.state === "stopped") {
                     this.setState({
+                        currentSegment: response.currentSegment,
                         temperature: response.sample.temperature,
                         elementState: response.elementState,
                         isStopped: (response.state === "stopped"),
@@ -148,10 +284,24 @@ class TrackingCookingScreen extends React.Component {
                             [{temperature: response.sample.temperature, timestamp: response.sample.timestamp}] :
                             this.state.realData.concat({temperature: response.sample.temperature, timestamp: response.sample.timestamp})
                     });
+                    // console.log("ici")
+                    if (this.state.currentSegment != -1 && this.state.currentSegment != undefined
+                        && this.state.theoreticData != null && this.state.theoreticData != undefined
+                        && this.state.theoreticData[this.state.currentSegment+1].isFull){
+                        this.increaseSegmentAccordingToRealData();
+                    }else{
+                        if (this.state.isInFullSeg === true){ //just Moved From Full Seg
+                            this.shrinkSegmentAccordingToRealData();
+                        }
+                    }
                 } else {
                     this.setState({ temperature: response.sample.temperature });
                 }
-
+                if (response.state === "delayed"){
+                    this.setState({isDelayed: true, delayDate: response.delay});
+                }else{
+                    this.setState({isDelayed: false});
+                }
             })
             .catch((error) => {
                 console.log(error);
@@ -165,21 +315,25 @@ class TrackingCookingScreen extends React.Component {
                 if (response.ok) {
                     return response.json();
                 }
-                else throw new Error("HTTP response status not code 200 as expected.");
+                else throw new Error("HTTP response status not code 200 as expected. cooking not started yet");
             })
             .then((response) => {
-                this.startDate = new Date(response.startDate);
-                this.currentProgram = this.findProgram(response.programId);
-                this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
-
-                this.setState({
-                    theoreticData: segmentsToChart(this.currentProgram.segments),
-                    realData: response.samples
-                });
+                if (!this.state.isDelayed){
+                    this.startDate = new Date(response.startDate);
+                    this.currentProgram = this.findProgram(response.programId);
+                    this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
+                    var tData = segmentsToChart(this.currentProgram.segments)
+                    //console.log("data in tracking 2", tData)
+                    this.setState({
+                        theoreticData: tData,
+                        theoreticDataFull: keepOnlyFullSegments(tData),
+                        realData: response.samples
+                    });
+                }
             })
             .catch((error) => {
                 console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
+                // Alert.alert("Erreur", "Connexion réseau échouée");
             });
     }
 
@@ -192,9 +346,11 @@ class TrackingCookingScreen extends React.Component {
             }
         }
         this.estimatedTime = estimateTimeInSecondsForAllSegments(this.currentProgram.segments);
-
+        var tData = segmentsToChart(this.currentProgram.segments)
+        // console.log("data in tracking", tData)
         this.setState({
-            theoreticData: segmentsToChart(this.currentProgram.segments),
+            theoreticData: tData,
+            theoreticDataFull: keepOnlyFullSegments(tData),
             realData: (!Array.isArray(this.state.realData) || this.state.realData === []) ? [] : [...this.state.realData]
         });
     }
@@ -206,6 +362,7 @@ class TrackingCookingScreen extends React.Component {
                     if (response.ok) {
                         this.setState({
                             realData: [],
+                            theoreticData: null,
                             theoreticData: null,
                             elementState: STALE,
                             isStopped: false
@@ -373,6 +530,15 @@ const styles = StyleSheet.create({
     terminated_text: {
         textAlign: 'center',
         fontSize: 28
+    },
+    delay_time: {
+        color: "red",
+        textAlign: 'center',
+        fontSize: 32
+    },
+    delay_text: {
+        textAlign: 'center',
+        fontSize: 20
     },
     terminated_container: {
         flex: 1,

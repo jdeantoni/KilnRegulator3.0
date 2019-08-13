@@ -8,18 +8,18 @@ class APIClient extends ApiClient {
 
     callApi(path, httpMethod, pathParams, queryParams, collectionQueryParams, headerParams, formParams,
             bodyParam, authNames, contentTypes, accepts, returnType, callback) {
-        return fetch(this.buildUrlForCall(path, pathParams),
+        return fetch(this.buildUrlForCall(path, pathParams, queryParams),
             {
                 method: httpMethod,
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: bodyParam === null ? null : JSON.stringify(bodyParam)
+                body: bodyParam === null ? null : JSON.stringify(bodyParam),
             });
     }
 
-    buildUrlForCall(path, pathParams) {
+    buildUrlForCall(path, pathParams, queryParams) {
         if (!path.match(/^\//)) {
             path = '/' + path;
         }

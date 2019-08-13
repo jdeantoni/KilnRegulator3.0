@@ -8,8 +8,8 @@ import {ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import EditProgramLineChart from "../components/EditProgramLineChart";
 import {unitToDev, unitToUser} from "../helpers/UnitsHelper";
-import {ADD_PROGRAM, DELETE_PROGRAM} from "../helpers/Constants";
-import segmentsToChart from "../helpers/ChartHelper";
+import {ADD_PROGRAM, DELETE_PROGRAM, IS_FULL} from "../helpers/Constants";
+import {segmentsToChart,keepOnlyFullSegments} from "../helpers/ChartHelper";
 import connect from "react-redux/es/connect/connect";
 import colors from "../styles/colors";
 import images from "../helpers/ImageLoader";
@@ -48,11 +48,14 @@ class EditProgramScreen extends React.Component {
         this.state = {
             programName: (this.initProgram === undefined) ? "" : this.initProgram.name,
             segments: (this.initProgram === undefined) ? [{}] : unitToUser(this.initProgram.segments),
-            segmentsEditableState: (this.initProgram === undefined || this.initProgram.segmentsEditableStates == null) ? [true,true,true] : this.initProgram.segmentsEditableStates,
+            segmentsEditableStates: (this.initProgram === undefined || this.initProgram.segmentsEditableStates == null) ? [true,true,true] : this.initProgram.segmentsEditableStates,
         };
     }
 
     render() {
+        var computedData = segmentsToChart(this.state.segments)
+        var fullSegmentsOnly = keepOnlyFullSegments(computedData)
+        console.log("fullSeg only :", fullSegmentsOnly)
         return (
             <View style={styles.main_container} behavior="padding">
                 <NavigationEvents
@@ -60,13 +63,14 @@ class EditProgramScreen extends React.Component {
                     onWillBlur={() => this.removeBackListener()}
                 />
                 <View style={styles.graph}>
-                    <EditProgramLineChart data={segmentsToChart(this.state.segments)}/>
+                    
+                    <EditProgramLineChart data={computedData} dataFull={fullSegmentsOnly}/>
                 </View>
 
                 <View style={styles.table}>
                     <Table
                         segments={this.state.segments}
-                        segmentsEditableState={this.state.segmentsEditableState}
+                        segmentsEditableStates={this.state.segmentsEditableStates}
                         onChangeValue={this.handleChangeValue}
                         onChangeState={this.handleChangeState}
                         />
@@ -91,8 +95,8 @@ class EditProgramScreen extends React.Component {
         );
     }
 
-    handleChangeValue = e => {this.setState({segments: e}); };
-    handleChangeState = e => {this.setState({segmentsEditableState: e}); };
+    handleChangeValue = e => {this.setState({segments: e}); this.setState({segmentsEditableStates: e.dataEditableState}); };
+    handleChangeState = es => {this.setState({segmentsEditableStates: es}); };
 
     saveProgram() {
         if (!this.checkIntegrity()) {
@@ -110,8 +114,8 @@ class EditProgramScreen extends React.Component {
                             uuid: uuidv4(),
                             name: this.state.programName.trim(),
                             segments: unitToDev(this.state.segments),
-                            segmentsEditableStates: this.state.segmentsEditableStates,
-                            lastModificationDate: (new Date()).toISOString()
+                            lastModificationDate: (new Date()).toISOString(),
+                            segmentsEditableStates: this.state.segmentsEditableStates
                         };
                         if (offlineMode) {
                             if (this.initProgram !== undefined) {
@@ -121,6 +125,7 @@ class EditProgramScreen extends React.Component {
                             this.props.navigation.navigate("ChooseProgram");
                         }
                         else if (this.initProgram === undefined) {
+                            // console.log("Programme: "+newProgram.segmentsEditableStates)
                             this.programApi.addProgram(newProgram)
                                 .then((response) => {
                                     if (response.ok) {
@@ -175,12 +180,15 @@ class EditProgramScreen extends React.Component {
 
     checkSegmentIntegrity(segment, i) {
         for (let key in segment) {
+            if (key === IS_FULL){
+                continue
+            }
             if (segment[key] === "" || segment[key] === "-" || segment[key] === ".") {
                 delete segment[key];
                 continue;
             }
             if (Number.isNaN(Number.parseFloat(segment[key]))) {
-                Alert.alert("Erreur", "Les segments comportent des erreurs de syntaxe.", [{text: 'Ok', onPress: () => {}}]);
+                Alert.alert("Erreur", "Le segment "+i+" comportent des erreurs de syntaxe: "+segment[key], [{text: 'Ok', onPress: () => {}}]);
                 return false;
             }
             if (Number.parseFloat(segment[key]) !== segment[key]) {

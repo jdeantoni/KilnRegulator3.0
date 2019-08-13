@@ -9,7 +9,9 @@ import {
     Image,
     FlatList,
     AsyncStorage,
-    Text
+    Text,
+    TextInput,
+    Keyboard
 } from 'react-native';
 import {displaySimpleArrow, offlineMode} from "../helpers/NavigationHelper";
 import {ActionAPI, ProgramsAPI} from "../network/APIClient";
@@ -20,8 +22,18 @@ import {NO_PROG_SELECTED, SELECT_PROGRAM, UPDATE_PROGRAMS} from "../helpers/Cons
 import images from "../helpers/ImageLoader";
 import ProgramItem from "../components/ProgramItem";
 import colors from "../styles/colors";
+import DialogInput from 'react-native-dialog-input';
+import DateTimePicker from "react-native-modal-datetime-picker";
+import {prettyPrintDuration} from "../helpers/UnitsHelper"
+
+
 
 class ChooseProgramScreen extends React.Component {
+    state = {
+        // isCookingDialogVisible : false,
+        isCookingDatePickerDialogVisible : false,
+        chosenDelay : 0
+    };
     static navigationOptions = ({ navigation }) => ({
         title: 'Choix du programme',
         headerLeft: (navigation.state.params === undefined || navigation.state.params.headerLeft === undefined) ?
@@ -65,6 +77,7 @@ class ChooseProgramScreen extends React.Component {
                 <View style={{flex: 6}}>
                     {this.displayList()}
                 </View>
+                {this.renderDelayInput()}
                 <View style={{flex: 2} && styles.buttons}>
                     <View style={styles.button}>
                         <Button
@@ -73,8 +86,60 @@ class ChooseProgramScreen extends React.Component {
                             color={colors.PRIMARY_COLOR}/>
                     </View>
                 </View>
+              
+            
             </View>
         );
+    }
+    renderDelayInput(){
+         if (!(this.props.selectedProgram === NO_PROG_SELECTED || offlineMode)){
+        return (
+       <View style={styles.delay_zone}> 
+        <Text style={styles.delay_text}>Départ différé:</Text> 
+        <TextInput 
+            placeholder={`départ différé ?`}
+            onFocus={(e) => this.setState({isCookingDatePickerDialogVisible: true})}
+            // onChangeText={(text) => {this.changeValueInData(key, headerKey, text)}}
+            value={prettyPrintDuration(this.state.chosenDelay)}
+            maxLength={5}
+            keyboardType= "numeric"
+        />
+        <DateTimePicker
+            isVisible={this.state.isCookingDatePickerDialogVisible}
+            onConfirm={ (date) =>{ 
+                    this.setState({chosenDelay: parseFloat((date.getHours() + (date.getMinutes()/60))),
+                                    isCookingDatePickerDialogVisible :false});
+                    Keyboard.dismiss()
+                }
+            }
+            onCancel={() => {this.setState({ isCookingDatePickerDialogVisible: false }); Keyboard.dismiss()} }
+            mode = 'time'
+        />
+        </View>);
+         }
+    }
+
+    sendCookingOrder(chosenDelay){
+        // console.log("cooking delay is set to "+ Number(chosenDelay));
+        this.actionAPI.startCooking({uuid: this.props.selectedProgram, delay:Number(chosenDelay)})
+                            .then((response) => {
+                                if (response.ok) {
+                                    var date = new Date();
+                                    date.setHours(date.getHours()+Math.trunc(chosenDelay))
+                                    date.setMinutes(date.getMinutes()+Math.trunc(chosenDelay*60))
+                                    this.props.navigation.navigate("TrackingCooking", {
+                                        program: this.props.selectedProgram,
+                                        startDate: date
+                                    });
+                                } else if (response.status === 503) {
+                                    this.error503Alert();
+                                }
+                                else throw new Error("HTTP response status not code 200 as expected.");
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                Alert.alert("Erreur", "Connexion réseau échouée");
+                            })
     }
 
     onWillFocus() {
@@ -121,25 +186,12 @@ class ChooseProgramScreen extends React.Component {
     }
 
     launchCooking() {
-        Alert.alert("Démarrage de la cuisson", "Êtes-vous sûr de vouloir lancer le processus de cuisson ?",
+        // this.setState({ isCookingDialogVisible: true });
+        Alert.alert("Démarrage de la cuisson", " programmée dans "+ prettyPrintDuration(this.state.chosenDelay),
             [
                 {text: 'Annuler', onPress: () => {}, style: 'cancel'},
                 {text: 'Oui', onPress: () =>
-                        this.actionAPI.startCooking({uuid: this.props.selectedProgram})
-                            .then((response) => {
-                                if (response.ok) {
-                                    this.props.navigation.navigate("TrackingCooking", {
-                                        program: this.props.selectedProgram
-                                    });
-                                } else if (response.status === 503) {
-                                    this.error503Alert();
-                                }
-                                else throw new Error("HTTP response status not code 200 as expected.");
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                                Alert.alert("Erreur", "Connexion réseau échouée");
-                            })
+                    this.sendCookingOrder(this.state.chosenDelay)
                 },
             ]);
     }
@@ -221,7 +273,7 @@ class ChooseProgramScreen extends React.Component {
     };
 
     haveThereBeenChanges(progs1, progs2) {
-        if (progs1 === undefined || progs2 === undefined || progs1.length !== progs2.length) {
+        if (progs1 === undefined || progs1 === null ||progs2 === null || progs2 === undefined || progs1.length !== progs2.length) {
             return true;
         }
         for (let i in progs1) {
@@ -245,6 +297,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: "center",
+    },
+    delay_zone: {
+        flexDirection:'row',
+        justifyContent: 'center',
+        alignItems: "center",
+        backgroundColor : colors.PRIMARY_LIGHT_COLOR,
+        height: 25
+    },
+    delay_text: {
+        fontWeight: "bold"
     },
     no_program_text: {
         fontStyle: 'italic',

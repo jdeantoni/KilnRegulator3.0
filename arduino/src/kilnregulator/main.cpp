@@ -19,6 +19,9 @@
 #include "WatchDog.h"
 #include "LCDMonitor.h"
 
+void sendState(Stream &stream, KilnRegulator &kilnRegulator);
+
+
 #define MAX_KEY_LENGTH 31
 
 ////   Adafruit_MAX31856 maxDAC(MAXcs, MAXdi, MAXdo, MAXclk);
@@ -30,7 +33,7 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{100000}; // 10000ms sampling rate, more or less…
+Timer samplingTimer{10000}; // 10000ms sampling rate, more or less…
 
 WatchDog watchdog;
 
@@ -114,7 +117,6 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	 * CRC computation
 	 */
 	stream.resetCRC();
-
 	strcpy(key, "request");
 
 	errCode = msgpack::readArraySize(stream, arraySize);
@@ -147,20 +149,23 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		double temperature = -1;
 		double slope = -1;
 		unsigned long duration = 0;
+		bool isFull = false;
 		errCode = msgpack::readArraySize(stream, arraySize);
-		//assert arraySize == 3
+		//assert arraySize == 4
 
 		errCode = msgpack::readInt(stream, id);
 		errCode = forceReadDouble(stream, temperature);
 		errCode = forceReadDouble(stream, slope);
 		errCode = msgpack::readInt(stream, duration);
+		errCode = msgpack::readBool(stream, isFull);
 
 		//assert id >= 0 && id < MAX_SEGMENT_COUNT
 
 		program.segments[id] = {
 			.temperature = temperature,
 			.slope = slope,
-			.duration = duration
+			.duration = duration,
+			.isFull = isFull
 		};
 		program.count++;
 	}
@@ -199,7 +204,7 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
 		}
-	} else if (!strncmp(key, "setpoint", keyLength+1)) {
+	} else if (!strncmp(key, "setpoint", keyLength+1)) { //is it really used ? f so, why ?
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
@@ -217,7 +222,20 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 	} else if (!strncmp(key, "getprogram", keyLength+1)) {
 		//send current program
 	}
+	else if (!strncmp(key, "delay", keyLength+1)) {
+		kilnRegulator.setState(KilnState::DELAYED);
+		int delay = -1; //in s
+		errCode = msgpack::readInt(stream, delay);
+		if (errCode) { // not error code but success
+			errCode = kilnRegulator.setWakeupDate(delay);
+		} else {
+			errCode = ErrorCode::BAD_REQUEST;
+			goto readerror;
+		}
+	}
 	sendAck(stream, msgId, key, errCode);
+	kilnRegulator.updateState(); //update state as quick as possible for user expererience
+	sendState(streamCRC, kilnRegulator);
 	return true;
 readerror:
 	while (Serial.available()) Serial.read(); //clear input buffer
@@ -226,7 +244,7 @@ readerror:
 }
 
 void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
-	size_t mapSize = 8;
+	size_t mapSize = 9;
 
 	uint32_t timestamp = now(); // get it first because it may send a time syncronisation request
 
@@ -260,6 +278,16 @@ void sendState(Stream &stream, KilnRegulator &kilnRegulator) {
 
 	msgpack::writeString5(stream, "ts", 2); //"timestamp"
 	msgpack::writeIntU32(stream, timestamp);
+	
+	msgpack::writeString5(stream, "d", 1); //"delay"
+	if (state == KilnState::DELAYED){
+		unsigned int secondesBeforeCooking = ((kilnRegulator.getWakeupDate() - now()));
+		unsigned int minutesBeforeCooking = (unsigned int)(secondesBeforeCooking/60);
+		msgpack::writeIntU32(stream, minutesBeforeCooking);
+	}else{
+		msgpack::writeIntU32(stream, 0);
+	}
+		
 }
 
 
@@ -270,7 +298,7 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
 
 	delay(500); // wait for MAX chip to stabilize
 
@@ -285,7 +313,8 @@ void setup() {
 	kilnRegulator.init();
 	setSyncProvider(requestTime);
 	setTime(1); // important to init it to one since lastTimesyncRequest is reset to 0
-
+	kilnRegulator.updateState();
+	sendState(streamCRC, kilnRegulator);
 	samplingTimer.start(millis());
 }
 
@@ -315,5 +344,5 @@ void loop() {
 	lcdMonitor.draw(kilnRegulator);
 
 	watchdog.update();
-	delay(300);
+	delay(1000);
 }

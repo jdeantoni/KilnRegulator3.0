@@ -7,9 +7,10 @@ var programSchema = new mongoose.Schema({
   segments: [{
     targetTemperature: Number,
     slope: Number,
-    duration: Number
+    duration: Number,
+    isFull: Boolean
   }],
-  segmentEditableStates: [{type:Boolean, default: true} ],
+  segmentsEditableStates: [{type:Boolean, default: true} ],
   archived: { type: Boolean, default: false}
 });
 mongoose.model('program', programSchema);

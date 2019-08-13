@@ -14,11 +14,26 @@ void KilnRegulator::init() {
 	//pid.SetOutputLimits(0, windowSize);
 }
 
+//internal helper
+void KilnRegulator::updateCurrentSegmentKind(){
+//check is a "full heat" segment, i.e., duration and slope ==0
+	 if (currentSegment == -1){
+		 return;
+	 }
+	 
+	 if(program->segments[currentSegment].isFull){
+		 currentSegmentKind = SegmentKind::FULL;
+	 }else{
+		 currentSegmentKind = SegmentKind::NORMAL;
+	 }
+ }
+
+
 double KilnRegulator::computeSetPoint() {
 	if (program == nullptr) {
 		return -1;
 	}
-	double setPoint = 0;
+	double setPoint = 20; //default temp
 	if (currentSegmentStartDate + program->segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
 		 currentSegment++;
 		 currentSegmentStartDate = now();
@@ -61,19 +76,45 @@ void KilnRegulator::regulate() {
 	}
 	if (windowSize * output / 255  > now - windowStartTime) { // heat
 		elementState = ElementState::HEATING;
-		digitalWrite(outputPin, HIGH); //heating elment on
+		digitalWrite(outputPin, HIGH); //heating element on
 		digitalWrite(2, HIGH); //led on
 	} else { // let cool down
 		elementState = ElementState::STALE;
-		digitalWrite(outputPin, LOW); //heating element on
+		digitalWrite(outputPin, LOW); //heating element off
 		digitalWrite(2, LOW); //led off
 	}
 }
 
+void KilnRegulator::heatUntilCommandReach(){
+	setSetpoint(program->segments[currentSegment].temperature);
+	if( this->temperature >= program->segments[currentSegment].temperature){
+		//stop heating
+		digitalWrite(outputPin, LOW); //heating element off
+		digitalWrite(2, LOW); //led off
+		//move next segment
+		currentSegment++;
+		currentSegmentStartDate = now();
+		if (currentSegment >= program->count) { // finished
+			stop();
+		}
+		return;
+	}else{
+		elementState = ElementState::HEATING;
+		digitalWrite(outputPin, HIGH); //heating element on
+		digitalWrite(2, HIGH); //led on
+	}
+}
+
 void KilnRegulator::updateState() {
-	temperature = thermocouple.readThermocoupleTemperature();
-	if (/*setpoint > -1 && */state == KilnState::RUNNING)
-		regulate();
+	this->temperature = thermocouple.readThermocoupleTemperature();
+	updateCurrentSegmentKind();
+	if (state == KilnState::RUNNING){
+		if (currentSegmentKind == SegmentKind::NORMAL){
+			regulate();
+		}else{
+			heatUntilCommandReach();
+		}
+	}
 }
 
 double KilnRegulator::getTemperature() const {
@@ -82,6 +123,10 @@ double KilnRegulator::getTemperature() const {
 
 uint8_t KilnRegulator::getState() const {
 	return state;
+}
+
+void KilnRegulator::setState(uint8_t newState){
+	state = newState;
 }
 
 uint8_t KilnRegulator::getElementState() const {
@@ -98,7 +143,7 @@ unsigned long KilnRegulator::getStartDate() const {
 
 int KilnRegulator::start(const Program &program) {
 
-	if (state != KilnState::READY) {
+	if ((state != KilnState::READY) && (state != KilnState::DELAYED)) {
 		return ErrorCode::INVALID_STATE;
 	}
 	/*if (setpoint < 0) {
@@ -124,7 +169,7 @@ int KilnRegulator::start(const Program &program) {
 }
 
 int KilnRegulator::stop() {
-	if (state != KilnState::RUNNING) {
+	if (state != KilnState::RUNNING && state != KilnState::DELAYED) {
 		return ErrorCode::INVALID_STATE;
 	}
 	elementState = ElementState::STALE;
@@ -164,4 +209,17 @@ int KilnRegulator::setSetpoint(double setpoint) {
 	if (setpoint < 0 || setpoint > 2048) return ErrorCode::TEMP_OUT_OF_BOUNDS;
 	this->setpoint = setpoint;
 	return 0;
+}
+
+int KilnRegulator::setWakeupDate(int delay){
+	wakeupDate = now() + (60*delay);
+	return 0;
+}
+
+int KilnRegulator::getWakeupDate(){
+	return wakeupDate;
+}
+
+SegmentKind KilnRegulator::getSegmentKind(){
+	return currentSegmentKind;
 }

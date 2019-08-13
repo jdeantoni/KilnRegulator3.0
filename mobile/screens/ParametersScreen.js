@@ -3,7 +3,6 @@ import {View, StyleSheet, Text, FlatList, Alert} from 'react-native';
 import {displayArrow, offlineMode} from "../helpers/NavigationHelper";
 import colors from "../styles/colors";
 import {NavigationEvents} from "react-navigation";
-import NetworkRoute from "../network/NetworkRoute";
 import ColorPalette from 'react-native-color-palette';
 import {AsyncStorage} from 'react-native';
 
@@ -46,29 +45,47 @@ export default class ParametersScreen extends React.Component {
                     onChange={color => {
                         colors.PRIMARY_COLOR = color;
                         this.storeData('@colors.PRIMARY_COLOR', color)
+                        if (color === "#C0392B"){
+                            colors.PRIMARY_DARK_COLOR = '#B0291B'
+                            this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
+                            colors.PRIMARY_LIGHT_COLOR = '#D0493B'
+                            this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
+                            colors.SECONDARY_LIGHT_COLOR = '#ffbb93'
+                            this.storeData('@colors.SECONDARY_LIGHT_COLOR', colors.SECONDARY_LIGHT_COLOR)
+                        }
+                        if (color === "#419e39"){
+                            colors.PRIMARY_DARK_COLOR = '#318e29'
+                            this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
+                            colors.PRIMARY_LIGHT_COLOR = '#51Ae49'
+                            this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
+                            colors.SECONDARY_LIGHT_COLOR = '#deffdb'
+                            this.storeData('@colors.SECONDARY_LIGHT_COLOR', colors.SECONDARY_LIGHT_COLOR)
+                        }
+                        if (color === "#d18202"){
+                            colors.PRIMARY_DARK_COLOR = '#d18202'
+                            this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
+                            colors.PRIMARY_LIGHT_COLOR = '#f1A222'
+                            this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
+                        }
+                        if (color === "#8E44AD"){
+                            colors.PRIMARY_DARK_COLOR = '#7E349D'
+                            this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
+                            colors.PRIMARY_LIGHT_COLOR = '#9E54BD'
+                            this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
+                        }
+                        if (color === "#2980B9"){
+                            colors.PRIMARY_DARK_COLOR = '#1970A9'
+                            this.storeData('@colors.PRIMARY_DARK_COLOR', colors.PRIMARY_DARK_COLOR)
+                            colors.PRIMARY_LIGHT_COLOR = '#3990C9'
+                            this.storeData('@colors.PRIMARY_LIGHT_COLOR', colors.PRIMARY_LIGHT_COLOR)
+                        }
                     }}
-                     value={colors.PRIMARY_COLOR}
-                    colors={['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9']}
+                    value={colors.PRIMARY_COLOR}
+                    colors={['#C0392B', '#419e39', '#d18202', '#8E44AD', '#2980B9']}
                     title={"couleur principale"}
-                    // icon={
-                    //     <Icon name={'check-circle-o'} size={25} color={'black'} />
-                    // // React-Native-Vector-Icons Example
-                    // }
                     />
 
-                    <ColorPalette
-                    onChange={color => {
-                        colors.PRIMARY_DARK_COLOR = color;
-                        this.storeData('@colors.PRIMARY_DARK_COLOR', color)
-                    }}
-                     value={colors.PRIMARY_DARK_COLOR}
-                    colors={['#C63F34', '#EF553F', '#A35FBF', '#964FB4', '#2F89BF']}
-                    title={"couleur secondaire"}
-                    // icon={
-                    //     <Icon name={'check-circle-o'} size={25} color={'black'} />
-                    // // React-Native-Vector-Icons Example
-                    // }
-                    />
+                   
                     
               
                 </View>

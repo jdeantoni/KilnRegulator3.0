@@ -22,9 +22,9 @@ class ProgramRepository {
 
   parseMongoProgram(mProgram) {
     let segments = [];
-    let segmentEditableStates = mProgram.segmentEditableStates;
     mProgram.segments.forEach(function(mSegment) {
       let segment = {};
+      segment.isFull = mSegment.isFull;
       if (mSegment.targetTemperature != null)
         segment.targetTemperature = mSegment.targetTemperature;
       if (mSegment.slope != null)
@@ -38,7 +38,7 @@ class ProgramRepository {
       name: mProgram.name,
       lastModificationDate: mProgram.lastModificationDate,
       segments: segments,
-      segmentEditableStates
+      segmentsEditableStates: mProgram.segmentsEditableStates
     }
   }
 

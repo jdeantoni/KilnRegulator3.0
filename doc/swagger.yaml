@@ -208,7 +208,6 @@ paths:
           description: "old program not found"
         500:
           description: "internal server error (database)"
-
   /action/start:
     post:
       tags:
@@ -226,6 +225,10 @@ paths:
               type: "string"
               description: "UUID of program to start on oven"
               format: "uuid"
+            delay:
+              type: "number"
+              description: "optional time for delayed cooking, in hour"
+              format: "float"
       responses:
         200:
           description: "successful operation"
@@ -348,6 +351,12 @@ definitions:
   Status:
     type: "object"
     properties:
+      delay:
+        type: "integer"
+        format: "int32"
+      currentSegment:
+        type: "string"
+        description: "id (number) of the current segment"
       errored:
         type: "boolean"
       state:
@@ -357,6 +366,7 @@ definitions:
         - "running"
         - "stopped"
         - "error"
+        - "delayed"
       elementState:
         type: "string"
         enum:
@@ -375,6 +385,7 @@ definitions:
         - "running"
         - "stopped"
         - "error"
+        - "delayed"
       elementState:
         type: "string"
         enum:
@@ -398,9 +409,13 @@ definitions:
         description: "slope in °C/second"
         format: "float"
       duration:
-        type: "integer"
-        description: "duration in seconds"
-        format: "int64"
+        type: "number"
+        description: "duration in hours"
+        format: "float"
+      isFull:
+        type: "boolean"
+        description: "indicate if the kiln must heat as quick as possible or follow a slope"
+        format: "boolean"
   Program:
     type: "object"
     properties:
@@ -419,7 +434,7 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Segment"
-      segmentEditableStates:
+      segmentsEditableStates:
         type: "array"
         items:
           type: "boolean"
