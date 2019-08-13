@@ -1,0 +1,74 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=kilRegulator_controlerSchematic_v4_arduinoNano_pizero
+*Date=16:39:52
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;;21.6408;-25.4766;0;Bottom;Copper Fill20
+2;;;62.1329;-28.4615;0;Bottom;Hole11
+3;;SOT-23 [SMD];42.403;-30.6555;0;Top;Q3
+4;;;17.3482;-30.2645;0;Bottom;Copper Fill2
+5;;;3.45891;-4.58549;0;Bottom;Hole13
+6;;;33.4712;-16.6791;0;Bottom;Via1
+7;;;48.6445;-46.3599;180;Bottom;relay
+8;;;33.2994;-9.1063;0;Bottom;Copper Fill8
+9;;;22.4528;-55.6555;0;Bottom;Hole6
+10;;;44.45;-33.7062;0;Bottom;Copper Fill18
+11;;;41.9862;-31.6742;0;Bottom;Copper Fill31
+12;;;26.8986;-35.5731;0;Bottom;Copper Fill7
+13;;;11.8237;-4.5597;0;Bottom;Copper Fill13
+14;;;42.8117;-39.3323;0;Bottom;Copper Fill15
+15;;;33.1891;-55.4421;0;Bottom;TXT1
+16;;;29.928;-55.494;0;Bottom;TXT2
+17;;;22.255;-15.5074;0;Bottom;Hole8
+18;;;62.4528;-4.65562;0;Bottom;Hole10
+19;;;14.3637;-2.7817;0;Bottom;Copper Fill12
+20;;;28.2194;-7.7093;0;Bottom;Copper Fill10
+21;;300 mil [THT];49.2376;-33.6555;180;Bottom;D1
+22;;;62.4528;-23.6554;0;Bottom;Hole9
+23;;;58.3184;-21.5777;0;Bottom;Copper Fill26
+24;;;45.4025;-32.7791;0;Bottom;Copper Fill34
+25;;SIP (Single Inline) [THT];22.0356;-3.61069;-90;Bottom;Screen (bottom side)
+26;;;8.0518;-20.3966;0;Bottom;Copper Fill33
+27;;;31.2922;-52.6523;0;Bottom;TXT1
+28;;;23.2664;-25.4766;0;Bottom;Copper Fill21
+29;;;46.3296;-33.7062;0;Bottom;Copper Fill35
+30;;screwterminal-3.5mm-2_lock;60.963;-48.6317;-90;Bottom;JP1
+31;;;29.0576;-30.6201;0;Bottom;Copper Fill4
+32;;;24.4094;-30.4931;0;Bottom;Copper Fill3
+33;;;32.3342;-28.6389;0;Bottom;Copper Fill1
+34;;;32.766;-24.8543;0;Bottom;Copper Fill27
+35;;;28.0839;-48.7986;0;Bottom;TXT2
+36;220;THT;34.533;-39.6555;180;Bottom;R1
+37;;;46.3296;-33.7062;0;Bottom;Copper Fill19
+38;;;45.4025;-32.7791;0;Bottom;Copper Fill17
+39;;;23.2664;-25.4766;0;Bottom;Copper Fill36
+40;;;26.7462;-28.6389;0;Bottom;Copper Fill29
+41;;;7.52301;-15.5074;0;Bottom;Hole7
+42;;;34.1122;-23.5843;0;Bottom;Copper Fill28
+43;;;31.8251;-52.2579;0;Bottom;TXT2
+44;;;14.3637;-4.5597;0;Bottom;Copper Fill11
+45;;;27.94;-28.7151;0;Bottom;Copper Fill6
+46;;;35.0277;-49.6393;0;Bottom;TXT1
+47;;;42.7228;-31.6742;0;Bottom;Copper Fill32
+48;;;44.8564;-19.2282;0;Bottom;Copper Fill22
+49;;;6.4262;-20.3966;0;Bottom;Copper Fill16
+50;;;14.8889;-35.582;180;Bottom;arduino
+51;;;11.8237;-2.7817;0;Bottom;Copper Fill14
+52;;;15.6464;-2.3753;0;Bottom;Copper Fill30
+53;;;54.0049;-14.1105;90;Bottom;Max31856
+54;;;3.45891;-28.4615;0;Bottom;Hole12
+55;;;7.45302;-55.6555;0;Bottom;Hole5
+56;;;38.4302;-35.4715;0;Bottom;Copper Fill24
+57;;;46.5328;-19.2282;0;Bottom;Copper Fill23
+58;;;43.6372;-29.693;0;Bottom;Copper Fill37
+59;;;30.8864;-8.3443;0;Bottom;Copper Fill9
