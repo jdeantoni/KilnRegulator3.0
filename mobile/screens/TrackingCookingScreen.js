@@ -287,6 +287,7 @@ class TrackingCookingScreen extends React.Component {
                     // console.log("ici")
                     if (this.state.currentSegment != -1 && this.state.currentSegment != undefined
                         && this.state.theoreticData != null && this.state.theoreticData != undefined
+                        && this.state.currentSegment+1 < this.state.theoreticData.length 
                         && this.state.theoreticData[this.state.currentSegment+1].isFull){
                         this.increaseSegmentAccordingToRealData();
                     }else{
@@ -305,7 +306,7 @@ class TrackingCookingScreen extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
+                Alert.alert("Erreur", "Connexion réseau échouée: "+error);
             });
     }
 

@@ -6,7 +6,7 @@ import TrackingLineChart from "../components/TrackingLineChart";
 import {CookingsAPI, ProgramsAPI} from "../network/APIClient";
 import NetworkRoute from "../network/NetworkRoute";
 import {isoDateToUser} from "../helpers/UnitsHelper";
-import segmentsToChart from "../helpers/ChartHelper";
+import {segmentsToChart} from "../helpers/ChartHelper";
 
 export default class HistoryScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -35,11 +35,12 @@ export default class HistoryScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
+                // console.log('response get Program: '+JSON.stringify(response))
                 this.setState({theoreticData: segmentsToChart(response.segments)});
             })
             .catch((error) => {
                 console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
+                Alert.alert("Erreur", "Connexion réseau échouée : "+error);
             });
 
         (new CookingsAPI(NetworkRoute.getInstance().getAddress()))
@@ -51,11 +52,12 @@ export default class HistoryScreen extends React.Component {
                 else throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
+                // console.log("realdata: "+JSON.stringify(response))
                 this.setState({realData: response.samples});
             })
             .catch((error) => {
                 console.log(error);
-                Alert.alert("Erreur", "Connexion réseau échouée");
+                Alert.alert("Erreur", "Connexion réseau échouée2: "+error);
             });
     }
 

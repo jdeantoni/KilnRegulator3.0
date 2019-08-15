@@ -77,9 +77,9 @@ export default class Table extends React.Component {
                     isChecked={this.state.data[key][IS_FULL]}
                     leftText={""}
                 />
-                {this.renderCell(TARGET_TEMPERATURE, 500, 4, key)}
-                {this.renderDurationCell(DURATION, 6.5, 5, key)}
-                {this.renderCell(SLOPE, 100, 4, key)}
+                {this.renderCell(TARGET_TEMPERATURE,'...', 4, key)}
+                {this.renderDurationCell(DURATION, '...', 5, key)}
+                {this.renderCell(SLOPE, '...', 4, key)}
                 <View style={styles.suppr_cell}>
                     <TouchableOpacity onPress={() => this.removeSegment(key)}>
                         <Image source={images.minus} style={styles.minus}/>

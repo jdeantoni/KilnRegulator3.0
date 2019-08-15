@@ -6,6 +6,7 @@ import {
     VictoryTheme,
     VictoryAxis,
     VictoryCursorContainer,
+    VictoryZoomContainer,
     VictoryScatter,
     VictoryLabel,
     VictoryGroup
@@ -26,7 +27,7 @@ export default class TrackingLineChart extends React.Component {
     }
 
     render() {
-        if (this.state.dimensions === undefined || this.props.theoreticData == null || this.props.theoreticData.length <= 1) {
+        if (this.state.dimensions === undefined || this.props.theoreticData == null || this.props.theoreticData.length <= 1 || this.props.realData == null || this.props.realData.length <= 1) {
             return (
                 <View style={styles.loading} onLayout={this.onLayout}>
                     <Image source={images.loading} style={{width: 100, height: 100}}/>
@@ -41,15 +42,18 @@ export default class TrackingLineChart extends React.Component {
                     theme={VictoryTheme.material}
                     width={this.state.width}
                     padding={{ left: 60, top: 60, right: 20, bottom: 70 }}
-                    containerComponent={<VictoryCursorContainer
-                        cursorDimension="x"
-                        cursorLabel={cursor => { return {
-                            message: (secondsToUser(cursor.x) + " | " + this.getTemperatureFromTimeInSegments(cursor.x) + "°C"),
-                            dimensions: this.state.dimensions};
-                        }}
-                        onCursorChange={this.handleCursorChange.bind(this)}
-                        cursorLabelComponent={<ChartCursorLabel/>}
-                    />}
+                    containerComponent={
+                            <VictoryZoomContainer/>
+                    //<VictoryCursorContainer
+                    //     cursorDimension="x"
+                    //     cursorLabel={cursor => { return {
+                    //         message: (secondsToUser(cursor.x) + " | " + this.getTemperatureFromTimeRealData(cursor.x) + "°C"),
+                    //         dimensions: this.state.dimensions};
+                    //     }}
+                    //     onCursorChange={this.handleCursorChange.bind(this)}
+                    //     cursorLabelComponent={<ChartCursorLabel/>}
+                    // />
+                }
                 >
                     <VictoryAxis
                         tickFormat={(t) => secondsToUser(t)}
@@ -69,8 +73,8 @@ export default class TrackingLineChart extends React.Component {
                             y={"temperature"}
                         />
                         {this.displayRealData()}
-                        {this.renderFullSegments(this.props.theoreticDataFull)
-                        }
+                        {/* {this.renderFullSegments(this.props.realData)
+                        } */}
                        <VictoryScatter
                         style={{
                             data: { stroke: (d) => d.isFull ? colors.PRIMARY_DARK_COLOR:colors.PRIMARY_LIGHT_COLOR, 
@@ -89,6 +93,9 @@ export default class TrackingLineChart extends React.Component {
     }
 
     renderFullSegments(dataFull){
+        if (dataFull === undefined){
+            return;
+        }
         if (dataFull.length > 0){
             return (<VictoryLine
                         style={{
@@ -107,7 +114,7 @@ export default class TrackingLineChart extends React.Component {
 
     handleCursorChange(value) {
         if (value == null) return;
-        const y = this.getTemperatureFromTimeInSegments(value);
+        const y = this.getTemperatureFromTimeRealData(value);
         if (y == null) return;
 
         this.setState({
@@ -146,13 +153,16 @@ export default class TrackingLineChart extends React.Component {
         this.setState({dimensions: {width, height}});
     };
 
-    getTemperatureFromTimeInSegments(time) {
-        let i;
-        for (i = 1; i < this.props.theoreticData.length; i++) {
-            if (time < this.props.theoreticData[i].time) break;
-        }
+    getTemperatureFromTimeRealData(time) {
+        // console.log('time is: ', time)
+        if (time > (this.props.realData.length*15)){
+            return null;
+        } 
         try {
-            return Math.round(this.coeff[i].a * time + this.coeff[i].b);
+            // console.log('index = ',Math.trunc(time/15));
+            const t = this.props.realData[Math.trunc(time/15)];
+            // console.log('temp =',t );
+            return t.temperature;
         } catch {
             return null;
         }

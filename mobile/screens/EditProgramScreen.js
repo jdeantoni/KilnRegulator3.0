@@ -81,7 +81,7 @@ class EditProgramScreen extends React.Component {
                         <Text style={{flex: 1}}>Nom du programme</Text>
                         <TextInput
                             style={styles.text_input}
-                            placeholder={"Nom du programme"}
+                            placeholder={"..."}
                             onChangeText={(text) => this.setState({programName: text})}
                             value={this.state.programName}/>
                     </View>
