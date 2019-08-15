@@ -1,0 +1,1 @@
+{"version":3,"sources":["NavigationConsumer.js"],"names":["Consumer","NavigationContext"],"mappings":"mKAAA,8E,GAEQA,CAAAA,Q,CAAaC,0B,CAAbD,Q,cAEOA,Q","sourcesContent":["import NavigationContext from './NavigationContext';\n\nconst { Consumer } = NavigationContext;\n\nexport default Consumer;\n"]}

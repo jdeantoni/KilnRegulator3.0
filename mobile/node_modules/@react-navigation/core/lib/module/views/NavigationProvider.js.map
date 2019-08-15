@@ -1,0 +1,1 @@
+{"version":3,"sources":["NavigationProvider.js"],"names":["NavigationContext","Provider"],"mappings":"AAAA,MAAOA,CAAAA,iBAAP,KAA8B,qBAA9B,C,GAEQC,CAAAA,Q,CAAaD,iB,CAAbC,Q,CAER,cAAeA,CAAAA,QAAf","sourcesContent":["import NavigationContext from './NavigationContext';\n\nconst { Provider } = NavigationContext;\n\nexport default Provider;\n"]}
