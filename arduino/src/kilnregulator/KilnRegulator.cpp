@@ -33,7 +33,7 @@ double KilnRegulator::computeSetPoint() {
 	if (program == nullptr) {
 		return -1;
 	}
-	double setPoint = 20; //default temp
+	double setPoint = 35; //default temp
 	if (currentSegmentStartDate + program->segments[currentSegment].duration < now()) { // first segment time elapsed, go to next segment
 		 currentSegment++;
 		 currentSegmentStartDate = now();

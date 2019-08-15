@@ -33,7 +33,7 @@ StreamCRC streamCRC(Serial);
 
 Program program;
 
-Timer samplingTimer{10000}; // 10000ms sampling rate, more or less…
+Timer samplingTimer{15000}; // 15'000ms sampling rate, more or less…
 
 WatchDog watchdog;
 
@@ -298,7 +298,7 @@ void setup() {
 
 	thermocouple.begin();
 
-	thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+	thermocouple.setThermocoupleType(MAX31856_TCTYPE_S);
 
 	delay(500); // wait for MAX chip to stabilize
 
