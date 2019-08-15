@@ -1,6 +1,6 @@
 const images = {
     hamburger: require('../assets/menu.png'),
-    wait: require('../assets/mouton.gif'),
+    wait: require('../assets/sablier.png'),
     minus: require('../assets/garbage.png'),
     arrow: require('../assets/left_arrow.png'),
     heating: require('../assets/heating.png'),
