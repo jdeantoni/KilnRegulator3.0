@@ -12,7 +12,7 @@ class ArduinoKilnRegulator {
   constructor(dev, baudRate) {
     const akr = this;
     this.arduino = new ArduinoMessagePack(dev, baudRate);
-
+    this.counterForModulo = 0;
     this.status = {
       temperature: 0.0,
       state: "ready",
@@ -108,11 +108,13 @@ class ArduinoKilnRegulator {
       status.timestamp = timestamp;
 
       // save new segment in database
-      cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
-      
+      if (this.counterForModulo%4==0){
+        cookingRepository.addSegment(this.cooking, {timestamp: timestamp, temperature: status.temperature});
+      }
+      this.counterForModulo++;
       this.status = status;
      
-      if (status.state != "stopped"){
+      if (status.state != "stopped" || this.hasBeenExtended){
       //  console.log('////////////////////  ADJUST PROGRAM !!')
        // console.log('this.currentProgram:',this.currentProgram)
        // console.log('this.status.currentSegment', this.status.currentSegment)
@@ -160,7 +162,7 @@ class ArduinoKilnRegulator {
             const dif = lastTimeStamp - theoreticEndTime;
             this.currentProgram.segments[this.status.currentSegment].duration = this.currentProgram.segments[this.status.currentSegment].duration + dif
           //  console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment].duration)
-            var previousTemp= 20;
+            var previousTemp= 35;
             if (this.status.currentSegment > 0){
               previousTemp = this.currentProgram.segments[this.status.currentSegment -1].targetTemperature
             }
@@ -185,7 +187,7 @@ class ArduinoKilnRegulator {
             const dif = theoreticEndTime - lastTimeStamp;
             this.currentProgram.segments[this.status.currentSegment-1].duration = this.currentProgram.segments[this.status.currentSegment-1].duration - dif
            // console.log('      new duration:',this.currentProgram.segments[this.status.currentSegment-1].duration)
-            var previousTemp= 20;
+            var previousTemp= 35;
             if (this.status.currentSegment > 1){ //we are next seg
               previousTemp = this.currentProgram.segments[this.status.currentSegment -2].targetTemperature
             }
@@ -219,7 +221,7 @@ class ArduinoKilnRegulator {
 
   // if a segment is missing a parameter, try to estimate it
   fillSegment(segment, oldSegment) {
-    let oldTemperature = 20;
+    let oldTemperature = 35;
     if (oldSegment != null)
       oldTemperature = oldSegment.targetTemperature;
 
