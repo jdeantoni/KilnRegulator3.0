@@ -20,7 +20,7 @@ void KilnRegulator::updateCurrentSegmentKind(){
 	 if (currentSegment == -1){
 		 return;
 	 }
-	 
+
 	 if(program->segments[currentSegment].isFull){
 		 currentSegmentKind = SegmentKind::FULL;
 	 }else{
@@ -97,6 +97,7 @@ void KilnRegulator::heatUntilCommandReach(){
 		if (currentSegment >= program->count) { // finished
 			stop();
 		}
+		windowStartTime = millis(); //reinit the winsdows stuff blured by the max segment
 		return;
 	}else{
 		elementState = ElementState::HEATING;
