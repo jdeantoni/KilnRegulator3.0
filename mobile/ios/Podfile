@@ -28,12 +28,9 @@ target 'KilnRegulator' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'RNGestureHandler', :podspec => '../node_modules/react-native-gesture-handler/RNGestureHandler.podspec'
   pod 'RNReanimated', :podspec => '../node_modules/react-native-reanimated/RNReanimated.podspec'
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+  pod 'RNSVG', :path => '../node_modules/react-native-svg/RNSVG.podspec'
 
   use_unimodules!
 
-  pod 'RNSVG', :path => '../node_modules/react-native-svg'
-
-  target 'KilnRegulatorTests' do
-    inherit! :search_paths
-  end
 end
