@@ -52,7 +52,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
      $(lsb_release -cs) stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 sudo apt update
-sudo apt-get install docker-ce docker-compose
+sudo apt-get install docker-ce docker-compose --no-install-recommends
 sudo usermod -G docker -a pi
 
 #Watchdog
