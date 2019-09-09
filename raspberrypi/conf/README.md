@@ -3,7 +3,7 @@
 ## Setup
 
 Raspbian Lite
-(note: on pi zero w, to connect through USB do ```touch ssh``` in the boot partition, then append ```dtoverlay=dwc2``` at the end of config.txt and append ```modules-load=dwc2,g_ether``` at the end of the line in cmdline.txt)
+(note: on pi zero w, to connect through USB do ```touch ssh``` in the boot partition, then append ```dtoverlay=dwc2``` at the end of config.txt and append ```modules-load=dwc2,g_ether``` after rootwait of the line in cmdline.txt)
 
 ### Auto
 
