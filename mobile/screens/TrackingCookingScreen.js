@@ -50,7 +50,8 @@ class TrackingCookingScreen extends React.Component {
             delayDate:this.props.startDate,
             isDelayed: false,
             currentSegment : 0,
-            isInFullSeg : false
+            isInFullSeg : false,
+            cookingDuration : 1
         };
     }
 
@@ -197,7 +198,7 @@ class TrackingCookingScreen extends React.Component {
                 array[i].time = array[i].time - dif
                 this.currentProgram.segments[i-1].duration = this.currentProgram.segments[i-1].duration - (dif/3600) 
                 if (i < arrayFull.length){
-                    arrayFull[i].time = arrayFull[i].time - dif
+                    arrayFull[i].time = arrayFull[i].time - dif 
                 }
             }
             this.setState({theoreticData: array, theoreticDataFull : arrayFull})
@@ -235,14 +236,17 @@ class TrackingCookingScreen extends React.Component {
             }
             else throw new Error("HTTP response status not code 200 as expected.");
         }).then((response) => {
-            console.log("TrackingCookingScreen.js ==> response is "+JSON.stringify(response))
+            // console.log("TrackingCookingScreen.js ==> response is "+JSON.stringify(response))
             if (response.state === "delayed"){
                 this.setState({currentSegment: response.currentSegment, isDelayed: true, delayDate: response.delay});
 
             }else{
-                this.setState({currentSegment: response.currentSegment, isDelayed: false});
+                this.setState({ 
+                    cookingDuration: response.sample.timestamp,
+                    currentSegment: response.currentSegment,
+                    isDelayed: false});
             }
-            console.log("current segment",this.state.currentSegment)
+            // console.log("current segment",this.state.currentSegment)
 
         })
 
@@ -276,6 +280,7 @@ class TrackingCookingScreen extends React.Component {
                 console.log("received state: ",response.state)
                 if (response.state === "running" || response.state === "stopped") {
                     this.setState({
+                        cookingDuration: response.sample.timestamp,
                         currentSegment: response.currentSegment,
                         temperature: response.sample.temperature,
                         elementState: response.elementState,
@@ -430,7 +435,7 @@ class TrackingCookingScreen extends React.Component {
     }
 
     infoToDisplay() {
-        const elapsedTime = this.computeElapsedTime();
+        const elapsedTime = this.state.cookingDuration;//computeElapsedTime();
         const {lastPoint, nextPoint} = this.findPointsOfSegments(elapsedTime);
 
         return {
@@ -442,9 +447,16 @@ class TrackingCookingScreen extends React.Component {
         };
     }
 
-    computeElapsedTime() {
-        return (new Date() - this.startDate) / 1000;
-    }
+    // computeElapsedTime() {
+    //     if (this.state.realData == undefined || this.state.realData.length <= 1){
+    //         return 0;
+    //     }
+    //     var lastTimeStamp = this.state.realData[this.state.realData.length-1].timestamp
+    //     var firstTimeStamp = this.state.realData[0].timestamp
+    //     var dif = new Date(lastTimeStamp*1000) - new Date(firstTimeStamp*1000)
+    //     console.log("state in computedElapsedTime: ",lastTimeStamp," -- ", firstTimeStamp, " dif ", dif)
+    //     return (Math.round((dif/1000)/60));
+    // }
 
     findPointsOfSegments(elapsedTime) {
         let lastPoint;
