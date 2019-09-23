@@ -1,11 +1,8 @@
 # KilnRegulator3.0
-The objective is to provide a cheap and up to date kiln regulator based on a micro controller and a smart phone app
-Please clone with ``git clone --recursive https://github.com/jdeantoni/KilnRegulator3.0.git``
 
-## Server
+## Vous en avez marre d'acheter des régulateurs de four tout droit sortit des années 80 à un prix exhorbitant ? 
 
-See `raspberrypi/`
+## Vous avez envie de pouvoir suivre votre cuisson en temps réel ?
 
-## Client
+## Vous voulez programmer votre cuisson depuis une interface conviviale ?
 
-See `mobile/`
