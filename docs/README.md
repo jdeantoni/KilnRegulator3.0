@@ -7,10 +7,8 @@
 ## Vous avez envie de pouvoir suivre votre cuisson en temps réel ?
 <img src="picts/cuissonEnCours.jpeg"
      style="float: left; margin-right: 10px;" width=200px/>
-     
 <img src="picts/cuissonEnCours2.jpeg"
      style="float: left; margin-right: 10px;" width=200px/>
-
 <img src="picts/cuisson1.jpeg"
      style="float: left; margin-right: 10px;" width=200px/>
 ## Vous voulez programmer votre cuisson depuis une interface conviviale ?
