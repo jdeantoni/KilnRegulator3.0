@@ -188,6 +188,9 @@ bool receiveMessage(StreamCRC &stream, KilnRegulator &kilnRegulator) {
 		program.count = 0;
 		//reset cooking
 	} else if (!strncmp(key, "timesync", keyLength+1)) {
+		if (kilnRegulator.getState() == KilnState::LOADING){
+			kilnRegulator.setState(KilnState::READY);
+		}
 		if (arraySize < 2) {
 			errCode = ErrorCode::BAD_REQUEST;
 			goto readerror;
@@ -295,6 +298,7 @@ void setup() {
 	Serial.begin(115200);
 	while (!Serial) continue;
 
+	kilnRegulator.setState(KilnState::LOADING);
 
 	thermocouple.begin();
 

@@ -58,9 +58,14 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
 	tft.setTextColor(ST77XX_BLACK);
 	tft.println(" min");
         tft.setTextSize(4);
-    }else{
-
-        if(kr.getState() == KilnState::STOPPED){
+    }else if (kr.getState() == KilnState::LOADING){
+        tft.setTextSize(2);
+        tft.setTextColor(ST77XX_RED);
+        tft.println("\n  LOADING \n");
+        tft.setTextColor(ST77XX_BLACK);
+        tft.setTextSize(2);
+        tft.println("  please\n  wait...");
+    }else if(kr.getState() == KilnState::STOPPED){
 		tft.setTextSize(2);
 		tft.setTextColor(ST77XX_BLUE);
 		tft.println(" ");
@@ -101,5 +106,5 @@ void LCDMonitor::draw(const KilnRegulator &kr) {
 			break;
 		}
 	}
-    }
+    
 }

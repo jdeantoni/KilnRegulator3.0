@@ -7,7 +7,8 @@ struct KilnState {
 		RUNNING,
 		STOPPED,
 		ERROR,
-		DELAYED
+		DELAYED,
+		LOADING
 	};
 };
 #endif //_KILNSTATE_H_
