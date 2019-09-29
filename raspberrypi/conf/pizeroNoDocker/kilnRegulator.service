@@ -1,0 +1,25 @@
+[Unit]
+Description=the Kiln Regulator nodejs server
+## make sure we only start the service after network is up
+Wants=network-online.target
+After=mongodb.target
+
+[Service]
+## use 'Type=forking' if the service backgrounds itself
+## other values are Type=simple (default) and Type=oneshot
+Type=forking
+## here we can set custom environment variables
+ExecStart=/usr/local/bin/startKilnRegulatorServer.sh
+ExecStop=/usr/bin/killall -9 node
+### NOTE: you can have multiple `ExecStop` lines
+ExecStop=/usr/bin/killall npm
+Restart=always
+# don't use 'nobody' if your script needs to access user files
+# (if User is not set the service will run as root)
+User=pi
+
+# Useful during debugging; remove it once the service is working
+#StandardOutput=console
+
+[Install]
+WantedBy=multi-user.target
