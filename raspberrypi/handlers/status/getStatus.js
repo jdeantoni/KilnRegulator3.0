@@ -8,7 +8,7 @@
 exports.handler = function getStatus(req, res, next) {
   const arduino = require('../../services/arduinorepository').first();
   if (!arduino) {
-    res.status(503);
+    res.status(200);
     res.send({errored: true});
     return;
   }

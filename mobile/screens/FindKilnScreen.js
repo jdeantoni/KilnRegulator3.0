@@ -19,7 +19,8 @@ class FindKilnScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ip: "192.168.88.1:3000"
+             ip: "192.168.88.1:3000"
+            // ip: "10.42.0.26:3000"
         };
     }
 
@@ -74,19 +75,20 @@ class FindKilnScreen extends React.Component {
 
         this.statusApi.getStatus()
             .then((response) => {
+            //    console.log("response ", response)
                 if (response.ok) {
                     return response.json();
                 }
-                else throw new Error("HTTP response status not code 200 as expected.");
+                return response.json(); 
+                //throw new Error("HTTP response status not code 200 as expected.");
             })
             .then((response) => {
                 NetworkRoute.getInstance().setAddress(this.state.ip);
                 setOfflineMode(false);
-                if (response.state === "ready") {
-                    this.props.navigation.navigate("ChooseProgram");
-                }
+                if (response.state  !== null && response.state !== undefined && response.state === "running") {
+                    this.props.navigation.navigate("TrackingCooking");                }
                 else {
-                    this.props.navigation.navigate("TrackingCooking");
+                    this.props.navigation.navigate("ChooseProgram");
                 }
             })
             .catch((error) => {

@@ -3,6 +3,7 @@
 ## Setup
 
 Raspbian Lite
+(note: on pi zero w, to connect through USB do ```touch ssh``` in the boot partition, then append ```dtoverlay=dwc2``` at the end of config.txt and append ```modules-load=dwc2,g_ether``` after rootwait of the line in cmdline.txt)
 
 ### Auto
 
@@ -51,7 +52,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
      $(lsb_release -cs) stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 sudo apt update
-sudo apt-get install docker-ce docker-compose
+sudo apt-get install docker-ce docker-compose --no-install-recommends
 sudo usermod -G docker -a pi
 
 #Watchdog

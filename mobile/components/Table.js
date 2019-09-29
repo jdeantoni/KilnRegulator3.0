@@ -23,7 +23,7 @@ export default class Table extends React.Component {
         
         var falseArray = Array(this.state.data.length).fill(false);
         falseArray[index] = true;
-        console.log(index,"farray= ", falseArray, "val ", falseArray[index])
+      //  console.log(index,"farray= ", falseArray, "val ", falseArray[index])
         this.setState( {isDateTimePickerVisible:falseArray});
       };
      
@@ -72,7 +72,7 @@ export default class Table extends React.Component {
                     style={{flex: 1, padding: 10}}
                     onClick={() => {
                         this.changeValueInData(key, IS_FULL, !this.state.data[key][IS_FULL]);
-                        console.log("press: ",this.state.data[key][IS_FULL]);
+                      //  console.log("press: ",this.state.data[key][IS_FULL]);
                      }}
                     isChecked={this.state.data[key][IS_FULL]}
                     leftText={""}
@@ -132,6 +132,7 @@ export default class Table extends React.Component {
                 // date= {new Date("2019-08-7T06:00:00.000Z")}
                 onCancel={this.hideDateTimePicker}
                 mode = 'time'
+                is24Hour = {true}
             />
             </View>
         );
@@ -199,14 +200,14 @@ export default class Table extends React.Component {
             }
             array[rowId][SLOPE] = 250; 
             array[rowId][DURATION] = ((array[rowId][TARGET_TEMPERATURE] - this.getTargetTempOfRow(rowId-1))/array[rowId][SLOPE])
-            console.log("duration : ", array[rowId][DURATION], ' ', this.getTargetTempOfRow(rowId-1), ' ', array[rowId][TARGET_TEMPERATURE])
+           // console.log("duration : ", array[rowId][DURATION], ' ', this.getTargetTempOfRow(rowId-1), ' ', array[rowId][TARGET_TEMPERATURE])
             editArray[this.giveEditableStateIndex(rowId,SLOPE)] = false;
             editArray[this.giveEditableStateIndex(rowId,DURATION)] = false;
 
         }
         //unfull
         if (headerKey === IS_FULL &&  value === false ){
-            console.log("unfull...")
+          //  console.log("unfull...")
             array[rowId][SLOPE] = undefined; 
             array[rowId][DURATION] = undefined;
             editArray[this.giveEditableStateIndex(rowId,SLOPE)] = true;
@@ -281,7 +282,7 @@ export default class Table extends React.Component {
         //     console.log("modified slope: ",array[rowId][SLOPE] )
         // }
         array[rowId][headerKey] = value;
-        console.log("enf of changeValueInData: ", JSON.stringify(array[rowId]));
+       // console.log("enf of changeValueInData: ", JSON.stringify(array[rowId]));
         this.setState({data: array});
         this.setState({dataEditableState: editArray})
         this.props.onChangeValue(array);
