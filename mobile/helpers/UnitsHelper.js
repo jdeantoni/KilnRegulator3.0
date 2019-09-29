@@ -18,7 +18,7 @@ export function prettyPrintDuration(fhour){
 
 export function unitToUser(segments) {
     if (segments === null) return null;
-    console.log("unitToUser() ... segments", JSON.stringify(segments))
+   // console.log("unitToUser() ... segments", JSON.stringify(segments))
     let newSegments = JSON.parse(JSON.stringify(segments));
 
     for (let i in segments) {
@@ -39,7 +39,7 @@ export function unitToUser(segments) {
  */
 export function unitToDev(segments) {
     if (segments === null) return null;
-    console.log("unitToDev() ... segments", JSON.stringify(segments))
+   // console.log("unitToDev() ... segments", JSON.stringify(segments))
     let newSegments = JSON.parse(JSON.stringify(segments));
     for (let i in newSegments) {
         if (segments[i].hasOwnProperty(DURATION)) {

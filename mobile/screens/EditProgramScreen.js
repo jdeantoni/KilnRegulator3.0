@@ -55,7 +55,7 @@ class EditProgramScreen extends React.Component {
     render() {
         var computedData = segmentsToChart(this.state.segments)
         var fullSegmentsOnly = keepOnlyFullSegments(computedData)
-        console.log("fullSeg only :", fullSegmentsOnly)
+       // console.log("fullSeg only :", fullSegmentsOnly)
         return (
             <View style={styles.main_container} behavior="padding">
                 <NavigationEvents

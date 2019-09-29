@@ -88,6 +88,7 @@ export default class ErrorsScreen extends React.Component {
     eraseErrors() {
         this.errorsApi.clearError()
             .then((response) => {
+              //  console.log("response", response)
                 if (response.ok) {
                     this.setState({errors: []});
                 }

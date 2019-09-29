@@ -2,6 +2,10 @@
   "name": "kiln-regulator",
   "private": true,
   "scripts": {
+    "start-web": "react-scripts start",
+    "build-web": "react-scripts build",
+    "test-web": "react-scripts test --env=jsdom",
+    "eject-web": "react-scripts eject",
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios"
@@ -12,19 +16,22 @@
     "querystring": "^0.2.0",
     "react": "16.8.3",
     "react-dom": "^16.9.0",
-    "react-native": "0.59.8",
+    "react-native": "0.59.10",
     "react-native-check-box": "^2.1.7",
     "react-native-color-palette": "^2.0.3",
     "react-native-dialog-input": "^1.0.7",
     "react-native-gesture-handler": "^1.3.0",
     "react-native-modal-datetime-picker": "^7.5.0",
     "react-native-reanimated": "^1.1.0",
+    "react-native-screens": "1.0.0-alpha.22",
+    "react-native-scripts": "^2.0.1",
     "react-native-settings-list": "^1.8.0",
-    "react-native-svg": "^9.6.2",
+    "react-native-svg": "^9.9.4",
     "react-native-unimodules": "~0.5.2",
-    "react-native-web": "^0.11.6",
+    "react-native-web": "^0.11.7",
     "react-navigation": "^3.11.1",
     "react-redux": "^5.1.1",
+    "react-scripts": "^3.1.1",
     "redux": "^4.0.1",
     "superagent": "^4.0.0",
     "uuid": "latest",
@@ -32,5 +39,17 @@
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
