@@ -15,3 +15,6 @@ Ce projet a été initié par Julien Deantoni et deux ingénieurs (étudiants à
 L'idée de départ est de mettre au gout du jour les technologies obsolètes utilisées par la majorité des vendeurs de programmateurs de fours céramiques. Nous proposons donc un régulateur qui se branche sur les prises classiques des fours de type ceradel ou solargil et qui communique avec une application permettant de programmer le four et de voir le suivi de cuisson; le tout pour un prix de revient autour de 70€ (et quelques heures de travail) si vous fabriquez tout vous même.
 
 
+Une video explicatif du projet initial se trouve ici: https://youtu.be/vaViCxbbG_A
+Noter que le boitié à bien évolué depuis ;):
+!["le régulateur"](picts/regulator_v0.9_small.jpg)
