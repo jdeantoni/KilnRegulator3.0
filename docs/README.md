@@ -16,5 +16,7 @@ L'idée de départ est de mettre au gout du jour les technologies obsolètes uti
 
 
 Une video explicatif du projet initial se trouve ici: https://youtu.be/vaViCxbbG_A
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vaViCxbbG_A" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 Noter que le boitié à bien évolué depuis ;):
 !["le régulateur"](picts/regulator_v0.9_small.jpg)
