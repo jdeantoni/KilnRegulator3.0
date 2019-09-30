@@ -20,7 +20,10 @@ L'idée de départ est de mettre au gout du jour les technologies obsolètes uti
 
 
 
-### Noter que le boitié à bien évolué depuis ;):
+### Notez que le boitié à bien évolué depuis ;):
 
 
 !["le régulateur"](picts/regulator_v0.9_small.jpg)
+
+
+Envie d'en savoir plus ? Contactez moi: julien  _._  deantoni   \at/   gmail   _._    com 
