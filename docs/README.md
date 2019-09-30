@@ -1,7 +1,7 @@
 # KilnRegulator3.0
 
 ## Vous en avez marre d'acheter des régulateurs de four tout droit sortit des années 80 à un prix exhorbitant ? 
-!["les régulateurs actuels !"](./picts/NoMoreOldKilnRegulator.jpg)
+[!["les régulateurs actuels !"](./picts/NoMoreOldKilnRegulator_small.jpg)](./picts/NoMoreOldKilnRegulator.jpg)
 ## Vous avez envie de pouvoir suivre votre cuisson en temps réel ?
 <img src="picts/cuissonEnCours.jpeg"
      style="float: left; margin-right: 10px;" width=200px/>
