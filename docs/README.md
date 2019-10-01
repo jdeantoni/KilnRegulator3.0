@@ -22,7 +22,7 @@ Nous proposons donc un régulateur qui se branche sur les prises classiques des 
 
 
 
-**Notez que le boitié à bien évolué depuis ;)**:
+**Notez que le boîtier à bien évolué depuis ;)**:
 
 
 !["le régulateur"](picts/regulator_v0.9_small.jpg)
