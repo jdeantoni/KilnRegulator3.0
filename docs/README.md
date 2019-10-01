@@ -11,7 +11,7 @@
 
 ### c'est possible grâce au projet [open source KilnRegulator3.0](https://github.com/jdeantoni/KilnRegulator3.0)
 
-Ce projet a été initié par Julien Deantoni et deux ingénieurs (étudiants à l'époque): Guillaume Cassagrande et Pierre Emmanuel Novac.
+Ce projet a été initié par Julien Deantoni et deux ingénieurs (étudiants à l'époque): Guillaume Casagrande et Pierre Emmanuel Novac.
 L'idée de départ est de mettre au gout du jour les technologies obsolètes utilisées par la majorité des vendeurs de programmateurs de fours céramiques.
 
 Nous proposons donc un régulateur qui se branche sur les prises classiques des fours de type ceradel ou solargil et qui communique avec une application smartphone (android ou ios) permettant de programmer le four et de voir le suivi de cuisson; le tout pour un prix de revient autour de 70€ environ (et quelques heures de travail) si vous fabriquez tout vous même.
