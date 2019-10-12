@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,7 +11,7 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		D9F7538C653CCBAFD29FB504 /* libPods-KilnRegulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BA69136D3D53AA851C8A827 /* libPods-KilnRegulator.a */; };
+		9F2E45DCBA82A6A4FDD265B1 /* libPods-KilnRegulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B093E1A89E5E0E5320D7317 /* libPods-KilnRegulator.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,10 +23,10 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = KilnRegulator/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = KilnRegulator/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = KilnRegulator/main.m; sourceTree = "<group>"; };
+		1A251E6025DD200E50C5EE22 /* Pods-KilnRegulator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KilnRegulator.debug.xcconfig"; path = "Target Support Files/Pods-KilnRegulator/Pods-KilnRegulator.debug.xcconfig"; sourceTree = "<group>"; };
+		2B093E1A89E5E0E5320D7317 /* libPods-KilnRegulator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KilnRegulator.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BA69136D3D53AA851C8A827 /* libPods-KilnRegulator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KilnRegulator.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5122526A53A8F2587B8F3C9F /* Pods-KilnRegulator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KilnRegulator.debug.xcconfig"; path = "Target Support Files/Pods-KilnRegulator/Pods-KilnRegulator.debug.xcconfig"; sourceTree = "<group>"; };
-		C60EE0989E93D6DD486786FC /* Pods-KilnRegulator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KilnRegulator.release.xcconfig"; path = "Target Support Files/Pods-KilnRegulator/Pods-KilnRegulator.release.xcconfig"; sourceTree = "<group>"; };
+		465A24F09F7781CF5A1073B0 /* Pods-KilnRegulator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KilnRegulator.release.xcconfig"; path = "Target Support Files/Pods-KilnRegulator/Pods-KilnRegulator.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -36,7 +36,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9F7538C653CCBAFD29FB504 /* libPods-KilnRegulator.a in Frameworks */,
+				9F2E45DCBA82A6A4FDD265B1 /* libPods-KilnRegulator.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,19 +63,9 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				3BA69136D3D53AA851C8A827 /* libPods-KilnRegulator.a */,
+				2B093E1A89E5E0E5320D7317 /* libPods-KilnRegulator.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		80F104C4016698F1DB1AAEF0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				5122526A53A8F2587B8F3C9F /* Pods-KilnRegulator.debug.xcconfig */,
-				C60EE0989E93D6DD486786FC /* Pods-KilnRegulator.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -92,7 +82,7 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				80F104C4016698F1DB1AAEF0 /* Pods */,
+				EE95E8BF3D523D1AE6D5A96C /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -107,6 +97,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EE95E8BF3D523D1AE6D5A96C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1A251E6025DD200E50C5EE22 /* Pods-KilnRegulator.debug.xcconfig */,
+				465A24F09F7781CF5A1073B0 /* Pods-KilnRegulator.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -114,7 +113,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "KilnRegulator" */;
 			buildPhases = (
-				2E727C4E8E55EE30AA96F315 /* [CP] Check Pods Manifest.lock */,
+				C6965BEBB90E751D92404309 /* [CP] Check Pods Manifest.lock */,
 				FD4C38642228810C00325AF5 /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
@@ -137,19 +136,14 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = Facebook;
-				TargetAttributes = {
-					00E356ED1AD99517003FC87E = {
-						CreatedOnToolsVersion = 6.2;
-						TestTargetID = 13B07F861A680F5B00A75B9A;
-					};
-				};
+				ORGANIZATIONNAME = DANThOmemade;
 			};
 			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "KilnRegulator" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -190,7 +184,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		2E727C4E8E55EE30AA96F315 /* [CP] Check Pods Manifest.lock */ = {
+		C6965BEBB90E751D92404309 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -260,13 +254,17 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5122526A53A8F2587B8F3C9F /* Pods-KilnRegulator.debug.xcconfig */;
+			baseConfigurationReference = 1A251E6025DD200E50C5EE22 /* Pods-KilnRegulator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = S5346345R8;
 				INFOPLIST_FILE = KilnRegulator/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -280,12 +278,16 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C60EE0989E93D6DD486786FC /* Pods-KilnRegulator.release.xcconfig */;
+			baseConfigurationReference = 465A24F09F7781CF5A1073B0 /* Pods-KilnRegulator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S5346345R8;
 				INFOPLIST_FILE = KilnRegulator/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

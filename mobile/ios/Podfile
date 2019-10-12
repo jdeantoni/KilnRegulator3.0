@@ -29,7 +29,6 @@ target 'KilnRegulator' do
   pod 'RNGestureHandler', :podspec => '../node_modules/react-native-gesture-handler/RNGestureHandler.podspec'
   pod 'RNReanimated', :podspec => '../node_modules/react-native-reanimated/RNReanimated.podspec'
   pod 'RNScreens', :path => '../node_modules/react-native-screens'
-  pod 'RNSVG', :path => '../node_modules/react-native-svg/RNSVG.podspec'
 
   use_unimodules!
 
