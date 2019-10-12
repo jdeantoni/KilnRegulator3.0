@@ -13,6 +13,7 @@ import {segmentsToChart,keepOnlyFullSegments} from "../helpers/ChartHelper";
 import connect from "react-redux/es/connect/connect";
 import colors from "../styles/colors";
 import images from "../helpers/ImageLoader";
+import {KeyboardAvoidingView} from 'react-native';
 
 class EditProgramScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
@@ -57,7 +58,8 @@ class EditProgramScreen extends React.Component {
         var fullSegmentsOnly = keepOnlyFullSegments(computedData)
         console.log("fullSeg only :", fullSegmentsOnly)
         return (
-            <View style={styles.main_container} behavior="padding">
+<KeyboardAvoidingView style={styles.main_container} behavior="padding" enabled>
+
                 <NavigationEvents
                     onWillFocus={() => this.addBackListener()}
                     onWillBlur={() => this.removeBackListener()}
@@ -91,7 +93,7 @@ class EditProgramScreen extends React.Component {
                         onPress={() => this.saveProgram()}
                         color={colors.PRIMARY_COLOR}/>
                 </View>
-            </View>
+</KeyboardAvoidingView>
         );
     }
 

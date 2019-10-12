@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "expo": "^34.0.4",
+    "expo-cli": "^3.1.2",
     "glog": "^1.7.0",
     "jest-serializer": "^23.0.1",
     "querystring": "^0.2.0",
@@ -22,7 +23,7 @@
     "react-native-reanimated": "^1.1.0",
     "react-native-screens": "1.0.0-alpha.22",
     "react-native-settings-list": "^1.8.0",
-    "react-native-svg": "^9.8.4",
+    "react-native-svg": "^9.9.8",
     "react-native-unimodules": "~0.5.2",
     "react-native-web": "^0.11.6",
     "react-navigation": "^3.11.1",
