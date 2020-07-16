@@ -12,7 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 
-const arduinoRepository = require('./services/arduinorepository');
+//const arduinoRepository = require('./services/arduinorepository');
 
 const app = express();
 

@@ -7,16 +7,16 @@
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
+    "crc": "3.8.0",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "mongoose": "^5.9.23",
     "morgan": "~1.9.0",
-    "mongoose": "~5.3.1",
-    "swagger-routes": "~1.7.0",
-    "swagger-ui-express": "~4.0.1",
     "msgpack5": "~4.2.1",
     "serialport": "~7.0.2",
-    "yamljs": "~0.3.0",
-    "crc": "3.8.0",
-    "uuid": "3.3.2"
+    "swagger-routes": "~1.7.0",
+    "swagger-ui-express": "~4.0.1",
+    "uuid": "3.3.2",
+    "yamljs": "~0.3.0"
   }
 }

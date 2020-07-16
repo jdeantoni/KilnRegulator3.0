@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="assets/picts/icon.png">
+
+    <title>Kiln Regulator 3.0</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles from the template -->
+    <link href="assets/css/dashboard.css" rel="stylesheet">
+    <link href="assets/css/kilnRegulator.css" rel="stylesheet">
+   
+
+    <!-- Graphs -->
+    <script src="assets/js/moment-with-locales.min.js"></script>
+    <script src="assets/js/Chart.min.js"></script>
+
+    <script src="assets/js/jquery-1.10.2.min.js">
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.bootstrap-growl.min.js"></script>
+    
+
+    <!--  the main control flow manager-->
+    <script src="assets/js/navigation.flow.js" type="module"></script>
+
+  </head>
+
+  <body>
+   <!-- <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Kiln Regulator</a>
+    </nav>
+   -->
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a id="homeButton" class="nav-link active" href="javascript:void(0);">
+                  <span data-feather="home"></span>
+                  Home <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item" id="currentCookingMenu">
+                <a id="currentCookingButton" class="nav-link" href="javascript:void(0);">
+                  <span data-feather="activity"></span>
+                  Current Cooking
+                </a>
+              </li>
+              <li class="nav-item">
+                <a id="programsButton" class="nav-link" href="javascript:void(0);">
+                  <span data-feather="folder-plus"></span>
+                  Programs
+                </a>
+              </li>
+              <li class="nav-item">
+                <a id="cookingHistoryButton" class="nav-link" href="javascript:void(0);">
+                  <span data-feather="archive"></span>
+                  Cooking History
+                </a>
+              </li>
+              <li class="nav-item">
+                <a id="settingsButton" class="nav-link" href="javascript:void(0);">
+                  <span data-feather="settings"></span>
+                  Settings
+                </a>
+              </li>
+          </div>
+        </nav>
+
+        <div id="home" class="container">
+            <h1 class="h2 col-sm text-center"> welcome to Kiln Regulator 3.0 </h1>
+            <div class="h2 col-sm border text-center rounded">
+                the kiln temperature is &nbsp;<span id="actualKilnTemp" class="font-weight-bold"></span> &nbsp; °C
+            </div>
+        </div>
+
+
+        <main id="programs" role="main" class="col-md-10 ml-sm-auto col-lg-10 pt-3 px-4">
+
+          <!--<div class="d-flex  flex-wrap flex-md-nowrap align-items-center border-bottom">
+           <div class="d-flex flew-wrap"> <h3 class="h3">Temperature Graph</h3> </div>-->
+           <div class="btn-toolbar justify-content-between" id="programsToolbar">
+             <div class="btn-group">
+              <select id="programList" class="mdb-select md-form">
+                  <option value="" disabled selected>Choose your program</option>
+              </select>
+              </div>
+            <div class="btn-group">
+              <button id="saveButton" class="btn btn-sm btn-outline-info">
+                  <span data-feather="save"></span>
+                    Save
+              </button>
+              &nbsp;
+              <button id="saveAsButton" class="btn btn-sm btn-outline-info">
+                  <span data-feather="save"></span>
+                    Save as
+              </button>
+            </div>
+            <div class="btn-group">
+              <button id="deleteProgramButton" class="btn btn-sm btn-warning">
+                  <span data-feather="trash"></span>
+                    Delete
+              </button>
+             </div>
+
+              <div id="startStopButtons" class="btn-group">
+                <button id="startCookingButton" class="btn btn-sm btn-outline-danger">
+                    <span data-feather="play-circle"></span>
+                    Start
+                </button>
+                &nbsp;
+                <button id="delayedCookingButton" class="btn btn-sm btn-outline-danger">
+                    <span data-feather="clock"></span>
+                    Delayed Cooking
+                </button>
+                &nbsp;
+                <button id="stopCookingButton" class="btn btn-sm btn-danger">
+                    <span data-feather="stop-circle"></span>
+                    Stop
+                </button>
+
+              </div>
+              
+            </div> 
+
+          <canvas class="my-4" id="temperatureChart" width="900" height="380"></canvas>
+
+          
+          <div id="graphData" class="table-responsive">
+          <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-8"><h2>Segments</b></h2></div>
+                    <div class="col-sm-4">
+                      <a id="addNewRowButton" class="nav-link" href="javascript:void(0);" tooltip="add a new segment">Add Segment <span data-feather="plus">add</span></a>
+                    </div>
+                </div>
+            </div>
+            <table id="graphDataTable" class="table table-sm">
+              <thead class="thead-light">
+                <tr>
+                  <th>#</th>
+                  <th>max ?</th>
+                  <th>Target Temperature</th>
+                  <th>Duration</th>
+                  <th>Slope</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+               
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="assets/js/popper.min.js"></script>
+
+    <!-- Icons -->
+    <script src="assets/js/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+
+   
+  </body>
+</html>
