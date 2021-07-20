@@ -16,7 +16,7 @@
     "querystring": "^0.2.0",
     "react": "16.8.3",
     "react-dom": "^16.9.0",
-    "react-native": "0.59.10",
+    "react-native": "0.62.3",
     "react-native-check-box": "^2.1.7",
     "react-native-color-palette": "^2.0.3",
     "react-native-dialog-input": "^1.0.7",
